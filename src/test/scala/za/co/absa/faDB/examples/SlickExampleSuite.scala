@@ -1,7 +1,7 @@
 package za.co.absa.faDB.examples
 
 import org.scalatest.funsuite.AnyFunSuite
-import za.co.absa.dbViaProcedures.SlickExample
+import za.co.absa.faDB.examples.SlickExample
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration

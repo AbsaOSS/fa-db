@@ -13,9 +13,8 @@
  * limitations under the License.
  */
 
-ThisBuild / organization := "za.co.absa"
 ThisBuild / name         := "fa-db"
-
+ThisBuild / organization := "za.co.absa"
 
 lazy val scala211 = "2.11.12"
 lazy val scala212 = "2.12.12"
@@ -35,10 +34,12 @@ libraryDependencies ++=  List(
   "com.typesafe.slick"  %% "slick"            % "3.3.3",
   "org.slf4j"            % "slf4j-nop"        % "1.6.4",
   "com.typesafe.slick"  %% "slick-hikaricp"   % "3.3.3",
-  "org.postgresql"       % "postgresql"       % "9.4-1206-jdbc42",
-
-  "io.github.finagle"   %% "finagle-postgres" % "0.13.0",
+//  "org.postgresql"       % "postgresql"       % "9.4-1206-jdbc42",
+//
+//  "io.github.finagle"   %% "finagle-postgres" % "0.13.0",
 
   "org.scalatest"       %% "scalatest"        % "3.2.9"  % Test,
   "org.scalamock"       %% "scalamock"        % "5.1.0"  % Test
 )
+
+releasePublishArtifactsAction := PgpKeys.publishSigned.value

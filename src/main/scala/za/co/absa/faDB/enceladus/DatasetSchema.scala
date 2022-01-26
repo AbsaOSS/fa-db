@@ -13,21 +13,24 @@
  * limitations under the License.
  */
 
-package package za.co.absa.faDB.enceladus
+package za.co.absa.faDB.enceladus
 
 import slick.dbio.{DBIOAction, NoStream}
 import slick.jdbc.GetResult
-import za.co.absa.dbViaProcedures.DBFunction.{DBSetFunction, DBValueFunction}
-import za.co.absa.dbViaProcedures.enceladus.DatasetSchema.{AddSchema, GetSchema, ListSchemas}
-import za.co.absa.dbViaProcedures.{DBFailException, DBSchema, DBSession}
+import za.co.absa.faDB.DBFunction.{DBSetFunction, DBValueFunction}
+import za.co.absa.faDB.enceladus.DatasetSchema.{AddSchema, GetSchema, ListSchemas}
+import za.co.absa.faDB.{DBSchema, DBSession}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import slick.jdbc.PostgresProfile.api._
 import slick.sql.SqlStreamingAction
+import za.co.absa.faDB.exceptions.DBFailException
 
 import java.sql.Timestamp
-import scala.util.Failure
+
+import za.co.absa.faDB.namingConventions.SnakeCaseNaming._
+
 
 class DatasetSchema(session: DBSession) extends DBSchema(session) {
   private val db = Database.forConfig(session.connection)

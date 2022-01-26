@@ -13,6 +13,6 @@
  * limitations under the License.
  */
 
-package package za.co.absa.faDB
+package za.co.absa.faDB
 
 class DBSession(val connection: String)

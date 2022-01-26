@@ -16,9 +16,9 @@
 package za.co.absa.faDB
 
 import org.scalatest.funsuite.AnyFunSuite
+import za.co.absa.faDB.namingConventions.SnakeCaseNaming._
 
 class DBSchemaSuite extends AnyFunSuite {
-
 
   test("schema name default") {
     val session = new DBSession("")

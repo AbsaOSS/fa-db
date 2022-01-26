@@ -13,9 +13,18 @@
  * limitations under the License.
  */
 
-package package za.co.absa.faDB
+package za.co.absa.faDB.namingConventions
 
-trait NameTransformer {
+import za.co.absa.faDB.exceptions.NamingException
 
-  def transformString(s: String): String
+class ExplicitNamingRequired extends NamingConvention {
+  override def stringPerConvention(original: String): String = {
+    val message = s"No convention for '$original', explicit naming required."
+    throw NamingException(message)
+  }
+}
+
+object ExplicitNamingRequired {
+  implicit val namingConvention: NamingConvention = new ExplicitNamingRequired()
+
 }

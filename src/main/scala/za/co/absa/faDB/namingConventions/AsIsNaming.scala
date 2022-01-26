@@ -13,16 +13,17 @@
  * limitations under the License.
  */
 
-package package za.co.absa.faDB
+package za.co.absa.faDB.namingConventions
 
-import slick.dbio.Effect
-import slick.jdbc.{GetResult, SQLActionBuilder}
-import slick.sql.SqlStreamingAction
+import za.co.absa.faDB.namingConventions.lettersCase.LettersCase
+import za.co.absa.faDB.namingConventions.lettersCase.LettersCase.AsIs
 
-object SQLActionBuilderImplicits {
-  implicit class SQLActionBuilderEnhancements(sqlActionBuilder: SQLActionBuilder) {
-    def ifStatusIs200As[R](implicit rconv: GetResult[R]): SqlStreamingAction[Vector[R], R, Effect] = {
-      ???
-    }
+class AsIsNaming(lettersCase: LettersCase) extends NamingConvention{
+  override def stringPerConvention(original: String): String = {
+    lettersCase.convert(original)
   }
+}
+
+object AsIsNaming {
+  implicit val namingConvention: NamingConvention = new AsIsNaming(AsIs)
 }

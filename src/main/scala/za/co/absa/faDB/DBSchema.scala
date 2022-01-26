@@ -13,10 +13,17 @@
  * limitations under the License.
  */
 
-package package za.co.absa.faDB
+package za.co.absa.faDB
 
-abstract class DBSchema(val session: DBSession, schemaNameOverride: Option[String] = None) extends  DBBase {
+import za.co.absa.faDB.namingConventions.NamingConvention
 
-  val schemaName: String = schemaNameOverride.getOrElse(objectNameFromClassName)
+abstract class DBSchema(val session: DBSession, schemaNameOverride: Option[String] = None)
+                       (implicit namingConvention: NamingConvention) {
+
+  def objectNameFromClassName(c: Class[_]): String = {
+    namingConvention.fromClassNamePerConvention(c)
+  }
+
+  val schemaName: String = schemaNameOverride.getOrElse(objectNameFromClassName(getClass))
 
 }

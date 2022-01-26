@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package package za.co.absa.faDB.enceladus
+package za.co.absa.faDB.enceladus
 
 case class DBCallStatus(status: Long, statusText: String)
 

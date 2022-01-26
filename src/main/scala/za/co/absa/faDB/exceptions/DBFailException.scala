@@ -1,6 +1,5 @@
-
 /*
- * Copyright 2019 ABSA Group Limited
+ * Copyright 2022 ABSA Group Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +13,6 @@
  * limitations under the License.
  */
 
-addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.6.0")
-addSbtPlugin("com.github.sbt" % "sbt-release" % "1.1.0")
-addSbtPlugin("com.github.sbt" % "sbt-pgp" % "2.1.2")
+package za.co.absa.faDB.exceptions
+
+case class DBFailException(status: Int, message: String) extends Exception(message)

@@ -26,33 +26,26 @@ ThisBuild / scmInfo := Some(
 
 ThisBuild / developers := List(
   Developer(
-    id    = "Zejnilovic",
-    name  = "Sasa Zejnilovic",
-    email = "sasa.zejnilovic@absa.africa",
-    url   = url("https://github.com/Zejnilovic")
-  ),
-  Developer(
     id    = "benedeki",
     name  = "David Benedeki",
     email = "david.benedeki@absa.africa",
     url   = url("https://github.com/benedeki")
-  ),
-  Developer(
-    id    = "dk1844",
-    name  = "Daniel Kavan",
-    email = "daniel.kavan@absa.africa",
-    url   = url("https://github.com/dk1844")
-  ),
-  Developer(
-    id    = "AdrianOlosutean",
-    name  = "Adrian Olosutean",
-    email = "adrian.olosutean@absa.africa",
-    url   = url("https://github.com/AdrianOlosutean")
   )
 )
 
 ThisBuild / homepage := Some(url("https://github.com/AbsaOSS/fa-DB"))
 ThisBuild / description := "DB data access via procedures"
-ThisBuild / startYear := Some(2021)
+ThisBuild / startYear := Some(2022)
 ThisBuild / licenses += "Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.txt")
+
+ThisBuild / pomIncludeRepository := { _ => false }
+ThisBuild / publishTo := {
+  val nexus = "https://oss.sonatype.org/"
+  if (isSnapshot.value) {
+    Some("snapshots" at s"${nexus}content/repositories/snapshots")
+  } else {
+    Some("releases" at s"${nexus}service/local/staging/deploy/maven2")
+  }
+}
+ThisBuild / publishMavenStyle := true
 

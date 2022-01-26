@@ -15,14 +15,14 @@
 
 package za.co.absa.faDB.examples
 
-import za.co.absa.dbViaProcedures.DBFunction.DBSetFunction
-import za.co.absa.dbViaProcedures.{DBSchema, DBSession}
+//import za.co.absa.dbViaProcedures.DBFunction.DBSetFunction
+//import za.co.absa.dbViaProcedures.{DBSchema, DBSession}
 
 
 case class Input(fieldA: String, fieldB: String)
 case class Output(status: Integer, statusText: String)
 
-class Example(session: DBSession) extends DBSchema(session) {
+//class Example(session: DBSession) extends DBSchema(session) {
 //  val myFunction: DBSetFunction[String, Int] = new DBSetFunction[String, Int](this, Some("my_function")) {
 //    override def apply(values: String): Seq[Int] = {
 //      values.toSeq.map(_.toInt)
@@ -38,12 +38,5 @@ class Example(session: DBSession) extends DBSchema(session) {
 //  }
 //
 //  val myFunction2 = new MyFunction2()
-
-}
-
-object Foo {
-  val example = new Example(???)
-
-//  example.myFunction2(Input("A", "B"))
-}
-
+//
+//}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 ABSA Group Limited
+ * Copyright 2022 ABSA Group Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,20 @@
  * limitations under the License.
  */
 
-package za.co.absa.faDB
+package za.co.absa.faDB.namingConventions.lettersCase
 
-import org.scalatest.funsuite.AnyFunSuite
+sealed trait LettersCase {
+  def convert(s: String): String
+}
 
-class HelloTest extends AnyFunSuite {
-//  test("run") {
-//    Hello.run(List.empty)
-//  }
+object LettersCase {
+  case object AsIs extends LettersCase {
+    override def convert(s: String): String = s
+  }
+  case object LowerCase extends LettersCase {
+    override def convert(s: String): String = s.toLowerCase
+  }
+  case object UpperCase extends LettersCase {
+    override def convert(s: String): String = s.toUpperCase
+  }
 }

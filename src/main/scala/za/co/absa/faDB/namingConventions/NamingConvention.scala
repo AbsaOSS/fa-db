@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 ABSA Group Limited
+ * Copyright 2022 ABSA Group Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,31 +13,21 @@
  * limitations under the License.
  */
 
-package za.co.absa.faDB
+package za.co.absa.faDB.namingConventions
 
-trait DBBase {
-  def objectNameFromClassName: String = {
-    val className = getClass.getSimpleName
+trait NamingConvention {
+  def fromClassNamePerConvention(c: Class[_]): String = {
+    val className = c.getSimpleName
     val cleanClassName = className.lastIndexOf('$') match {
       case -1 => className
       case x => className.substring(0, x)
     }
-    stripIfFirstChar(camelCaseToSnakeCase(cleanClassName), '_')
+    stringPerConvention(cleanClassName)
   }
 
-  def camelCaseToSnakeCase(s: String): String = {
-    s.replaceAll("([A-Z])", "_$1").toLowerCase
+  def fromClassNamePerConvention(instance: AnyRef): String = {
+    fromClassNamePerConvention(instance.getClass)
   }
 
-  def stripIfFirstChar(s: String, ch: Char): String = {
-    if (s == "") {
-      s
-    } else if (s(0) == ch){
-      s.substring(1)
-    } else {
-      s
-    }
-  }
+  def stringPerConvention(original: String): String
 }
-
-case class  DBFailException(status: Int, message: String) extends Exception(message)

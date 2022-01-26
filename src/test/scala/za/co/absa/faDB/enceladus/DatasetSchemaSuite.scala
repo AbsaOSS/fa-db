@@ -18,8 +18,9 @@ package za.co.absa.faDB.enceladus
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import za.co.absa.dbViaProcedures.{DBFailException, DBSession}
-import za.co.absa.dbViaProcedures.enceladus.DatasetSchema.{Schema, SchemaInput}
+import za.co.absa.faDB.DBSession
+import za.co.absa.faDB.enceladus.DatasetSchema.{Schema, SchemaInput}
+import za.co.absa.faDB.exceptions.DBFailException
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration

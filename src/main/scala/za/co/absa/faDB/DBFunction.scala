@@ -17,13 +17,13 @@ package za.co.absa.faDB
 
 import scala.concurrent.Future
 
-abstract class DBFunction(schema: DBSchema, functionNameOverride: Option[String] = Some("a")) extends DBBase {
+abstract class DBFunction(schema: DBSchema, functionNameOverride: Option[String] = Some("a")) {
   val functionName: String = {
-    val fn = functionNameOverride.getOrElse(objectNameFromClassName)
+    val fn = functionNameOverride.getOrElse(schema.objectNameFromClassName(getClass))
     if (schema.schemaName.isEmpty) {
       fn
     } else {
-      s"${schema.schemaName}.${functionNameOverride.getOrElse(objectNameFromClassName)}"
+      s"${schema.schemaName}.$fn}"
     }
   }
 }
