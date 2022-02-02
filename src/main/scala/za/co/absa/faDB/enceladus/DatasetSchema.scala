@@ -16,33 +16,32 @@
 package za.co.absa.faDB.enceladus
 
 import slick.dbio.{DBIOAction, NoStream}
-import slick.jdbc.GetResult
-import za.co.absa.faDB.DBFunction.{DBSeqFunction, DBValueFunction}
 import za.co.absa.faDB.enceladus.DatasetSchema.{AddSchema, GetSchema, ListSchemas}
-import za.co.absa.faDB.{DBSchema, DBSession}
+import za.co.absa.faDB.{DBSchema, DBSchema2, DBSession}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import slick.jdbc.PostgresProfile.api._
 import slick.sql.SqlStreamingAction
+import za.co.absa.faDB.Slick.{SlickExecutor, SlickQuery, SlickSession}
 import za.co.absa.faDB.exceptions.DBFailException
 
 import java.sql.Timestamp
-
 import za.co.absa.faDB.namingConventions.SnakeCaseNaming.Implicits.namingConvention
 
 
-class DatasetSchema(session: DBSession) extends DBSchema(session) {
-  private val db = Database.forConfig(session.connection)
+class DatasetSchema(session: SlickSession) extends DBSchema(session) {
 
-  val addSchema = new AddSchema(this)
+  private implicit val schema: DatasetSchema = this
+  val addSchema = new AddSchema
   val getSchema = new GetSchema(this)
-  val listSchemas = new ListSchemas(this)
-
-  def run[R](a: DBIOAction[R, NoStream, Nothing]): Future[R] = {
-    db.run(a)
-  }
+  val listSchemas = new ListSchemas
 }
+
+
+
+
+
 
 object DatasetSchema {
   case class SchemaInput(schemaName: String,
@@ -63,7 +62,7 @@ object DatasetSchema {
                     lockedWhen: Option[Timestamp],
                     deletedBy: Option[String],
                     deletedWhen: Option[Timestamp])
-  case class SchemaHead(schemaName: String, schemaLatestVersion: Int)
+
 
   private implicit val SchemaHeadImplicit: GetResult[SchemaHead] = GetResult(r => {SchemaHead(r.<<, r.<<)})
   private implicit val GetSchemaImplicit: GetResult[Schema] = GetResult(r => {
@@ -77,16 +76,24 @@ object DatasetSchema {
 
   final class ListSchemas(schema: DBSchema) extends DBSeqFunction[Boolean, SchemaHead](schema) {
     override def apply(values: Boolean = false): Future[Seq[SchemaHead]] = {
-      val query: SqlStreamingAction[Vector[SchemaHead], SchemaHead, Effect] =
+      val sqlX =
         sql"""SELECT A.schema_name, A.schema_latest_version
-             FROM #$functionName($values) A;""".as[SchemaHead]
-      schema.asInstanceOf[DatasetSchema].run(query)
+             FROM #$functionName($values) A;"""
+
+      val slickQuery = new SlickQuery {
+        override def sql =  sqlX
+        override def rConf[R] = {
+          if
+          GetResult(r => {SchemaHead(r.<<, r.<<)})
+        }
+      }
+      schema.execute(slickQuery)
     }
   }
 
-  final class AddSchema(schema: DBSchema) extends DBValueFunction[SchemaInput, Long](schema) {
+  final class AddSchema(implicit schema: DatasetSchema) extends DBUniqueFunction[SchemaInput, Long](schema) {
     override def apply(values: SchemaInput): Future[Long] = {
-      val query =
+      val query: SqlStreamingAction[Vector[(Int, String, Long)], (Int, String, Long), Effect] =
         sql"""SELECT A.status, A.status_text, A.id_schema_version
              FROM #$functionName(${values.schemaName}, ${values.schemaVersion}, ${values.schemaDescription},
                 ${values.fields}::JSONB, ${values.userName}
@@ -104,12 +111,18 @@ object DatasetSchema {
     }
   }
 
-  final class GetSchema(schema: DBSchema) extends DBValueFunction[(String, Option[Int]), Schema](schema) {
+  final class GetSchema(implicit schema: DatasetSchema) extends DBUniqueFunction[(String, Option[Int]), Schema](schema) {
     override def apply(values: (String, Option[Int])): Future[Schema] = {
-      val query =
+      val query: SqlStreamingAction[Vector[Schema], Schema, Effect] =
         sql"""SELECT A.*
              FROM #$functionName(${values._1}, ${values._2}) A;""".as[Schema]
-      schema.asInstanceOf[DatasetSchema].run(query).map(_.head)
+      //schema.asInstanceOf[DatasetSchema].run(query).map(_.head)
+      val res = schema.session.asInstanceOf[SlickSession].db.run(query)
+      res.map(_.head)
+    }
+
+    def hmmm[R](query: SqlStreamingAction[Vector[R], R, Effect]): Future[Seq[R]] = {
+      schema.session.asInstanceOf[SlickSession].db.run(query)
     }
 
     def apply(id: Long): Future[Schema] = {
@@ -122,3 +135,6 @@ object DatasetSchema {
 
 
 }
+
+
+

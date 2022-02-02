@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 ABSA Group Limited
+ * Copyright 2022 ABSA Group Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,9 @@ import za.co.absa.faDB.namingConventions.NamingConvention
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-abstract class DBSchema[Q](val session: DBSession[Q], schemaNameOverride: Option[String] = None)
-                       (implicit namingConvention: NamingConvention) {
+abstract class DBSchema2[E](val executor: Executor[E], schemaNameOverride: Option[String] = None)
+                           (implicit namingConvention: NamingConvention) {
+
 
   def objectNameFromClassName(c: Class[_]): String = {
     namingConvention.fromClassNamePerConvention(c)
@@ -29,19 +30,19 @@ abstract class DBSchema[Q](val session: DBSession[Q], schemaNameOverride: Option
 
   val schemaName: String = schemaNameOverride.getOrElse(objectNameFromClassName(getClass))
 
-  def execute[R](query: Q): Future[Seq[R]] = {
-    session.executeQuery(query)
+  def execute[R](query: E => Future[Seq[R]]): Future[Seq[R]] = {
+    executor.run(query)
   }
 
-  def unique[R](query: Q): Future[R] = {
+  def unique[R](query: E => Future[Seq[R]]): Future[R] = {
     for {
-      all <- session.executeQuery(query)
+      all <- execute(query)
     } yield all.head
   }
 
-  def option[R](query: Q): Future[Option[R]] = {
+  def option[R](query: E => Future[Seq[R]]): Future[Option[R]] = {
     for {
-      all <- session.executeQuery(query)
+      all <- execute(query)
     } yield all.headOption
   }
 }
