@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 ABSA Group Limited
+ * Copyright 2022 ABSA Group Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,23 @@
  * limitations under the License.
  */
 
-package za.co.absa.faDB
+package za.co.absa.faDB.Slick
+
+import slick.jdbc.JdbcBackend.Database
+import za.co.absa.faDB.DBFunction.QueryFunction
+import za.co.absa.faDB.DBExecutor
 
 import scala.concurrent.Future
 
-trait DBSession[Q, C] {
-  def executeQuery[R](query: Q)(implicit convertor: C): Future[Seq[R]]
+class SlickExecutor(db: Database) extends DBExecutor[Database] {
+  override def run[R](fnc: QueryFunction[Database, R]): Future[Seq[R]] = {
+    fnc(db)
+  }
+}
+
+object SlickExecutor {
+  def forConfig(dbConfig: String): SlickExecutor = {
+    val db = Database.forConfig(dbConfig)
+    new SlickExecutor(db)
+  }
 }

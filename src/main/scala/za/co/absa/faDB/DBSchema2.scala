@@ -20,7 +20,7 @@ import za.co.absa.faDB.namingConventions.NamingConvention
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-abstract class DBSchema2[E](val executor: Executor[E], schemaNameOverride: Option[String] = None)
+abstract class DBSchema2[E](val executor: DBExecutor[E], schemaNameOverride: Option[String] = None)
                            (implicit namingConvention: NamingConvention) {
 
 

@@ -15,9 +15,11 @@
 
 package za.co.absa.faDB
 
+import za.co.absa.faDB.DBFunction.QueryFunction
+
 import scala.concurrent.Future
 
-abstract class DBFunction[Q](schema: DBSchema2[Q], functionNameOverride: Option[String] = Some("a")) {
+abstract class DBFunction[E, T, R](schema: DBSchema2[E], functionNameOverride: Option[String] = Some("a")) {
   val functionName: String = {
     val fn = functionNameOverride.getOrElse(schema.objectNameFromClassName(getClass))
     if (schema.schemaName.isEmpty) {
@@ -27,28 +29,30 @@ abstract class DBFunction[Q](schema: DBSchema2[Q], functionNameOverride: Option[
     }
   }
 
-  protected def buildQuery[T](values: T): Q
+  protected def queryFunction(values: T): QueryFunction[E, R]
 }
 
 object DBFunction {
-  abstract class DBSeqFunction[T, R](schema: DBSchema, functionNameOverride: Option[String] = None)
-    extends DBFunction(schema, functionNameOverride) {
+  type QueryFunction[E, R] = (E => Future[Seq[R]])
+
+  abstract class DBSeqFunction[E, T, R](schema: DBSchema2[E], functionNameOverride: Option[String] = None)
+    extends DBFunction[E, T, R](schema, functionNameOverride) {
     def apply(values: T): Future[Seq[R]] = {
-      schema.execute(buildQuery(values))
+      schema.execute(queryFunction(values))
     }
   }
 
-  abstract class DBUniqueFunction[Q, T, R](schema: DBSchema2[Q], functionNameOverride: Option[String] = None)
-    extends DBFunction(schema, functionNameOverride) {
+  abstract class DBUniqueFunction[E, T, R](schema: DBSchema2[E], functionNameOverride: Option[String] = None)
+    extends DBFunction[E, T, R](schema, functionNameOverride) {
     def apply(values: T): Future[R] = {
-      schema.unique(buildQuery(values))
+      schema.unique(queryFunction(values))
     }
   }
 
-  abstract class DBOptionFunction[Q, T, R](schema: DBSchema2[Q], functionNameOverride: Option[String] = None)
-    extends DBFunction (schema, functionNameOverride) {
+  abstract class DBOptionFunction[E, T, R](schema: DBSchema2[E], functionNameOverride: Option[String] = None)
+    extends DBFunction[E, T, R](schema, functionNameOverride) {
     def apply(values: T): Future[Option[R]] = {
-      schema.option(buildQuery(values))
+      schema.option(queryFunction(values))
     }
   }
 }

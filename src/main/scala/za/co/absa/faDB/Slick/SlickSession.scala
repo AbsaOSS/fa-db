@@ -17,7 +17,7 @@ package za.co.absa.faDB.Slick
 
 import slick.jdbc.{GetResult, JdbcBackend}
 import slick.jdbc.JdbcBackend.Database
-import za.co.absa.faDB.{DBSession, Executor}
+import za.co.absa.faDB.{DBSession, DBExecutor}
 
 import scala.concurrent.Future
 
@@ -40,9 +40,3 @@ object SlickSession {
   }
 }
 
-
-class SlickExecutor(db: Database) extends Executor[Database] {
-  override def run[R](fnc: Database =>  Future[Seq[R]]): Future[Seq[R]] = {
-    fnc(db)
-  }
-}
