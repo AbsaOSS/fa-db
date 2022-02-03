@@ -25,5 +25,7 @@ class AsIsNaming(lettersCase: LettersCase) extends NamingConvention{
 }
 
 object AsIsNaming {
-  implicit val namingConvention: NamingConvention = new AsIsNaming(AsIs)
+  object Implicits {
+    implicit val namingConvention: NamingConvention = new AsIsNaming(AsIs)
+  }
 }

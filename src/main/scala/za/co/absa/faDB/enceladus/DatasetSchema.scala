@@ -17,7 +17,7 @@ package za.co.absa.faDB.enceladus
 
 import slick.dbio.{DBIOAction, NoStream}
 import slick.jdbc.GetResult
-import za.co.absa.faDB.DBFunction.{DBSetFunction, DBValueFunction}
+import za.co.absa.faDB.DBFunction.{DBSeqFunction, DBValueFunction}
 import za.co.absa.faDB.enceladus.DatasetSchema.{AddSchema, GetSchema, ListSchemas}
 import za.co.absa.faDB.{DBSchema, DBSession}
 
@@ -29,7 +29,7 @@ import za.co.absa.faDB.exceptions.DBFailException
 
 import java.sql.Timestamp
 
-import za.co.absa.faDB.namingConventions.SnakeCaseNaming._
+import za.co.absa.faDB.namingConventions.SnakeCaseNaming.Implicits.namingConvention
 
 
 class DatasetSchema(session: DBSession) extends DBSchema(session) {
@@ -75,7 +75,7 @@ object DatasetSchema {
     Schema(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<)
   })
 
-  final class ListSchemas(schema: DBSchema) extends DBSetFunction[Boolean, SchemaHead](schema) {
+  final class ListSchemas(schema: DBSchema) extends DBSeqFunction[Boolean, SchemaHead](schema) {
     override def apply(values: Boolean = false): Future[Seq[SchemaHead]] = {
       val query: SqlStreamingAction[Vector[SchemaHead], SchemaHead, Effect] =
         sql"""SELECT A.schema_name, A.schema_latest_version

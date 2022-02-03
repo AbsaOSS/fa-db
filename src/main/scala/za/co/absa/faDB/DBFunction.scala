@@ -29,7 +29,7 @@ abstract class DBFunction(schema: DBSchema, functionNameOverride: Option[String]
 }
 
 object DBFunction {
-  abstract class DBSetFunction[T, R](schema: DBSchema, functionNameOverride: Option[String] = None)
+  abstract class DBSeqFunction[T, R](schema: DBSchema, functionNameOverride: Option[String] = None)
     extends DBFunction(schema, functionNameOverride) {
     def apply(values: T): Future[Seq[R]]
   }

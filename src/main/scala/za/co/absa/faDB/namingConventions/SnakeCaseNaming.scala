@@ -41,5 +41,7 @@ class SnakeCaseNaming(lettersCase: LettersCase) extends NamingConvention {
 }
 
 object SnakeCaseNaming {
-  implicit val namingConvention: NamingConvention = new SnakeCaseNaming(LowerCase)
+  object Implicits {
+    implicit val namingConvention: NamingConvention = new SnakeCaseNaming(LowerCase)
+  }
 }

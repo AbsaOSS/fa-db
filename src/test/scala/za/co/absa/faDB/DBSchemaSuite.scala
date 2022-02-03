@@ -16,7 +16,7 @@
 package za.co.absa.faDB
 
 import org.scalatest.funsuite.AnyFunSuite
-import za.co.absa.faDB.namingConventions.SnakeCaseNaming._
+import za.co.absa.faDB.namingConventions.SnakeCaseNaming.Implicits.namingConvention
 
 class DBSchemaSuite extends AnyFunSuite {
 

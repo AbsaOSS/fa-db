@@ -25,6 +25,7 @@ class ExplicitNamingRequired extends NamingConvention {
 }
 
 object ExplicitNamingRequired {
-  implicit val namingConvention: NamingConvention = new ExplicitNamingRequired()
-
+  object Implicits {
+    implicit val namingConvention: NamingConvention = new ExplicitNamingRequired()
+  }
 }
