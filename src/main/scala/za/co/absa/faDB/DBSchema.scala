@@ -20,6 +20,16 @@ import za.co.absa.faDB.namingConventions.NamingConvention
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
+/**
+  * An abstract class, an ancestor to represent a database schema (each database function should be placed in a schema)
+  * The database name of the schema is derives from the class name based on the provided naming convention
+  *
+  * @param executor           - executor to execute the queries through
+  * @param schemaNameOverride - in case the class name would not match the database schema name, this gives the
+  *                           possibility of override
+  * @param namingConvention   - the [[NamingConvention]] prescribing how to convert a class name into a db object name
+  * @tparam E                 - the engine of the executor type, e.g. Slick [[Database]]
+  */
 abstract class DBSchema[E](val executor: DBExecutor[E], schemaNameOverride: Option[String] = None)
                           (implicit namingConvention: NamingConvention) {
 
