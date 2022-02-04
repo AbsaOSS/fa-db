@@ -16,22 +16,26 @@
 package za.co.absa.faDB
 
 import org.scalatest.funsuite.AnyFunSuite
+import za.co.absa.faDB.DBFunction.QueryFunction
 import za.co.absa.faDB.namingConventions.SnakeCaseNaming.Implicits.namingConvention
 
+import scala.concurrent.Future
+
 class DBSchemaSuite extends AnyFunSuite {
+  private val executor = new DBExecutor[String] {
+    override def run[R](fnc: QueryFunction[String, R]): Future[Seq[R]] = ???
+  }
 
   test("schema name default") {
-    val session = new DBSession("")
 
-    class Foo(session: DBSession) extends DBSchema(session)
-    val schema = new Foo(session)
+    class Foo(executor: DBExecutor[String]) extends DBSchema(executor)
+    val schema = new Foo(executor)
     assert(schema.schemaName == "foo")
   }
-  test("schema name overriden") {
-    val session = new DBSession("")
-    class Foo(session: DBSession) extends DBSchema(session, Some("bar"))
+  test("schema name overridden") {
+    class Foo(executor: DBExecutor[String]) extends DBSchema(executor, Some("bar"))
 
-    val schema = new Foo(session)
+    val schema = new Foo(executor)
     assert(schema.schemaName == "bar")
   }
 }

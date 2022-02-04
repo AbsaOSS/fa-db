@@ -19,6 +19,6 @@ import za.co.absa.faDB.DBFunction.QueryFunction
 
 import scala.concurrent.Future
 
-trait DBExecutor[E] {
+trait DBExecutor[+E] {
   def run[R](fnc: QueryFunction[E, R]): Future[Seq[R]]
 }

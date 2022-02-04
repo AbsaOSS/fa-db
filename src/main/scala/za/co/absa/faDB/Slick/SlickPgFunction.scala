@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 ABSA Group Limited
+ * Copyright 2022 ABSA Group Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,16 @@
  * limitations under the License.
  */
 
-package za.co.absa.faDB.examples
+package za.co.absa.faDB.Slick
 
-import org.scalatest.funsuite.AnyFunSuite
+import slick.jdbc.{GetResult, SQLActionBuilder}
+import za.co.absa.faDB.DBFunction.QueryFunction
+import slick.jdbc.PostgresProfile.api._
 
-class ExampleSuite extends AnyFunSuite {
-  test("foo") {
-//    val expected = Seq(72, 101, 108, 108, 111)
-//    val session = new DBSession
-//    val example = new Example(session)
-//    val result = example.myFunction("Hello")
-//    assert(result == expected)
+trait SlickPgFunction {
+  def makeQueryFunction[R](sql: SQLActionBuilder)(implicit rconv: GetResult[R]): QueryFunction[Database, R] = {
+    val query = sql.as[R]
+    val resultFnc = {db: Database => db.run(query)}
+    resultFnc
   }
 }

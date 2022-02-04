@@ -13,24 +13,25 @@
  * limitations under the License.
  */
 
-package za.co.absa.faDB.enceladus
+package za.co.absa.faDB.Slick
 
-import slick.jdbc.GetResult
-import slick.jdbc.JdbcBackend.Database
-import za.co.absa.faDB.Slick.SlickSession
-import za.co.absa.faDB.enceladus.DatasetSchema.SchemaHead
 
-class EnceladusSlickSession(db: Database) extends SlickSession(db: Database) {
+import scala.concurrent.Future
+import slick.jdbc.PostgresProfile.api._
 
-  private implicit val SchemaHeadImplicit: GetResult[SchemaHead] = GetResult(r => {SchemaHead(r.<<, r.<<)})
+import za.co.absa.faDB.DBFunction.QueryFunction
+import za.co.absa.faDB.DBExecutor
 
-  private def getConverter[R](): GetResult[R] = {
-    if R == SchemaHead {
-      SchemaHeadImplicit
-    }
-    rconv
+
+class SlickPgExecutor(db: Database) extends DBExecutor[Database] {
+  override def run[R](fnc: QueryFunction[Database, R]): Future[Seq[R]] = {
+    fnc(db)
   }
-  override def converter[R]: GetResult[R] = {
-    getConverter[R]()
+}
+
+object SlickPgExecutor {
+  def forConfig(dbConfig: String): SlickPgExecutor = {
+    val db = Database.forConfig(dbConfig)
+    new SlickPgExecutor(db)
   }
 }

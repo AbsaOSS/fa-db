@@ -19,7 +19,7 @@ import za.co.absa.faDB.DBFunction.QueryFunction
 
 import scala.concurrent.Future
 
-abstract class DBFunction[E, T, R](schema: DBSchema2[E], functionNameOverride: Option[String] = Some("a")) {
+abstract class DBFunction[E, T, R](schema: DBSchema[E], functionNameOverride: Option[String] = Some("a")) {
   val functionName: String = {
     val fn = functionNameOverride.getOrElse(schema.objectNameFromClassName(getClass))
     if (schema.schemaName.isEmpty) {
@@ -35,21 +35,21 @@ abstract class DBFunction[E, T, R](schema: DBSchema2[E], functionNameOverride: O
 object DBFunction {
   type QueryFunction[E, R] = (E => Future[Seq[R]])
 
-  abstract class DBSeqFunction[E, T, R](schema: DBSchema2[E], functionNameOverride: Option[String] = None)
+  abstract class DBSeqFunction[E, T, R](schema: DBSchema[E], functionNameOverride: Option[String] = None)
     extends DBFunction[E, T, R](schema, functionNameOverride) {
     def apply(values: T): Future[Seq[R]] = {
       schema.execute(queryFunction(values))
     }
   }
 
-  abstract class DBUniqueFunction[E, T, R](schema: DBSchema2[E], functionNameOverride: Option[String] = None)
+  abstract class DBUniqueFunction[E, T, R](schema: DBSchema[E], functionNameOverride: Option[String] = None)
     extends DBFunction[E, T, R](schema, functionNameOverride) {
     def apply(values: T): Future[R] = {
       schema.unique(queryFunction(values))
     }
   }
 
-  abstract class DBOptionFunction[E, T, R](schema: DBSchema2[E], functionNameOverride: Option[String] = None)
+  abstract class DBOptionFunction[E, T, R](schema: DBSchema[E], functionNameOverride: Option[String] = None)
     extends DBFunction[E, T, R](schema, functionNameOverride) {
     def apply(values: T): Future[Option[R]] = {
       schema.option(queryFunction(values))

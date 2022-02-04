@@ -13,21 +13,22 @@
  * limitations under the License.
  */
 
-package za.co.absa.faDB.enceladus
+package za.co.absa.faDB.examples.enceladus
 
-import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import za.co.absa.faDB.DBSession
-import za.co.absa.faDB.enceladus.DatasetSchema.{Schema, SchemaInput}
+import za.co.absa.faDB.Slick.SlickPgExecutor
+import za.co.absa.faDB.examples.enceladus.DatasetSchema._
 import za.co.absa.faDB.exceptions.DBFailException
+import slick.jdbc.PostgresProfile.api._
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 class DatasetSchemaSuite extends AnyWordSpec with Matchers {
-  private val session = new DBSession("menasdb")
-  private val schemas = new DatasetSchema(session)
+  private val db = Database.forConfig("menasdb")
+  private val executor = new SlickPgExecutor(db)
+  private val schemas = new DatasetSchema(executor)
 
   private def checkException(exception: DBFailException): Unit = {
     println(s"Requested failed with: ${exception.status} - ${exception.message}")

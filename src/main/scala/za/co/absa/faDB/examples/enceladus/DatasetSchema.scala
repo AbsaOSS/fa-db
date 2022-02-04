@@ -13,32 +13,31 @@
  * limitations under the License.
  */
 
-package za.co.absa.faDB.enceladus
+package za.co.absa.faDB.examples.enceladus
 
-import slick.jdbc.JdbcBackend.Database
-import za.co.absa.faDB.DBSchema2
-import za.co.absa.faDB.Slick.{SlickExecutor, SlickFunction}
+import za.co.absa.faDB.DBSchema
+import za.co.absa.faDB.Slick.{SlickPgExecutor, SlickPgFunction}
 import za.co.absa.faDB.namingConventions.SnakeCaseNaming.Implicits.namingConvention
-import DatasetSchema2._
 import slick.jdbc.GetResult
 import za.co.absa.faDB.DBFunction._
 import slick.jdbc.PostgresProfile.api._
-import za.co.absa.faDB.enceladus.DatasetSchema.Schema
 import za.co.absa.faDB.exceptions.DBFailException
 
 import java.sql.Timestamp
 import scala.concurrent.Future
 
-class DatasetSchema2(executor: SlickExecutor) extends DBSchema2(executor) {
+import DatasetSchema._
 
-  private implicit val schema: DBSchema2[ExecutorEngineType] = this
+class DatasetSchema(executor: SlickPgExecutor) extends DBSchema(executor) {
+
+  private implicit val schema: DBSchema[ExecutorEngineType] = this
   val addSchema = new AddSchema
   val getSchema = new GetSchema
   val listSchemas = new ListSchemas
 }
 
 
-object DatasetSchema2 {
+object DatasetSchema {
   type ExecutorEngineType = Database
 
   case class SchemaInput(schemaName: String,
@@ -73,9 +72,9 @@ object DatasetSchema2 {
     Schema(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<)
   })
 
-  final class AddSchema(implicit schema: DBSchema2[ExecutorEngineType])
+  final class AddSchema(implicit schema: DBSchema[ExecutorEngineType])
     extends DBUniqueFunction[ExecutorEngineType, SchemaInput, Long](schema)
-    with SlickFunction {
+    with SlickPgFunction {
 
     override protected def queryFunction(values: SchemaInput): QueryFunction[ExecutorEngineType, Long] = {
       val gr:GetResult[Long] = GetResult(r => {
@@ -95,9 +94,9 @@ object DatasetSchema2 {
     }
   }
 
-  final class GetSchema(implicit schema: DBSchema2[ExecutorEngineType])
+  final class GetSchema(implicit schema: DBSchema[ExecutorEngineType])
     extends DBUniqueFunction[ExecutorEngineType, (String, Option[Int]), Schema](schema)
-    with SlickFunction {
+    with SlickPgFunction {
 
     def apply(id: Long): Future[Schema] = {
       val sql =
@@ -115,9 +114,11 @@ object DatasetSchema2 {
     }
   }
 
-  final class ListSchemas(implicit schema: DBSchema2[ExecutorEngineType])
-    extends DBSeqFunction[ExecutorEngineType, Boolean, SchemaHeader](schema)()
-    with SlickFunction {
+  final class ListSchemas(implicit schema: DBSchema[ExecutorEngineType])
+    extends DBSeqFunction[ExecutorEngineType, Boolean, SchemaHeader](schema)
+    with SlickPgFunction {
+
+    override def apply(values: Boolean = false): Future[Seq[SchemaHeader]] = super.apply(values)
 
     override protected def queryFunction(values: Boolean): QueryFunction[ExecutorEngineType, SchemaHeader] = {
       val sql =
