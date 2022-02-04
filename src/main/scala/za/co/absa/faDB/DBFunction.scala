@@ -25,7 +25,7 @@ abstract class DBFunction[E, T, R](schema: DBSchema[E], functionNameOverride: Op
     if (schema.schemaName.isEmpty) {
       fn
     } else {
-      s"${schema.schemaName}.$fn}"
+      s"${schema.schemaName}.$fn"
     }
   }
 
