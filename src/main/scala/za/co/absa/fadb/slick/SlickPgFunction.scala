@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-package za.co.absa.faDB.Slick
+package za.co.absa.fadb.slick
 
 import slick.jdbc.{GetResult, SQLActionBuilder}
-import za.co.absa.faDB.DBFunction.QueryFunction
+import za.co.absa.fadb.DBFunction.QueryFunction
 import slick.jdbc.PostgresProfile.api._
 
 trait SlickPgFunction {

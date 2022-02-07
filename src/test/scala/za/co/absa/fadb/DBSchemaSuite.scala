@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
-package za.co.absa.faDB
+package za.co.absa.fadb
 
 import org.scalatest.funsuite.AnyFunSuite
-import za.co.absa.faDB.DBFunction.QueryFunction
-import za.co.absa.faDB.namingConventions.SnakeCaseNaming.Implicits.namingConvention
+import za.co.absa.fadb.DBFunction.QueryFunction
+import za.co.absa.fadb.naming_conventions.SnakeCaseNaming.Implicits.namingConvention
 
 import scala.concurrent.Future
 

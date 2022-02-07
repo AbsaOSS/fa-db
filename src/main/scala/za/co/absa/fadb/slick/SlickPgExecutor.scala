@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-package za.co.absa.faDB.Slick
+package za.co.absa.fadb.slick
 
 
 import scala.concurrent.Future
 import slick.jdbc.PostgresProfile.api._
 
-import za.co.absa.faDB.DBFunction.QueryFunction
-import za.co.absa.faDB.DBExecutor
+import za.co.absa.fadb.DBFunction.QueryFunction
+import za.co.absa.fadb.DBExecutor
 
 
 class SlickPgExecutor(db: Database) extends DBExecutor[Database] {

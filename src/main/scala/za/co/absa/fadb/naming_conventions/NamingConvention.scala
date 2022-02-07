@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package za.co.absa.faDB.namingConventions
+package za.co.absa.fadb.naming_conventions
 
 trait NamingConvention {
   def fromClassNamePerConvention(c: Class[_]): String = {

@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-package za.co.absa.faDB
+package za.co.absa.fadb
 
-import za.co.absa.faDB.namingConventions.NamingConvention
+import za.co.absa.fadb.naming_conventions.NamingConvention
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global

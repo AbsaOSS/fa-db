@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-package za.co.absa.faDB
+package za.co.absa.fadb
 
-import za.co.absa.faDB.DBFunction.QueryFunction
+import za.co.absa.fadb.DBFunction.QueryFunction
 
 import scala.concurrent.Future
 

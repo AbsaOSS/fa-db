@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-package za.co.absa.faDB.namingConventions
+package za.co.absa.fadb.naming_conventions
 
-import za.co.absa.faDB.namingConventions.lettersCase.LettersCase
-import za.co.absa.faDB.namingConventions.lettersCase.LettersCase.AsIs
+import za.co.absa.fadb.naming_conventions.lettersCase.LettersCase
+import za.co.absa.fadb.naming_conventions.lettersCase.LettersCase.AsIs
 
 class AsIsNaming(lettersCase: LettersCase) extends NamingConvention{
   override def stringPerConvention(original: String): String = {

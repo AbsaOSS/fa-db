@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package za.co.absa.faDB.namingConventions.lettersCase
+package za.co.absa.fadb.naming_conventions.lettersCase
 
 sealed trait LettersCase {
   def convert(s: String): String

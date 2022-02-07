@@ -13,15 +13,15 @@
  * limitations under the License.
  */
 
-package za.co.absa.faDB.examples.enceladus
+package za.co.absa.fadb.examples.enceladus
 
-import za.co.absa.faDB.DBSchema
-import za.co.absa.faDB.Slick.{SlickPgExecutor, SlickPgFunction}
-import za.co.absa.faDB.namingConventions.SnakeCaseNaming.Implicits.namingConvention
+import za.co.absa.fadb.DBSchema
+import za.co.absa.fadb.slick.{SlickPgExecutor, SlickPgFunction}
+import za.co.absa.fadb.naming_conventions.SnakeCaseNaming.Implicits.namingConvention
 import slick.jdbc.GetResult
-import za.co.absa.faDB.DBFunction._
+import za.co.absa.fadb.DBFunction._
 import slick.jdbc.PostgresProfile.api._
-import za.co.absa.faDB.exceptions.DBFailException
+import za.co.absa.fadb.exceptions.DBFailException
 
 import java.sql.Timestamp
 import scala.concurrent.Future

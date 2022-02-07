@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-package za.co.absa.faDB.namingConventions
+package za.co.absa.fadb.naming_conventions
 
-import za.co.absa.faDB.exceptions.NamingException
+import za.co.absa.fadb.exceptions.NamingException
 
 class ExplicitNamingRequired extends NamingConvention {
   override def stringPerConvention(original: String): String = {

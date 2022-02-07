@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-package za.co.absa.faDB.examples.enceladus
+package za.co.absa.fadb.examples.enceladus
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import za.co.absa.faDB.Slick.SlickPgExecutor
-import za.co.absa.faDB.examples.enceladus.DatasetSchema._
-import za.co.absa.faDB.exceptions.DBFailException
+import za.co.absa.fadb.slick.SlickPgExecutor
+import za.co.absa.fadb.examples.enceladus.DatasetSchema._
+import za.co.absa.fadb.exceptions.DBFailException
 import slick.jdbc.PostgresProfile.api._
 
 import scala.concurrent.Await

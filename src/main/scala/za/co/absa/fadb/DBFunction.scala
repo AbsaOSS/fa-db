@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-package za.co.absa.faDB
+package za.co.absa.fadb
 
-import za.co.absa.faDB.DBFunction.QueryFunction
+import za.co.absa.fadb.DBFunction.QueryFunction
 
 import scala.concurrent.Future
 
@@ -50,7 +50,7 @@ object DBFunction {
     * Represents a function returning a set (in DB sense) of rows
     *
     * @param schema               - the schema the function belongs into
-    * @param functionNameOverride - in case the class name would not mathc the database function name, this gives the
+    * @param functionNameOverride - in case the class name would not match the database function name, this gives the
     *                             possibility of override
     * @tparam E                   - the type of the [[DBExecutor]] engine
     * @tparam T                   - the type covering the input fields of the database function
@@ -67,7 +67,7 @@ object DBFunction {
     * Represents a function returning exactly one record
     *
     * @param schema               - the schema the function belongs into
-    * @param functionNameOverride - in case the class name would not mathc the database function name, this gives the
+    * @param functionNameOverride - in case the class name would not match the database function name, this gives the
     *                             possibility of override
     * @tparam E                   - the type of the [[DBExecutor]] engine
     * @tparam T                   - the type covering the input fields of the database function
@@ -84,7 +84,7 @@ object DBFunction {
     * Represents a function returning one optional record
     *
     * @param schema               - the schema the function belongs into
-    * @param functionNameOverride - in case the class name would not mathc the database function name, this gives the
+    * @param functionNameOverride - in case the class name would not match the database function name, this gives the
     *                             possibility of override
     * @tparam E                   - the type of the [[DBExecutor]] engine
     * @tparam T                   - the type covering the input fields of the database function

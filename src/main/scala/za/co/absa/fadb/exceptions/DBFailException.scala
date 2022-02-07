@@ -13,6 +13,6 @@
  * limitations under the License.
  */
 
-package za.co.absa.faDB.exceptions
+package za.co.absa.fadb.exceptions
 
 case class DBFailException(status: Int, message: String) extends Exception(message)
