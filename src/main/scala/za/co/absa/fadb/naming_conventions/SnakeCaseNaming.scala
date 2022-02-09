@@ -15,8 +15,8 @@
 
 package za.co.absa.fadb.naming_conventions
 
-import za.co.absa.fadb.naming_conventions.lettersCase.LettersCase
-import za.co.absa.fadb.naming_conventions.lettersCase.LettersCase.LowerCase
+import za.co.absa.fadb.naming_conventions.letters_case.LettersCase
+import za.co.absa.fadb.naming_conventions.letters_case.LettersCase.LowerCase
 
 class SnakeCaseNaming(lettersCase: LettersCase) extends NamingConvention {
   private def camelCaseToSnakeCase(s: String): String = {
