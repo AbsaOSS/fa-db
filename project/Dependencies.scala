@@ -19,8 +19,7 @@ import sbt._
 object Dependencies {
 
 
-  private def coomonDependencies(scalaVersion: String): Seq[ModuleID] = Seq(
-    "org.scala-lang"      %  "scala-compiler"               % scalaVersion,
+  private def commonDependencies(scalaVersion: String): Seq[ModuleID] = Seq(
     "org.scalatest"      %% "scalatest" % "3.1.0"           % Test,
     "org.scalatest"      %% "scalatest-flatspec" % "3.2.0"  % Test,
     "org.scalatestplus"  %% "mockito-1-10" % "3.1.0.0"      % Test
@@ -29,12 +28,12 @@ object Dependencies {
   def rootDependencies(scalaVersion: String): Seq[ModuleID] = Seq()
 
   def coreDependencies(scalaVersion: String): Seq[ModuleID] = {
-    coomonDependencies(scalaVersion) ++ Seq(
+    commonDependencies(scalaVersion) ++ Seq(
     )
   }
 
   def slickDependencies(scalaVersion: String): Seq[ModuleID] = {
-    coomonDependencies(scalaVersion) ++ Seq(
+    commonDependencies(scalaVersion) ++ Seq(
       "com.typesafe.slick"  %% "slick"                        % "3.3.3",
       "org.slf4j"            % "slf4j-nop"                    % "1.6.4",
       "com.typesafe.slick"  %% "slick-hikaricp"               % "3.3.3",

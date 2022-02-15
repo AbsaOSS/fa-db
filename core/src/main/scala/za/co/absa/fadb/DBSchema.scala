@@ -29,7 +29,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * @param schemaNameOverride - in case the class name would not match the database schema name, this gives the
   *                           possibility of override
   * @param namingConvention   - the [[NamingConvention]] prescribing how to convert a class name into a db object name
-  * @tparam E                 - the engine of the executor type, e.g. Slick [[Database]]
+  * @tparam E                 - the engine of the executor type, e.g. Slick Database
   */
 abstract class DBSchema[E](val executor: DBExecutor[E], schemaNameOverride: Option[String] = None)
                           (implicit namingConvention: NamingConvention) {
