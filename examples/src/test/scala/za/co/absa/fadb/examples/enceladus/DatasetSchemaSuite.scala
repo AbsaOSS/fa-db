@@ -36,7 +36,7 @@ class DatasetSchemaSuite extends AnyWordSpec with Matchers {
   }
 
   // test cases are set to be ignored now, as they are not idempotent and require other project's (Enceladus) data structures
-  
+
   "listSchemas" should {
     "list the schemas" ignore {
       val ls = schemas.listSchemas()
