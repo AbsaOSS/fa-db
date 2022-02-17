@@ -1,5 +1,3 @@
-import sbt.Resolvers.local
-
 /*
  * Copyright 2022 ABSA Group Limited
  *
