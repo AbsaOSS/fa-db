@@ -36,7 +36,7 @@ class DatasetSchemaSuite extends AnyWordSpec with Matchers {
   }
 
   "listSchemas" should {
-    "list the schemas" in {
+    "list the schemas" ignore {
       val ls = schemas.listSchemas()
       val result = Await.result(ls, Duration.Inf)
       result.foreach(println)
@@ -45,33 +45,33 @@ class DatasetSchemaSuite extends AnyWordSpec with Matchers {
 
   "getSchema" should {
     "return the particular schema" when {
-      "given name and version" in {
+      "given name and version" ignore {
         val ls = schemas.getSchema(("aaa", Option(1)))
         val result = Await.result(ls, Duration.Inf)
         println(result)
       }
-      "given id" in {
+      "given id" ignore {
         val gs = schemas.getSchema(1000000000000051L)
         val result = Await.result(gs, Duration.Inf)
         println(result)
       }
     }
     "return the latest schema version" when {
-      "only the schema name is given" in {
+      "only the schema name is given" ignore {
         val ls = schemas.getSchema(("aaa", None))
         val result = Await.result(ls, Duration.Inf)
         println(result)
       }
     }
     "fail" when {
-      "schema does not exist" in {
+      "schema does not exist" ignore {
         val exception = intercept[DBFailException] {
           val gs = schemas.getSchema(("xxx", None))
           Await.result(gs, Duration.Inf)
         }
         checkException(exception)
       }
-      "requested schema version does not exist" in {
+      "requested schema version does not exist" ignore {
         val exception = intercept[DBFailException] {
           val gs = schemas.getSchema(("aaa", Some(1000)))
           Await.result(gs, Duration.Inf)
@@ -82,7 +82,7 @@ class DatasetSchemaSuite extends AnyWordSpec with Matchers {
   }
 
   "addSchema" should {
-    "add a schema" in {
+    "add a schema" ignore {
       val schemaInput = SchemaInput(
         schemaName = "bbe",
         schemaVersion = 1,
@@ -94,7 +94,7 @@ class DatasetSchemaSuite extends AnyWordSpec with Matchers {
       println(result)
     }
     "fail" when {
-      "Schema already exists" in {
+      "Schema already exists" ignore {
         val schemaInput = SchemaInput(
           schemaName = "aaa",
           schemaVersion = 2,
@@ -107,7 +107,7 @@ class DatasetSchemaSuite extends AnyWordSpec with Matchers {
         }
         checkException(exception)
       }
-      "Schema version wrong" in {
+      "Schema version wrong" ignore {
         val schemaInput = SchemaInput(
           schemaName = "aaa",
           schemaVersion = 1000,
@@ -119,12 +119,6 @@ class DatasetSchemaSuite extends AnyWordSpec with Matchers {
           Await.result(schemas.addSchema(schemaInput), Duration.Inf)
         }
         checkException(exception)
-      }
-      "Schema has been disabled" in {
-        // TODO
-      }
-      "Schema has been locked" in {
-        // TODO
       }
     }
   }

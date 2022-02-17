@@ -56,7 +56,6 @@ lazy val faDBSlick = (project in file("slick"))
   .settings(
     name := "slick",
     libraryDependencies ++= slickDependencies(scalaVersion.value),
-    Test / parallelExecution := false,
     (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value // printScalaVersion is run with compile
   ).dependsOn(faDbCore)
 
