@@ -14,4 +14,16 @@
  * limitations under the License.
  */
 
-ThisBuild / version := "0.1.0-SNAPSHOT"
+package za.co.absa.fadb.slick
+
+import slick.jdbc.{GetResult, SQLActionBuilder}
+import za.co.absa.fadb.DBFunction.QueryFunction
+import slick.jdbc.PostgresProfile.api._
+
+trait SlickPgFunction {
+  def makeQueryFunction[R](sql: SQLActionBuilder)(implicit rconv: GetResult[R]): QueryFunction[Database, R] = {
+    val query = sql.as[R]
+    val resultFnc = {db: Database => db.run(query)}
+    resultFnc
+  }
+}

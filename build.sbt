@@ -1,9 +1,10 @@
 /*
- * Copyright 2021 ABSA Group Limited
+ * Copyright 2022 ABSA Group Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -13,33 +14,56 @@
  * limitations under the License.
  */
 
-ThisBuild / name         := "fa-db"
-ThisBuild / organization := "za.co.absa"
+ThisBuild / organization := "za.co.absa.fa-db"
 
 lazy val scala211 = "2.11.12"
 lazy val scala212 = "2.12.12"
 
 ThisBuild / scalaVersion := scala211
 ThisBuild / crossScalaVersions := Seq(scala211, scala212)
-ThisBuild / publish := {}
 
-libraryDependencies ++=  List(
+import Dependencies._
 
-  "org.scala-lang"      %  "scala-compiler"   % scalaVersion.value,
-  //"org.tpolecat"        %% "skunk-core"       % "0.2.0",
-//  "org.scalikejdbc"     %% "scalikejdbc"      % "3.4.+",
-//  "com.h2database"      %  "h2"               % "1.4.+",
-//  "ch.qos.logback"      %  "logback-classic"  % "1.2.+",
+ThisBuild/resolvers += Resolver.mavenLocal + "Local Maven" at Path.userHome.asFile.toURI.toURL + ".m2/repository"
 
-  "com.typesafe.slick"  %% "slick"            % "3.3.3",
-  "org.slf4j"            % "slf4j-nop"        % "1.6.4",
-  "com.typesafe.slick"  %% "slick-hikaricp"   % "3.3.3",
-  "org.postgresql"       % "postgresql"       % "9.4-1206-jdbc42",
-//
-//  "io.github.finagle"   %% "finagle-postgres" % "0.13.0",
+lazy val printScalaVersion = taskKey[Unit]("Print Scala versions faDB is being built for.")
 
-  "org.scalatest"       %% "scalatest"        % "3.2.9"  % Test,
-  "org.scalamock"       %% "scalamock"        % "5.1.0"  % Test
-)
+ThisBuild / printScalaVersion := {
+  val log = streams.value.log
+  log.info(s"Building with Scala ${scalaVersion.value}")
+  log.info(s"Local maven ${Resolver.mavenLocal}")
+}
+
+lazy val parent = (project in file("."))
+  .aggregate(faDbCore, faDBSlick, faDBExamples)
+  .settings(
+    name := "root",
+    libraryDependencies ++= rootDependencies(scalaVersion.value),
+    javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint"),
+    publish / skip := true
+  )
+
+lazy val faDbCore = (project in file("core"))
+  .settings(
+    name := "core",
+    libraryDependencies ++= coreDependencies(scalaVersion.value),
+    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value // printScalaVersion is run with compile
+  )
+
+lazy val faDBSlick = (project in file("slick"))
+  .settings(
+    name := "slick",
+    libraryDependencies ++= slickDependencies(scalaVersion.value),
+    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value // printScalaVersion is run with compile
+  ).dependsOn(faDbCore)
+
+lazy val faDBExamples = (project in file("examples"))
+  .settings(
+    name := "examples",
+    libraryDependencies ++= examplesDependencies(scalaVersion.value),
+    Test / parallelExecution := false,
+    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value, // printScalaVersion is run with compile
+    publish / skip := true
+  ).dependsOn(faDbCore, faDBSlick)
 
 releasePublishArtifactsAction := PgpKeys.publishSigned.value

@@ -14,4 +14,20 @@
  * limitations under the License.
  */
 
-ThisBuild / version := "0.1.0-SNAPSHOT"
+package za.co.absa.fadb.naming_conventions.letters_case
+
+sealed trait LettersCase {
+  def convert(s: String): String
+}
+
+object LettersCase {
+  case object AsIs extends LettersCase {
+    override def convert(s: String): String = s
+  }
+  case object LowerCase extends LettersCase {
+    override def convert(s: String): String = s.toLowerCase
+  }
+  case object UpperCase extends LettersCase {
+    override def convert(s: String): String = s.toUpperCase
+  }
+}

@@ -14,4 +14,25 @@
  * limitations under the License.
  */
 
-ThisBuild / version := "0.1.0-SNAPSHOT"
+package za.co.absa.fadb.slick
+
+
+import scala.concurrent.Future
+import slick.jdbc.PostgresProfile.api._
+
+import za.co.absa.fadb.DBFunction.QueryFunction
+import za.co.absa.fadb.DBExecutor
+
+
+class SlickPgExecutor(db: Database) extends DBExecutor[Database] {
+  override def run[R](fnc: QueryFunction[Database, R]): Future[Seq[R]] = {
+    fnc(db)
+  }
+}
+
+object SlickPgExecutor {
+  def forConfig(dbConfig: String): SlickPgExecutor = {
+    val db = Database.forConfig(dbConfig)
+    new SlickPgExecutor(db)
+  }
+}

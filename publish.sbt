@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 ABSA Group Limited
+ * Copyright 2022 ABSA Group Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ ThisBuild / developers := List(
 )
 
 ThisBuild / homepage := Some(url("https://github.com/AbsaOSS/fa-DB"))
-ThisBuild / description := "DB data access via procedures"
+ThisBuild / description := "DB data access via DB functions"
 ThisBuild / startYear := Some(2022)
 ThisBuild / licenses += "Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.txt")
 

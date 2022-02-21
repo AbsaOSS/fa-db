@@ -14,4 +14,19 @@
  * limitations under the License.
  */
 
-ThisBuild / version := "0.1.0-SNAPSHOT"
+package za.co.absa.fadb.naming_conventions
+
+import za.co.absa.fadb.naming_conventions.letters_case.LettersCase
+import za.co.absa.fadb.naming_conventions.letters_case.LettersCase.AsIs
+
+class AsIsNaming(lettersCase: LettersCase) extends NamingConvention{
+  override def stringPerConvention(original: String): String = {
+    lettersCase.convert(original)
+  }
+}
+
+object AsIsNaming {
+  object Implicits {
+    implicit val namingConvention: NamingConvention = new AsIsNaming(AsIs)
+  }
+}

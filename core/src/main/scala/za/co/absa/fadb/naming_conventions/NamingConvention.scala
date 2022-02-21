@@ -14,4 +14,21 @@
  * limitations under the License.
  */
 
-ThisBuild / version := "0.1.0-SNAPSHOT"
+package za.co.absa.fadb.naming_conventions
+
+trait NamingConvention {
+  def fromClassNamePerConvention(c: Class[_]): String = {
+    val className = c.getSimpleName
+    val cleanClassName = className.lastIndexOf('$') match {
+      case -1 => className
+      case x => className.substring(0, x)
+    }
+    stringPerConvention(cleanClassName)
+  }
+
+  def fromClassNamePerConvention(instance: AnyRef): String = {
+    fromClassNamePerConvention(instance.getClass)
+  }
+
+  def stringPerConvention(original: String): String
+}

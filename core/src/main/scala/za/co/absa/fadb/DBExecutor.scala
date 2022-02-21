@@ -14,4 +14,17 @@
  * limitations under the License.
  */
 
-ThisBuild / version := "0.1.0-SNAPSHOT"
+package za.co.absa.fadb
+
+import za.co.absa.fadb.DBFunction.QueryFunction
+
+import scala.concurrent.Future
+
+/**
+  * And abstraction to make it possible to execute queries through regardless of the provided database engine library
+  *
+  * @tparam E - the type of the engine, E.g. a Slick Postgres Database
+  */
+trait DBExecutor[+E] {
+  def run[R](fnc: QueryFunction[E, R]): Future[Seq[R]]
+}
