@@ -25,6 +25,6 @@ import scala.concurrent.Future
   *
   * @tparam E - the type of the engine, E.g. a Slick Postgres Database
   */
-trait DBExecutor[+E] {
+trait DBExecutor[E] {
   def run[R](fnc: QueryFunction[E, R]): Future[Seq[R]]
 }
