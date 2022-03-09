@@ -5,7 +5,7 @@
 
 [![Build](https://github.com/AbsaOSS/fa-db/workflows/Build/badge.svg)](https://github.com/AbsaOSS/fa-db/actions)
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/fa-db_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/fa-db_2.11) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/fa-db_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/fa-db_2.12)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/core_2.11/badge.svg)](https://search.maven.org/search?q=g:za.co.absa.fa-db)
 
 ___
 
@@ -53,7 +53,7 @@ Currently, the library is developed with Postgres as the target DB. But the appr
 ```scala
 libraryDependencies ++= Seq(
   "za.co.absa.fa-db" %% "core"  % "X.Y.Z",
-  "za.co.absa.fa-db" %% "slick" % "X.Y.Z",
+  "za.co.absa.fa-db" %% "slick" % "X.Y.Z"
 )
 ```
 
@@ -83,8 +83,8 @@ libraryDependencies ++= Seq(
    <version>${latest_version}</version>
 </dependency>
 <dependency>
-<groupId>za.co.absa.fa-db</groupId>
-<artifactId>slick_2.12</artifactId>
-<version>${latest_version}</version>
+    <groupId>za.co.absa.fa-db</groupId>
+    <artifactId>slick_2.12</artifactId>
+    <version>${latest_version}</version>
 </dependency>
 ```
