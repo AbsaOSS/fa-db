@@ -59,7 +59,11 @@ libraryDependencies ++= Seq(
 
 #### Maven
 
-##### Scala 2.11 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/fa-db_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/fa-db_2.11)
+##### Scala 2.11
+
+Modules:
+* Core [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/core_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/core_2.11)
+* Slick [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/slick_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/slick_2.11)
 
 ```xml
 <dependency>
@@ -74,7 +78,10 @@ libraryDependencies ++= Seq(
 </dependency>
 ```
 
-### Scala 2.12 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/fa-db_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/fa-db_2.12)
+### Scala 2.12 
+Modules:
+* Core [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/core_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/core_2.12)
+* Slick [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/slick_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/slick_2.12)
 
 ```xml
 <dependency>
