@@ -1,6 +1,21 @@
 # fa-db
 ## _Functional Access to Database_
 
+### Build Status
+
+[![Build](https://github.com/AbsaOSS/fa-db/workflows/Build/badge.svg)](https://github.com/AbsaOSS/fa-db/actions)
+
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/core_2.11/badge.svg)](https://search.maven.org/search?q=g:za.co.absa.fa-db)
+
+___
+
+<!-- toc -->
+- [What is fa-db](#what-is-fa-db)
+- [Usage](#usage)
+<!-- tocstop -->
+
+## What is fa-db
+
 This library is a less traditional way to facilitate data between an application and an SQL Database.
 
 Traditionally application directly applies SQL queries or use some ORM framework. While the first approach mixes two
@@ -30,3 +45,53 @@ within the application.**
 
 Currently, the library is developed with Postgres as the target DB. But the approach is applicable to any DB supporting stored procedure/functions – Oracle, MS-SQL, ...
 
+
+### Usage
+
+#### Sbt
+
+```scala
+libraryDependencies ++= Seq(
+  "za.co.absa.fa-db" %% "core"  % "X.Y.Z",
+  "za.co.absa.fa-db" %% "slick" % "X.Y.Z"
+)
+```
+
+#### Maven
+
+##### Scala 2.11
+
+Modules:
+* Core [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/core_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/core_2.11)
+* Slick [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/slick_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/slick_2.11)
+
+```xml
+<dependency>
+   <groupId>za.co.absa.fa-db</groupId>
+   <artifactId>core_2.11</artifactId>
+   <version>${latest_version}</version>
+</dependency>
+<dependency>
+<groupId>za.co.absa.fa-db</groupId>
+<artifactId>slick_2.11</artifactId>
+<version>${latest_version}</version>
+</dependency>
+```
+
+### Scala 2.12 
+Modules:
+* Core [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/core_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/core_2.12)
+* Slick [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/slick_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/slick_2.12)
+
+```xml
+<dependency>
+   <groupId>za.co.absa.fa-db</groupId>
+   <artifactId>core_2.12</artifactId>
+   <version>${latest_version}</version>
+</dependency>
+<dependency>
+    <groupId>za.co.absa.fa-db</groupId>
+    <artifactId>slick_2.12</artifactId>
+    <version>${latest_version}</version>
+</dependency>
+```
