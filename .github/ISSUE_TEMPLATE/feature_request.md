@@ -1,7 +1,7 @@
 ---
 name: Feature request
 about: Suggest an idea for this project
-labels: 'feature, under discussion, priority: undecided'
+labels: 'feature, DB, under discussion, priority: undecided'
 
 ---
 
