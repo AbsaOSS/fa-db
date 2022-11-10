@@ -34,6 +34,37 @@ ThisBuild / printScalaVersion := {
   log.info(s"Local maven ${Resolver.mavenLocal}")
 }
 
+lazy val jacocoCoreReportSettings = Seq(
+  jacocoReportSettings := JacocoReportSettings(
+    s"fa-db:core Jacoco Report",
+    None,
+    JacocoThresholds(),
+    Seq(JacocoReportFormats.HTML, JacocoReportFormats.XML),
+    "utf-8"),
+  jacocoExcludes := Seq(
+//        "za.co.absa.fadb.naming_conventions.SnakeCaseNaming*", // class and related objects
+//        "za.co.absa.fadb.naming_conventions.AsIsNaming" // class only
+  )
+)
+
+lazy val jacocoSlickReportSettings = Seq(
+  jacocoReportSettings := JacocoReportSettings(
+    s"fa-db:slick Jacoco Report",
+    None,
+    JacocoThresholds(),
+    Seq(JacocoReportFormats.HTML, JacocoReportFormats.XML),
+    "utf-8")
+)
+
+lazy val jacocoExamplesReportSettings = Seq(
+  jacocoReportSettings := JacocoReportSettings(
+    s"fa-db:examples Jacoco Report",
+    None,
+    JacocoThresholds(),
+    Seq(JacocoReportFormats.HTML, JacocoReportFormats.XML),
+    "utf-8")
+)
+
 lazy val parent = (project in file("."))
   .aggregate(faDbCore, faDBSlick, faDBExamples)
   .settings(
@@ -49,6 +80,7 @@ lazy val faDbCore = (project in file("core"))
     libraryDependencies ++= coreDependencies(scalaVersion.value),
     (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value // printScalaVersion is run with compile
   )
+  .settings(jacocoCoreReportSettings: _*)
 
 lazy val faDBSlick = (project in file("slick"))
   .settings(
@@ -56,6 +88,7 @@ lazy val faDBSlick = (project in file("slick"))
     libraryDependencies ++= slickDependencies(scalaVersion.value),
     (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value // printScalaVersion is run with compile
   ).dependsOn(faDbCore)
+  .settings(jacocoSlickReportSettings: _*)
 
 lazy val faDBExamples = (project in file("examples"))
   .settings(
@@ -65,5 +98,6 @@ lazy val faDBExamples = (project in file("examples"))
     (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value, // printScalaVersion is run with compile
     publish / skip := true
   ).dependsOn(faDbCore, faDBSlick)
+  .settings(jacocoExamplesReportSettings: _*)
 
 releasePublishArtifactsAction := PgpKeys.publishSigned.value

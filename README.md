@@ -95,3 +95,12 @@ Modules:
     <version>${latest_version}</version>
 </dependency>
 ```
+
+### How to generate Code coverage report
+```sbt
+sbt jacoco
+```
+Code coverage will be generated on path:
+```
+{local-path}\fa-db\{module}\target\scala-2.XY\jacoco\report\html
+```
