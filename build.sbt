@@ -61,9 +61,7 @@ lazy val faDbCore = (project in file("core"))
   )
   .settings(
     jacocoReportSettings := commonJacocoReportSettings.withTitle("fa-db:core Jacoco Report"),
-    jacocoExcludes := commonJacocoExcludes ++ Seq(
-//      "za.co.absa.fadb.naming_conventions.AsIsNaming" // extra exclude example
-    )
+    jacocoExcludes := commonJacocoExcludes
   )
 
 lazy val faDBSlick = (project in file("slick"))
