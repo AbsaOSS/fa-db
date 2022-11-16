@@ -75,3 +75,4 @@ lazy val faDBExamples = (project in file("examples"))
   ).dependsOn(faDbCore, faDBSlick)
 
 releasePublishArtifactsAction := PgpKeys.publishSigned.value
+Global / excludeLintKeys += ThisBuild / name
