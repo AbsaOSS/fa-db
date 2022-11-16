@@ -23,6 +23,7 @@ ThisBuild / scalaVersion := scala211
 ThisBuild / crossScalaVersions := Seq(scala211, scala212)
 
 import Dependencies._
+import com.github.sbt.jacoco.report.JacocoReportSettings
 
 ThisBuild/resolvers += Resolver.mavenLocal + "Local Maven" at Path.userHome.asFile.toURI.toURL + ".m2/repository"
 
@@ -34,35 +35,13 @@ ThisBuild / printScalaVersion := {
   log.info(s"Local maven ${Resolver.mavenLocal}")
 }
 
-lazy val jacocoCoreReportSettings = Seq(
-  jacocoReportSettings := JacocoReportSettings(
-    s"fa-db:core Jacoco Report",
-    None,
-    JacocoThresholds(),
-    Seq(JacocoReportFormats.HTML, JacocoReportFormats.XML),
-    "utf-8"),
-  jacocoExcludes := Seq(
-//        "za.co.absa.fadb.naming_conventions.SnakeCaseNaming*", // class and related objects
-//        "za.co.absa.fadb.naming_conventions.AsIsNaming" // class only
-  )
+lazy val commonJacocoReportSettings: JacocoReportSettings = JacocoReportSettings(
+  formats = Seq(JacocoReportFormats.HTML, JacocoReportFormats.XML)
 )
 
-lazy val jacocoSlickReportSettings = Seq(
-  jacocoReportSettings := JacocoReportSettings(
-    s"fa-db:slick Jacoco Report",
-    None,
-    JacocoThresholds(),
-    Seq(JacocoReportFormats.HTML, JacocoReportFormats.XML),
-    "utf-8")
-)
-
-lazy val jacocoExamplesReportSettings = Seq(
-  jacocoReportSettings := JacocoReportSettings(
-    s"fa-db:examples Jacoco Report",
-    None,
-    JacocoThresholds(),
-    Seq(JacocoReportFormats.HTML, JacocoReportFormats.XML),
-    "utf-8")
+lazy val commonJacocoExcludes: Seq[String] = Seq(
+  //        "za.co.absa.fadb.naming_conventions.SnakeCaseNaming*", // class and related objects
+  //        "za.co.absa.fadb.naming_conventions.AsIsNaming" // class only
 )
 
 lazy val parent = (project in file("."))
@@ -80,7 +59,12 @@ lazy val faDbCore = (project in file("core"))
     libraryDependencies ++= coreDependencies(scalaVersion.value),
     (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value // printScalaVersion is run with compile
   )
-  .settings(jacocoCoreReportSettings: _*)
+  .settings(
+    jacocoReportSettings := commonJacocoReportSettings.withTitle("fa-db:core Jacoco Report"),
+    jacocoExcludes := commonJacocoExcludes ++ Seq(
+//      "za.co.absa.fadb.naming_conventions.AsIsNaming" // extra exclude example
+    )
+  )
 
 lazy val faDBSlick = (project in file("slick"))
   .settings(
@@ -88,7 +72,10 @@ lazy val faDBSlick = (project in file("slick"))
     libraryDependencies ++= slickDependencies(scalaVersion.value),
     (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value // printScalaVersion is run with compile
   ).dependsOn(faDbCore)
-  .settings(jacocoSlickReportSettings: _*)
+  .settings(
+    jacocoReportSettings := commonJacocoReportSettings.withTitle("fa-db:slick Jacoco Report"),
+    jacocoExcludes := commonJacocoExcludes
+  )
 
 lazy val faDBExamples = (project in file("examples"))
   .settings(
@@ -98,6 +85,9 @@ lazy val faDBExamples = (project in file("examples"))
     (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value, // printScalaVersion is run with compile
     publish / skip := true
   ).dependsOn(faDbCore, faDBSlick)
-  .settings(jacocoExamplesReportSettings: _*)
+  .settings(
+    jacocoReportSettings := commonJacocoReportSettings.withTitle("fa-db:examples Jacoco Report"),
+    jacocoExcludes := commonJacocoExcludes
+  )
 
 releasePublishArtifactsAction := PgpKeys.publishSigned.value
