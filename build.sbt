@@ -15,6 +15,7 @@
  */
 
 import Dependencies._
+import com.github.sbt.jacoco.report.JacocoReportSettings
 
 ThisBuild / name := "fa-db"
 ThisBuild / organization := "za.co.absa.fa-db"
@@ -37,6 +38,15 @@ ThisBuild / printScalaVersion := {
   log.info(s"Local maven ${Resolver.mavenLocal}")
 }
 
+lazy val commonJacocoReportSettings: JacocoReportSettings = JacocoReportSettings(
+  formats = Seq(JacocoReportFormats.HTML, JacocoReportFormats.XML)
+)
+
+lazy val commonJacocoExcludes: Seq[String] = Seq(
+  //        "za.co.absa.fadb.naming_conventions.SnakeCaseNaming*", // class and related objects
+  //        "za.co.absa.fadb.naming_conventions.AsIsNaming" // class only
+)
+
 lazy val parent = (project in file("."))
   .aggregate(faDbCore, faDBSlick, faDBExamples)
   .settings(
@@ -55,6 +65,10 @@ lazy val faDbCore = (project in file("core"))
     scalacOptions ++= commonScalacOptions,
     (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value // printScalaVersion is run with compile
   )
+  .settings(
+    jacocoReportSettings := commonJacocoReportSettings.withTitle("fa-db:core Jacoco Report"),
+    jacocoExcludes := commonJacocoExcludes
+  )
 
 lazy val faDBSlick = (project in file("slick"))
   .settings(
@@ -64,6 +78,10 @@ lazy val faDBSlick = (project in file("slick"))
     scalacOptions ++= commonScalacOptions,
     (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value // printScalaVersion is run with compile
   ).dependsOn(faDbCore)
+  .settings(
+    jacocoReportSettings := commonJacocoReportSettings.withTitle("fa-db:slick Jacoco Report"),
+    jacocoExcludes := commonJacocoExcludes
+  )
 
 lazy val faDBExamples = (project in file("examples"))
   .settings(
@@ -73,6 +91,10 @@ lazy val faDBExamples = (project in file("examples"))
     (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value, // printScalaVersion is run with compile
     publish / skip := true
   ).dependsOn(faDbCore, faDBSlick)
+  .settings(
+    jacocoReportSettings := commonJacocoReportSettings.withTitle("fa-db:examples Jacoco Report"),
+    jacocoExcludes := commonJacocoExcludes
+  )
 
 releasePublishArtifactsAction := PgpKeys.publishSigned.value
 Global / excludeLintKeys += ThisBuild / name
