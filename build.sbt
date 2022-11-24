@@ -17,7 +17,7 @@
 import Dependencies._
 
 ThisBuild / name := "fa-db"
-ThisBuild / organization := "za.co.absa"
+ThisBuild / organization := "za.co.absa.fa-db"
 
 lazy val scala211 = "2.11.12"
 lazy val scala212 = "2.12.12"
