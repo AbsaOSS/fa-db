@@ -48,7 +48,7 @@ jobs:
         with:
           java-version: "adopt@1.8"
       - name: Build and run tests
-        run: sbt ++${{matrix.scala}} jacoco
+        run: sbt ++${{matrix.scala}} jacoco doc
       - name: Add coverage to PR
         id: jacoco
         uses: madrapps/jacoco-report@v1.3
