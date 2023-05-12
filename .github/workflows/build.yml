@@ -24,7 +24,7 @@ on:
       types: [ assigned, opened, synchronize, reopened, labeled ]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -42,13 +42,50 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - uses: coursier/cache-action@v5
       - name: Setup Scala
         uses: olafurpg/setup-scala@v10
         with:
           java-version: "adopt@1.8"
       - name: Build and run tests
-        run: sbt ++${{matrix.scala}} jacoco doc
+        run: sbt ++${{matrix.scala}} jacoco doc # We will need JaCoCo report in second job
+      - uses: actions/cache/save@v3
+        with:
+          path: |
+            ${{ github.workspace }}/core/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
+            ${{ github.workspace }}/examples/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
+            ${{ github.workspace }}/slick/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
+          key: ${{ runner.os }}-${{ matrix.scalaShort }}-${{ hashFiles('**/jacoco.xml') }}
+        
+  jacoco:
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - scala: 2.11.12
+            scalaShort: "2.11"
+            overall: 0.0
+            changed: 80.0
+          - scala: 2.12.17
+            scalaShort: "2.12"
+            overall: 0.0
+            changed: 80.0
+    name: JaCoCo Code Coverage ${{matrix.scala}}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: actions/cache/restore@v3
+        with:
+          path: |
+            ${{ github.workspace }}/core/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
+            ${{ github.workspace }}/examples/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
+            ${{ github.workspace }}/slick/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
+          key: ${{ runner.os }}-${{ matrix.scalaShort }}-${{ hashFiles('**/jacoco.xml') }}
+      - name: Setup Scala
+        uses: olafurpg/setup-scala@v10
+        with:
+          java-version: "adopt@1.8"
       - name: Add coverage to PR
         id: jacoco
         uses: madrapps/jacoco-report@v1.3
