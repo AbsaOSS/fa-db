@@ -38,7 +38,7 @@ jobs:
             scalaShort: "2.12"
             overall: 0.0
             changed: 80.0
-    name: Build on Scala ${{matrix.scala}}
+    name: JaCoco test coverage on Scala ${{matrix.scala}}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2

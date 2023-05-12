@@ -41,17 +41,17 @@ abstract class DBSchema[E](val executor: DBExecutor[E], schemaNameOverride: Opti
 
   val schemaName: String = schemaNameOverride.getOrElse(objectNameFromClassName(getClass))
 
-  def execute[R](query: E => Future[Seq[R]]): Future[Seq[R]] = {
+  def execute[R](query: QueryFunction[E, R]): Future[Seq[R]] = {
     executor.run(query)
   }
 
-  def unique[R](query: E => Future[Seq[R]]): Future[R] = {
+  def unique[R](query: QueryFunction[E, R]): Future[R] = {
     for {
       all <- execute(query)
     } yield all.head
   }
 
-  def option[R](query: E => Future[Seq[R]]): Future[Option[R]] = {
+  def option[R](query: QueryFunction[E, R]): Future[Option[R]] = {
     for {
       all <- execute(query)
     } yield all.headOption

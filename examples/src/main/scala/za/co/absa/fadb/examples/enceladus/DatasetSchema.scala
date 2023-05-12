@@ -16,7 +16,7 @@
 
 package za.co.absa.fadb.examples.enceladus
 
-import za.co.absa.fadb.DBSchema
+import za.co.absa.fadb.{DBSchema, QueryFunction}
 import za.co.absa.fadb.slick.{SlickPgExecutor, SlickPgFunction}
 import za.co.absa.fadb.naming_conventions.SnakeCaseNaming.Implicits.namingConvention
 import slick.jdbc.GetResult
@@ -26,7 +26,6 @@ import za.co.absa.fadb.exceptions.DBFailException
 
 import java.sql.Timestamp
 import scala.concurrent.Future
-
 import DatasetSchema._
 
 class DatasetSchema(executor: SlickPgExecutor) extends DBSchema(executor) {

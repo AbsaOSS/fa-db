@@ -16,8 +16,6 @@
 
 package za.co.absa.fadb
 
-import za.co.absa.fadb.DBFunction.QueryFunction
-
 import scala.concurrent.Future
 
 /**
