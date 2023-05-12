@@ -20,7 +20,6 @@ on:
   push:
     branches: [master ]
   pull_request:
-      branches: [ master ]
       types: [ assigned, opened, synchronize, reopened, labeled ]
 
 jobs:
