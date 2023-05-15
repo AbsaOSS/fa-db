@@ -43,6 +43,7 @@ lazy val commonJacocoReportSettings: JacocoReportSettings = JacocoReportSettings
 )
 
 lazy val commonJacocoExcludes: Seq[String] = Seq(
+  "za.co.absa.fadb.package*"
   //        "za.co.absa.fadb.naming_conventions.SnakeCaseNaming*", // class and related objects
   //        "za.co.absa.fadb.naming_conventions.AsIsNaming" // class only
 )
