@@ -54,7 +54,7 @@ jobs:
             ${{ github.workspace }}/examples/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
             ${{ github.workspace }}/slick/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
           key: ${{ runner.os }}-${{ matrix.scalaShort }}-${{ hashFiles('**/jacoco.xml') }}
-        
+
   jacoco:
     runs-on: ubuntu-latest
     needs: build
@@ -78,8 +78,8 @@ jobs:
         with:
           path: |
             ${{ github.workspace }}/core/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
-            ${{ github.workspace }}/examples/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
             ${{ github.workspace }}/slick/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
+# examples doesn't need code coverage - at least not now
           key: ${{ runner.os }}-${{ matrix.scalaShort }}-${{ hashFiles('**/jacoco.xml') }}
       - name: Setup Scala
         uses: olafurpg/setup-scala@v10

@@ -29,7 +29,7 @@ import scala.concurrent.Future
   * @tparam T                   - the type covering the input fields of the database function
   * @tparam R                   - the type covering the returned fields from the database function
   */
-abstract class DBFunction[E, T, R](schema: DBSchema[E], functionNameOverride: Option[String] = Some("a")) {
+abstract class DBFunction[E, T, R](schema: DBSchema[E], functionNameOverride: Option[String] = None) {
   val functionName: String = {
     val fn = functionNameOverride.getOrElse(schema.objectNameFromClassName(getClass))
     if (schema.schemaName.isEmpty) {
