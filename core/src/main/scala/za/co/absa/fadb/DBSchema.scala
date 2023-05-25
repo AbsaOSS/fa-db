@@ -28,7 +28,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * @param executor           - executor to execute the queries through
   * @param schemaNameOverride - in case the class name would not match the database schema name, this gives the
   *                           possibility of override
-  * @param namingConvention   - the [[NamingConvention]] prescribing how to convert a class name into a db object name
+  * @param namingConvention   - the [[za.co.absa.fadb.naming_conventions.NamingConvention]](NamingConvention) prescribing how to convert a class name into a db object name
   * @tparam E                 - the engine of the executor type, e.g. Slick Database
   */
 abstract class DBSchema[E](val executor: DBExecutor[E], schemaNameOverride: Option[String] = None)
@@ -41,17 +41,17 @@ abstract class DBSchema[E](val executor: DBExecutor[E], schemaNameOverride: Opti
 
   val schemaName: String = schemaNameOverride.getOrElse(objectNameFromClassName(getClass))
 
-  def execute[R](query: E => Future[Seq[R]]): Future[Seq[R]] = {
+  def execute[R](query: QueryFunction[E, R]): Future[Seq[R]] = {
     executor.run(query)
   }
 
-  def unique[R](query: E => Future[Seq[R]]): Future[R] = {
+  def unique[R](query: QueryFunction[E, R]): Future[R] = {
     for {
       all <- execute(query)
     } yield all.head
   }
 
-  def option[R](query: E => Future[Seq[R]]): Future[Option[R]] = {
+  def option[R](query: QueryFunction[E, R]): Future[Option[R]] = {
     for {
       all <- execute(query)
     } yield all.headOption

@@ -16,8 +16,6 @@
 
 package za.co.absa.fadb
 
-import za.co.absa.fadb.DBFunction.QueryFunction
-
 import scala.concurrent.Future
 
 /**
@@ -31,7 +29,7 @@ import scala.concurrent.Future
   * @tparam T                   - the type covering the input fields of the database function
   * @tparam R                   - the type covering the returned fields from the database function
   */
-abstract class DBFunction[E, T, R](schema: DBSchema[E], functionNameOverride: Option[String] = Some("a")) {
+abstract class DBFunction[E, T, R](schema: DBSchema[E], functionNameOverride: Option[String] = None) {
   val functionName: String = {
     val fn = functionNameOverride.getOrElse(schema.objectNameFromClassName(getClass))
     if (schema.schemaName.isEmpty) {
@@ -45,8 +43,6 @@ abstract class DBFunction[E, T, R](schema: DBSchema[E], functionNameOverride: Op
 }
 
 object DBFunction {
-  type QueryFunction[E, R] = E => Future[Seq[R]]
-
   /**
     * Represents a function returning a set (in DB sense) of rows
     *

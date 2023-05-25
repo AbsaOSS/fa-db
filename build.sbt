@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+import Dependencies._
+import com.github.sbt.jacoco.report.JacocoReportSettings
+
+ThisBuild / name := "fa-db"
 ThisBuild / organization := "za.co.absa.fa-db"
 
 lazy val scala211 = "2.11.12"
@@ -22,12 +26,11 @@ lazy val scala212 = "2.12.17"
 ThisBuild / scalaVersion := scala211
 ThisBuild / crossScalaVersions := Seq(scala211, scala212)
 
-import Dependencies._
-import com.github.sbt.jacoco.report.JacocoReportSettings
-
 ThisBuild/resolvers += Resolver.mavenLocal + "Local Maven" at Path.userHome.asFile.toURI.toURL + ".m2/repository"
 
 lazy val printScalaVersion = taskKey[Unit]("Print Scala versions faDB is being built for.")
+lazy val commonJavacOptions = Seq("-source", "1.8", "-target", "1.8", "-Xlint")
+lazy val commonScalacOptions = Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings")
 
 ThisBuild / printScalaVersion := {
   val log = streams.value.log
@@ -40,6 +43,7 @@ lazy val commonJacocoReportSettings: JacocoReportSettings = JacocoReportSettings
 )
 
 lazy val commonJacocoExcludes: Seq[String] = Seq(
+  "za.co.absa.fadb.package*"
   //        "za.co.absa.fadb.naming_conventions.SnakeCaseNaming*", // class and related objects
   //        "za.co.absa.fadb.naming_conventions.AsIsNaming" // class only
 )
@@ -49,7 +53,8 @@ lazy val parent = (project in file("."))
   .settings(
     name := "root",
     libraryDependencies ++= rootDependencies(scalaVersion.value),
-    javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint"),
+    javacOptions ++= commonJavacOptions,
+    scalacOptions ++= commonScalacOptions,
     publish / skip := true
   )
 
@@ -57,6 +62,8 @@ lazy val faDbCore = (project in file("core"))
   .settings(
     name := "core",
     libraryDependencies ++= coreDependencies(scalaVersion.value),
+    javacOptions ++= commonJavacOptions,
+    scalacOptions ++= commonScalacOptions,
     (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value // printScalaVersion is run with compile
   )
   .settings(
@@ -68,6 +75,8 @@ lazy val faDBSlick = (project in file("slick"))
   .settings(
     name := "slick",
     libraryDependencies ++= slickDependencies(scalaVersion.value),
+    javacOptions ++= commonJavacOptions,
+    scalacOptions ++= commonScalacOptions,
     (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value // printScalaVersion is run with compile
   ).dependsOn(faDbCore)
   .settings(
@@ -89,3 +98,4 @@ lazy val faDBExamples = (project in file("examples"))
   )
 
 releasePublishArtifactsAction := PgpKeys.publishSigned.value
+Global / excludeLintKeys += ThisBuild / name

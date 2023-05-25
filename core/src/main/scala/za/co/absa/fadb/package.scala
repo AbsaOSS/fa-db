@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.slick
+package za.co.absa
 
-import slick.jdbc.{GetResult, SQLActionBuilder}
-import slick.jdbc.PostgresProfile.api._
-import za.co.absa.fadb.QueryFunction
+import scala.concurrent.Future
 
-trait SlickPgFunction {
-  def makeQueryFunction[R](sql: SQLActionBuilder)(implicit rconv: GetResult[R]): QueryFunction[Database, R] = {
-    val query = sql.as[R]
-    val resultFnc = {db: Database => db.run(query)}
-    resultFnc
-  }
+package object fadb {
+  type QueryFunction[E, R] = E => Future[Seq[R]]
 }
