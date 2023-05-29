@@ -22,9 +22,9 @@ import za.co.absa.fadb.{DBFunctionFabric, QueryFunction}
 
 trait SlickPgFunction[T, R] extends DBFunctionFabric {
 
-  protected def sqlToCallFunction(values: T): SQLActionBuilder = ??? //TODO make abstract
+  protected def sqlToCallFunction(values: T): SQLActionBuilder
 
-  protected def resultConverter: GetResult[R] = ??? //TODO make abstract
+  protected def resultConverter: GetResult[R]
 
   protected def makeQueryFunction(sql: SQLActionBuilder)(implicit rconv: GetResult[R]): QueryFunction[Database, R] = {
     val query = sql.as[R]
