@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 ABSA Group Limited
+ * Copyright 2023 ABSA Group Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package za.co.absa
+package za.co.absa.fadb
 
-import scala.concurrent.Future
+/**
+  * This trait serves the purpose of introducing functions that are common to all DB Function objects and mix-in traits
+  * that offer certain implementations. This trait should help with the inheritance of all of these
+  */
+trait DBFunctionFabric {
+  def functionName: String
 
-package object fadb {
-  /**
-    * Represents a database query call (in the model of Fa-Db a call to a DB stored procedure). When provided a DB
-    * connection (of type [[DBExecutor]]) it executes the query and transforms it to the desired result type sequence.
-    * @tparam E - the type of the DB connection to execute on
-    * @tparam R - the type of result
-    */
-  type QueryFunction[E, R] = E => Future[Seq[R]]
+  protected def fieldsToSelect: Seq[String] = Seq.empty
 }

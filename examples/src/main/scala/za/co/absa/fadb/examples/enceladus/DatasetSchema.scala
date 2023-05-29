@@ -16,17 +16,17 @@
 
 package za.co.absa.fadb.examples.enceladus
 
-import za.co.absa.fadb.{DBSchema, QueryFunction}
+import za.co.absa.fadb.{DBSchema}
 import za.co.absa.fadb.slick.{SlickPgExecutor, SlickPgFunction}
 import za.co.absa.fadb.naming_conventions.SnakeCaseNaming.Implicits.namingConvention
-import slick.jdbc.GetResult
+import slick.jdbc.{GetResult, SQLActionBuilder}
 import za.co.absa.fadb.DBFunction._
 import slick.jdbc.PostgresProfile.api._
-import za.co.absa.fadb.exceptions.DBFailException
 
 import java.sql.Timestamp
 import scala.concurrent.Future
 import DatasetSchema._
+import za.co.absa.fadb.statushandling.StatusException
 
 class DatasetSchema(executor: SlickPgExecutor) extends DBSchema(executor) {
 
@@ -67,64 +67,65 @@ object DatasetSchema {
     val status: Int = r.<<
     val statusText: String = r.<<
     if (status != 200) {
-      throw DBFailException(status, statusText)
+      throw new StatusException(status, statusText)
     }
     Schema(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<)
   })
 
   final class AddSchema(implicit schema: DBSchema[ExecutorEngineType])
     extends DBUniqueFunction[ExecutorEngineType, SchemaInput, Long](schema)
-    with SlickPgFunction {
+    with SlickPgFunction[SchemaInput, Long] {
 
-    override protected def queryFunction(values: SchemaInput): QueryFunction[ExecutorEngineType, Long] = {
-      val gr:GetResult[Long] = GetResult(r => {
-        val status: Int = r.<<
-        val statusText: String = r.<<
-        if (status != 201) throw DBFailException(status, statusText)
-        r.<<
-      })
 
-      val sql =
-        sql"""SELECT A.status, A.status_text, A.id_schema_version
+    override protected def sqlToCallFunction(values: SchemaInput): SQLActionBuilder = {
+      sql"""SELECT A.status, A.status_text, A.id_schema_version
              FROM #$functionName(${values.schemaName}, ${values.schemaVersion}, ${values.schemaDescription},
                 ${values.fields}::JSONB, ${values.userName}
              ) A;"""
+    }
 
-      makeQueryFunction(sql)(gr)
+    override protected def resultConverter: GetResult[Long] = {
+      val gr:GetResult[Long] = GetResult(r => {
+        val status: Int = r.<<
+        val statusText: String = r.<<
+        if (status != 201) throw new StatusException(status, statusText)
+        r.<<
+      })
+      gr
     }
   }
 
   final class GetSchema(implicit schema: DBSchema[ExecutorEngineType])
     extends DBUniqueFunction[ExecutorEngineType, (String, Option[Int]), Schema](schema)
-    with SlickPgFunction {
+    with SlickPgFunction[(String, Option[Int]), Schema] {
 
     def apply(id: Long): Future[Schema] = {
       val sql =
         sql"""SELECT A.*
              FROM #$functionName($id) A;"""
-      schema.unique(makeQueryFunction[Schema](sql))
+
+      schema.unique(makeQueryFunction(sql)(resultConverter))
     }
 
-    override protected def queryFunction(values: (String, Option[Int])): QueryFunction[ExecutorEngineType, Schema] = {
-      val sql =
-        sql"""SELECT A.*
+    override protected def sqlToCallFunction(values: (String, Option[Int])): SQLActionBuilder = {
+      sql"""SELECT A.*
               FROM #$functionName(${values._1}, ${values._2}) A;"""
-
-      makeQueryFunction[Schema](sql)
     }
+
+    override protected def resultConverter: GetResult[Schema] = DatasetSchema.GetSchemaImplicit
   }
 
   final class ListSchemas(implicit schema: DBSchema[ExecutorEngineType])
     extends DBSeqFunction[ExecutorEngineType, Boolean, SchemaHeader](schema)
-    with SlickPgFunction {
+    with SlickPgFunction[Boolean, SchemaHeader] {
 
     override def apply(values: Boolean = false): Future[Seq[SchemaHeader]] = super.apply(values)
 
-    override protected def queryFunction(values: Boolean): QueryFunction[ExecutorEngineType, SchemaHeader] = {
-      val sql =
-             sql"""SELECT A.schema_name, A.schema_latest_version
+    override protected def sqlToCallFunction(values: Boolean): SQLActionBuilder = {
+      sql"""SELECT A.schema_name, A.schema_latest_version
                    FROM #$functionName($values) as A;"""
-      makeQueryFunction[SchemaHeader](sql)
     }
+
+    override protected def resultConverter: GetResult[SchemaHeader] = DatasetSchema.SchemaHeaderImplicit
   }
 }
