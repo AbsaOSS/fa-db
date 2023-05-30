@@ -16,7 +16,7 @@
 
 package za.co.absa.fadb.examples.enceladus
 
-import za.co.absa.fadb.{DBSchema}
+import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.slick.{SlickPgExecutor, SlickPgFunction}
 import za.co.absa.fadb.naming_conventions.SnakeCaseNaming.Implicits.namingConvention
 import slick.jdbc.{GetResult, SQLActionBuilder}
