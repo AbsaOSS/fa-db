@@ -21,7 +21,7 @@ import za.co.absa.fadb.statushandling.StatusException
 import za.co.absa.fadb.statushandling.StatusException._
 
 import scala.reflect.ClassTag
-import scala.util.{Failure, Try}
+import scala.util.Try
 
 class StandardStatusHandlingTest extends AnyFunSuite {
   test("Verify checkStatus error mapping") {
