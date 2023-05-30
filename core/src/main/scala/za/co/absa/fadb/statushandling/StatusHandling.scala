@@ -38,5 +38,5 @@ trait StatusHandling extends DBFunctionFabric{
 
 object StatusHandling {
   val defaultStatusFieldName = "status"
-  val defaultStatusTextFieldName = "status_test"
+  val defaultStatusTextFieldName = "status_text"
 }
