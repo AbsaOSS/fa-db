@@ -16,7 +16,11 @@
 
 package za.co.absa.fadb
 
+import za.co.absa.fadb.DBEngine.Query
+import za.co.absa.fadb.naming_conventions.NamingConvention
+
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * The most general abstraction of database function representation
@@ -29,7 +33,9 @@ import scala.concurrent.Future
   * @tparam T                   - the type covering the input fields of the database function
   * @tparam R                   - the type covering the returned fields from the database function
   */
-abstract class DBFunction[E, T, R](schema: DBSchema[E], functionNameOverride: Option[String] = None)  extends DBFunctionFabric {
+abstract class DBFunction[T, R, Q <: Query](schema: DBSchema[Q], functionNameOverride: Option[String] = None)  extends DBFunctionFabric {
+  type QR
+
   val functionName: String = {
     val fn = functionNameOverride.getOrElse(schema.objectNameFromClassName(getClass))
     if (schema.schemaName.isEmpty) {
@@ -39,6 +45,13 @@ abstract class DBFunction[E, T, R](schema: DBSchema[E], functionNameOverride: Op
     }
   }
 
+  def namingConvention: NamingConvention = schema.namingConvention
+
+  override protected def fieldsToSelect: Seq[String] = super.fieldsToSelect //TODO should get the names from R #6
+
+  protected def query(values: T): Q
+
+  protected def converter: QR => R
   /**
     * For the given output it returns a function to execute the SQL query and interpret the results.
     * Basically it should create a function which contains a query to be executable and executed on on the [[DBExecutor]]
@@ -46,7 +59,19 @@ abstract class DBFunction[E, T, R](schema: DBSchema[E], functionNameOverride: Op
     * @param values - the input values of the DB function (stored procedure)
     * @return       - the query function that when provided an executor will return the result of the DB function call
     */
-  protected def queryFunction(values: T): QueryFunction[E, R]
+
+  protected def execute(values: T): Future[Seq[R]] = {
+    schema.dBEngine.execute(query(values), converter)
+  }
+
+  protected def unique(values: T): Future[R] = {
+    schema.dBEngine.unique(query(values), converter)
+  }
+
+  protected def option(values: T): Future[Option[R]] = {
+    schema.dBEngine.option(query(values), converter)
+  }
+
 }
 
 object DBFunction {
@@ -60,11 +85,9 @@ object DBFunction {
     * @tparam T                   - the type covering the input fields of the database function
     * @tparam R                   - the type covering the returned fields from the database function
     */
-  abstract class DBSeqFunction[E, T, R](schema: DBSchema[E], functionNameOverride: Option[String] = None)
-    extends DBFunction[E, T, R](schema, functionNameOverride) {
-    def apply(values: T): Future[Seq[R]] = {
-      schema.execute(queryFunction(values))
-    }
+  abstract class DBSeqFunction[T, R, Q <: Query, QR](schema: DBSchema[Q], functionNameOverride: Option[String] = None)
+    extends DBFunction[T, R, Q, QR](schema, functionNameOverride) {
+    def apply(values: T): Future[Seq[R]] = execute(values)
   }
 
   /**
@@ -77,11 +100,9 @@ object DBFunction {
     * @tparam T                   - the type covering the input fields of the database function
     * @tparam R                   - the type covering the returned fields from the database function
     */
-  abstract class DBUniqueFunction[E, T, R](schema: DBSchema[E], functionNameOverride: Option[String] = None)
-    extends DBFunction[E, T, R](schema, functionNameOverride) {
-    def apply(values: T): Future[R] = {
-      schema.unique(queryFunction(values))
-    }
+  abstract class DBUniqueFunction[T, R, Q <: Query, QR](schema: DBSchema[Q], functionNameOverride: Option[String] = None)
+    extends DBFunction[T, R, Q, QR](schema, functionNameOverride) {
+    def apply(values: T): Future[R] = unique(values)
   }
 
   /**
@@ -94,10 +115,8 @@ object DBFunction {
     * @tparam T                   - the type covering the input fields of the database function
     * @tparam R                   - the type covering the returned fields from the database function
     */
-  abstract class DBOptionFunction[E, T, R](schema: DBSchema[E], functionNameOverride: Option[String] = None)
-    extends DBFunction[E, T, R](schema, functionNameOverride) {
-    def apply(values: T): Future[Option[R]] = {
-      schema.option(queryFunction(values))
-    }
+  abstract class DBOptionFunction[T, R, Q <: Query, QR](schema: DBSchema[Q], functionNameOverride: Option[String] = None)
+    extends DBFunction[T, R, Q, QR](schema, functionNameOverride) {
+    def apply(values: T): Future[Option[R]] = option(values)
   }
 }

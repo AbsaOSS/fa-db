@@ -16,25 +16,36 @@
 
 package za.co.absa.fadb.slick
 
-import slick.jdbc.{GetResult, SQLActionBuilder}
-import slick.jdbc.PostgresProfile.api._
-import za.co.absa.fadb.{DBFunctionFabric, QueryFunction}
+import slick.jdbc.{GetResult, PositionedResult}
+import za.co.absa.fadb.{DBFunction, DBFunctionFabric}
 
 trait SlickPgFunction[T, R] extends DBFunctionFabric {
+  protected val alias = "A"
 
-  protected def sqlToCallFunction(values: T): SQLActionBuilder
-
-  protected def resultConverter: GetResult[R]
-
-  protected def makeQueryFunction(sql: SQLActionBuilder)(implicit rconv: GetResult[R]): QueryFunction[Database, R] = {
-    val query = sql.as[R]
-    val resultFnc = {db: Database => db.run(query)}
-    resultFnc
+  protected def selectEntry: String = {
+    val fieldsSeq = fieldsToSelect
+    if (fieldsSeq.isEmpty) {
+      "*"
+    } else {
+      val aliasToUse = if (alias.isEmpty) {
+        ""
+      } else {
+        s"$alias."
+      }
+      fieldsToSelect.map(aliasToUse + _).mkString(",")
+    }
   }
 
-  protected def queryFunction(values: T): QueryFunction[Database, R] = {
-    val converter = resultConverter
-    val functionSql = sqlToCallFunction(values)
-    makeQueryFunction(functionSql)(converter)
-  }
+  protected def query(values: T): SlickQuery
+
+  protected def slickConverter: GetResult[R]
+
+  protected def converter: PositionedResult => R = slickConverter
 }
+
+object SlickPgFunction {
+  type DBSeqFunction[T, R] = DBFunction.DBSeqFunction[T, R, SlickQuery, PositionedResult] with SlickPgFunction[T, R]
+  type DBUniqueFunction[T, R] = DBFunction.DBUniqueFunction[T, R, SlickQuery, PositionedResult] with SlickPgFunction[T, R]
+  type DBOptionFunction[T, R] = DBFunction.DBOptionFunction[T, R, SlickQuery, PositionedResult] with SlickPgFunction[T, R]
+}
+

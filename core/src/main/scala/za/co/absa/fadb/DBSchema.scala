@@ -16,10 +16,8 @@
 
 package za.co.absa.fadb
 
+import za.co.absa.fadb.DBEngine.Query
 import za.co.absa.fadb.naming_conventions.NamingConvention
-
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * An abstract class, an ancestor to represent a database schema (each database function should be placed in a schema)
@@ -31,9 +29,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * @param namingConvention   - the [[za.co.absa.fadb.naming_conventions.NamingConvention]](NamingConvention) prescribing how to convert a class name into a db object name
   * @tparam E                 - the engine of the executor type, e.g. Slick Database
   */
-abstract class DBSchema[E](val executor: DBExecutor[E], schemaNameOverride: Option[String] = None)
-                          (implicit namingConvention: NamingConvention) {
+abstract class DBSchema[Q <: Query](val dBEngine: DBEngine[Q], schemaNameOverride: Option[String] = None)
+                                    (implicit val namingConvention: NamingConvention) {
 
+  type QueryType[R] = dBEngine.QueryType[R]
 
   def objectNameFromClassName(c: Class[_]): String = {
     namingConvention.fromClassNamePerConvention(c)
@@ -41,19 +40,4 @@ abstract class DBSchema[E](val executor: DBExecutor[E], schemaNameOverride: Opti
 
   val schemaName: String = schemaNameOverride.getOrElse(objectNameFromClassName(getClass))
 
-  def execute[R](query: QueryFunction[E, R]): Future[Seq[R]] = {
-    executor.run(query)
-  }
-
-  def unique[R](query: QueryFunction[E, R]): Future[R] = {
-    for {
-      all <- execute(query)
-    } yield all.head
-  }
-
-  def option[R](query: QueryFunction[E, R]): Future[Option[R]] = {
-    for {
-      all <- execute(query)
-    } yield all.headOption
-  }
 }
