@@ -18,12 +18,23 @@ package za.co.absa.fadb.slick
 
 import slick.jdbc.{GetResult, SQLActionBuilder}
 import slick.jdbc.PostgresProfile.api._
-import za.co.absa.fadb.QueryFunction
+import za.co.absa.fadb.{DBFunctionFabric, QueryFunction}
 
-trait SlickPgFunction {
-  def makeQueryFunction[R](sql: SQLActionBuilder)(implicit rconv: GetResult[R]): QueryFunction[Database, R] = {
+trait SlickPgFunction[T, R] extends DBFunctionFabric {
+
+  protected def sqlToCallFunction(values: T): SQLActionBuilder
+
+  protected def resultConverter: GetResult[R]
+
+  protected def makeQueryFunction(sql: SQLActionBuilder)(implicit rconv: GetResult[R]): QueryFunction[Database, R] = {
     val query = sql.as[R]
     val resultFnc = {db: Database => db.run(query)}
     resultFnc
+  }
+
+  protected def queryFunction(values: T): QueryFunction[Database, R] = {
+    val converter = resultConverter
+    val functionSql = sqlToCallFunction(values)
+    makeQueryFunction(functionSql)(converter)
   }
 }
