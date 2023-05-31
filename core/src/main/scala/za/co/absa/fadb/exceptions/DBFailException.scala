@@ -16,4 +16,12 @@
 
 package za.co.absa.fadb.exceptions
 
-case class DBFailException(status: Int, message: String) extends Exception(message)
+/**
+  * General Fa-DB exception class
+  * @param message  - the message describing the reason of exception
+  */
+class DBFailException(message: String) extends Exception(message)
+
+object DBFailException {
+  def apply(message: String): DBFailException = new DBFailException(message)
+}

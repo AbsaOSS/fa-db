@@ -29,7 +29,7 @@ import scala.concurrent.Future
   * @tparam T                   - the type covering the input fields of the database function
   * @tparam R                   - the type covering the returned fields from the database function
   */
-abstract class DBFunction[E, T, R](schema: DBSchema[E], functionNameOverride: Option[String] = None) {
+abstract class DBFunction[E, T, R](schema: DBSchema[E], functionNameOverride: Option[String] = None)  extends DBFunctionFabric {
   val functionName: String = {
     val fn = functionNameOverride.getOrElse(schema.objectNameFromClassName(getClass))
     if (schema.schemaName.isEmpty) {
@@ -39,6 +39,13 @@ abstract class DBFunction[E, T, R](schema: DBSchema[E], functionNameOverride: Op
     }
   }
 
+  /**
+    * For the given output it returns a function to execute the SQL query and interpret the results.
+    * Basically it should create a function which contains a query to be executable and executed on on the [[DBExecutor]]
+    * and transforming the result of that query to result type.
+    * @param values - the input values of the DB function (stored procedure)
+    * @return       - the query function that when provided an executor will return the result of the DB function call
+    */
   protected def queryFunction(values: T): QueryFunction[E, R]
 }
 
