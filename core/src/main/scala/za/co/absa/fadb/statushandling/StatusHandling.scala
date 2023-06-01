@@ -25,11 +25,11 @@ import scala.util.Try
 /**
   * A basis for mix-in traits for [[DBFunction]] that support `status` and `status text` for easier handling
   */
-trait StatusHandling extends DBFunctionFabric{
+trait StatusHandling extends DBFunctionFabric {
 
   def namingConvention: NamingConvention
 
-  def checkStatus(status: Integer, statusText: String): Try[Unit]
+  protected def checkStatus(status: Integer, statusText: String): Try[Unit]
 
   def statusFieldName: String = namingConvention.stringPerConvention(defaultStatusFieldName)
   def statusTextFieldName: String = namingConvention.stringPerConvention(defaultStatusTextFieldName)

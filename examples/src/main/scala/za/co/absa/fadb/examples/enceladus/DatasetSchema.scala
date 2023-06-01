@@ -18,8 +18,6 @@ package za.co.absa.fadb.examples.enceladus
 
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.slick.{SlickPgEngine, SlickPgFunction, SlickPgFunctionWithStatusSupport, SlickQuery}
-import za.co.absa.fadb.slick.SlickPgFunctionWithStatusSupport._
-import za.co.absa.fadb.slick.SlickPgFunction.{DBSeqFunction => DBSeqFunctionNoStatus}
 import za.co.absa.fadb.naming_conventions.SnakeCaseNaming.Implicits.namingConvention
 import slick.jdbc.{GetResult, SQLActionBuilder}
 import slick.jdbc.PostgresProfile.api._
@@ -27,11 +25,14 @@ import slick.jdbc.PostgresProfile.api._
 import java.sql.Timestamp
 import scala.concurrent.Future
 import DatasetSchema._
+import za.co.absa.fadb.DBFunction.{DBSeqFunction, DBUniqueFunction}
 import za.co.absa.fadb.statushandling.{StatusException, UserDefinedStatusHandling}
 
 class DatasetSchema(engine: SlickPgEngine) extends DBSchema(engine) {
 
-  private implicit val schema: DBSchema[SlickQuery] = this
+
+
+  private implicit val schema: DBSchema = this
   val addSchema = new AddSchema
   val getSchema = new GetSchema
   val listSchemas = new ListSchemas
@@ -39,7 +40,6 @@ class DatasetSchema(engine: SlickPgEngine) extends DBSchema(engine) {
 
 
 object DatasetSchema {
-  type ExecutorEngineType = Database
 
   case class SchemaInput(schemaName: String,
                          schemaVersion: Int,
@@ -73,73 +73,62 @@ object DatasetSchema {
     Schema(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<)
   })
 
-  final class AddSchema(implicit schema: DBSchema[SlickQuery])
+  final class AddSchema(implicit schema: DBSchema)
     extends DBUniqueFunction[SchemaInput, Long](schema)
+    with SlickPgFunction[SchemaInput, Long]
     with UserDefinedStatusHandling {
 
-
-//  TODO ---
-//    override protected def sqlToCallFunction(values: SchemaInput): SQLActionBuilder = {
-//      sql"""SELECT A.status, A.status_text, A.id_schema_version
-//             FROM #$functionName(${values.schemaName}, ${values.schemaVersion}, ${values.schemaDescription},
-//                ${values.fields}::JSONB, ${values.userName}
-//             ) A;"""
-//    }
-//
-//    override protected def resultConverter: GetResult[Long] = {
-//      val gr:GetResult[Long] = GetResult(r => {
-//        val status: Int = r.<<
-//        val statusText: String = r.<<
-//        if (status != 201) throw new StatusException(status, statusText)
-//        r.<<
-//      })
-//      gr
-//    }
-
-    override def OKStatuses: Set[Integer] = Set(201)
-  }
-
-  final class GetSchema(implicit schema: DBSchema[SlickQuery])
-    extends DBUniqueFunction[(String, Option[Int]), Schema](schema)
-    with UserDefinedStatusHandling {
-
-    def apply(id: Long): Future[Schema] = {
-      val sql =
-        sql"""SELECT A.*
-             FROM #$functionName($id) A;"""
-
-      schema.unique(makeQueryFunction(sql)(resultConverter))
+    override protected def sql(values: SchemaInput): SQLActionBuilder = {
+      sql"""SELECT A.status, A.status_text, A.id_schema_version
+            FROM #$functionName(${values.schemaName}, ${values.schemaVersion}, ${values.schemaDescription},
+              ${values.fields}::JSONB, ${values.userName}
+            ) A;"""
     }
 
-// TODO ---
-//    override protected def sqlToCallFunction(values: (String, Option[Int])): SQLActionBuilder = {
-//      sql"""SELECT A.*
-//              FROM #$functionName(${values._1}, ${values._2}) A;"""
-//    }
-//
-//    override protected def resultConverter: GetResult[Schema] = DatasetSchema.GetSchemaImplicit
+    override protected def slickConverter: GetResult[Long] = GetResult.GetLong
+
+    override def OKStatuses: Set[Integer] = Set(201)
+
   }
 
-  final class ListSchemas(implicit schema: DBSchema[SlickQuery])
-    extends DBSeqFunctionNoStatus[Boolean, SchemaHeader](schema) {
+  final class GetSchema(implicit schema: DBSchema)
+    extends DBUniqueFunction[(String, Option[Int]), Schema](schema)
+    with SlickPgFunctionWithStatusSupport[(String, Option[Int]), Schema]
+    with UserDefinedStatusHandling {
+
+//  TODO +++
+//    def apply(id: Long): Future[Schema] = {
+//      val sql =
+//        sql"""SELECT A.*
+//             FROM #$functionName($id) A;"""
+//
+//      val slickQuery: schema.QueryType[Schema] = SlickQuery(sql, slickConverter)
+//      schema.dBEngine.unique[Schema](slickQuery)
+//    }
+
+    override protected def sql(values: (String, Option[Int])): SQLActionBuilder = {
+      sql"""SELECT A.*
+            FROM #$functionName(${values._1}, ${values._2}) A;"""
+    }
+
+    override protected val slickConverter: GetResult[Schema] = GetResult{r =>
+      Schema(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<)
+    }
+
+    override val OKStatuses: Set[Integer] = Set(200)
+  }
+
+  final class ListSchemas(implicit schema: DBSchema)
+    extends DBSeqFunction[Boolean, SchemaHeader](schema)
+    with SlickPgFunction[Boolean, SchemaHeader] {
 
     override def apply(values: Boolean = false): Future[Seq[SchemaHeader]] = super.apply(values)
 
-    override def fieldsToSelect: Seq[String] = {
-      super.fieldsToSelect
+    override protected def sql(values: Boolean): SQLActionBuilder = {
+      sql"""SELECT A.schema_name, A.schema_latest_version
+            FROM #$functionName($values) as A;"""
     }
 
-    protected def query(values: T): SlickQuery = {
-
-    }
-
-//  TODO ---
-//    override protected def sqlToCallFunction(values: Boolean): SQLActionBuilder = {
-//      sql"""SELECT A.schema_name, A.schema_latest_version
-//                   FROM #$functionName($values) as A;"""
-//    }
-//
-//    override protected def resultConverter: GetResult[SchemaHeader] = DatasetSchema.SchemaHeaderImplicit
-
+    override protected val slickConverter: GetResult[SchemaHeader] = GetResult(r => {SchemaHeader(r.<<, r.<<)})
   }
 }

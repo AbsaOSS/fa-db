@@ -16,7 +16,6 @@
 
 package za.co.absa.fadb
 
-import za.co.absa.fadb.DBEngine.Query
 import za.co.absa.fadb.naming_conventions.NamingConvention
 
 import scala.concurrent.Future
@@ -33,8 +32,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * @tparam T                   - the type covering the input fields of the database function
   * @tparam R                   - the type covering the returned fields from the database function
   */
-abstract class DBFunction[T, R, Q <: Query](schema: DBSchema[Q], functionNameOverride: Option[String] = None)  extends DBFunctionFabric {
-  type QR
+abstract class DBFunction[T, R](val schema: DBSchema, functionNameOverride: Option[String] = None)  extends DBFunctionFabric[T,R] {
+
+  override type QueryType[X] = schema.dBEngine.QueryType[X]
 
   val functionName: String = {
     val fn = functionNameOverride.getOrElse(schema.objectNameFromClassName(getClass))
@@ -49,9 +49,8 @@ abstract class DBFunction[T, R, Q <: Query](schema: DBSchema[Q], functionNameOve
 
   override protected def fieldsToSelect: Seq[String] = super.fieldsToSelect //TODO should get the names from R #6
 
-  protected def query(values: T): Q
+  //protected def query[Q >: QueryType[R]](values: T): Q
 
-  protected def converter: QR => R
   /**
     * For the given output it returns a function to execute the SQL query and interpret the results.
     * Basically it should create a function which contains a query to be executable and executed on on the [[DBExecutor]]
@@ -61,15 +60,15 @@ abstract class DBFunction[T, R, Q <: Query](schema: DBSchema[Q], functionNameOve
     */
 
   protected def execute(values: T): Future[Seq[R]] = {
-    schema.dBEngine.execute(query(values), converter)
+    schema.dBEngine.execute(query(values))
   }
 
   protected def unique(values: T): Future[R] = {
-    schema.dBEngine.unique(query(values), converter)
+    schema.dBEngine.unique(query(values))
   }
 
   protected def option(values: T): Future[Option[R]] = {
-    schema.dBEngine.option(query(values), converter)
+    schema.dBEngine.option(query(values))
   }
 
 }
@@ -85,8 +84,8 @@ object DBFunction {
     * @tparam T                   - the type covering the input fields of the database function
     * @tparam R                   - the type covering the returned fields from the database function
     */
-  abstract class DBSeqFunction[T, R, Q <: Query, QR](schema: DBSchema[Q], functionNameOverride: Option[String] = None)
-    extends DBFunction[T, R, Q, QR](schema, functionNameOverride) {
+  abstract class DBSeqFunction[T, R](schema: DBSchema, functionNameOverride: Option[String] = None)
+    extends DBFunction[T, R](schema, functionNameOverride) {
     def apply(values: T): Future[Seq[R]] = execute(values)
   }
 
@@ -100,8 +99,8 @@ object DBFunction {
     * @tparam T                   - the type covering the input fields of the database function
     * @tparam R                   - the type covering the returned fields from the database function
     */
-  abstract class DBUniqueFunction[T, R, Q <: Query, QR](schema: DBSchema[Q], functionNameOverride: Option[String] = None)
-    extends DBFunction[T, R, Q, QR](schema, functionNameOverride) {
+  abstract class DBUniqueFunction[T, R](schema: DBSchema, functionNameOverride: Option[String] = None)
+    extends DBFunction[T, R](schema, functionNameOverride) {
     def apply(values: T): Future[R] = unique(values)
   }
 
@@ -115,8 +114,8 @@ object DBFunction {
     * @tparam T                   - the type covering the input fields of the database function
     * @tparam R                   - the type covering the returned fields from the database function
     */
-  abstract class DBOptionFunction[T, R, Q <: Query, QR](schema: DBSchema[Q], functionNameOverride: Option[String] = None)
-    extends DBFunction[T, R, Q, QR](schema, functionNameOverride) {
+  abstract class DBOptionFunction[T, R](schema: DBSchema, functionNameOverride: Option[String] = None)
+    extends DBFunction[T, R](schema, functionNameOverride) {
     def apply(values: T): Future[Option[R]] = option(values)
   }
 }

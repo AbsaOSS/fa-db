@@ -16,7 +16,7 @@
 
 package za.co.absa.fadb.slick
 
-import slick.jdbc.PositionedResult
+import slick.jdbc.{GetResult, PositionedResult}
 import za.co.absa.fadb.DBFunction
 
 import scala.util.Try
@@ -25,16 +25,15 @@ trait SlickPgFunctionWithStatusSupport[T, R] extends SlickPgFunction[T, R] {
 
   protected def checkStatus(status: Integer, statusText: String): Try[Unit]
 
-  override protected def converter: PositionedResult => R = { queryResult =>
+  private def converterWithStatus(queryResult: PositionedResult, actualConverter: GetResult[R]): R = {
     val status: Int = queryResult.<<
     val statusText: String = queryResult.<<
     checkStatus(status, statusText).get //throw exception if status was off
-    slickConverter(queryResult)
+    actualConverter(queryResult)
   }
-}
 
-object SlickPgFunctionWithStatusSupport {
-  type DBSeqFunction[T, R] = DBFunction.DBSeqFunction[T, R, SlickQuery, PositionedResult] with SlickPgFunctionWithStatusSupport[T, R]
-  type DBUniqueFunction[T, R] = DBFunction.DBUniqueFunction[T, R, SlickQuery, PositionedResult] with SlickPgFunctionWithStatusSupport[T, R]
-  type DBOptionFunction[T, R] = DBFunction.DBOptionFunction[T, R, SlickQuery, PositionedResult] with SlickPgFunctionWithStatusSupport[T, R]
+  override protected def query[Q >: QueryType[R]](values: T): Q = {
+    val original = super.query(values)
+    new QueryType(original.sql, GetResult{converterWithStatus(_, original.getResult)})
+  }
 }

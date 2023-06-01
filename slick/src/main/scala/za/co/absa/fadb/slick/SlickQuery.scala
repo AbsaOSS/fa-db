@@ -17,9 +17,7 @@
 package za.co.absa.fadb.slick
 
 import slick.jdbc.{GetResult, SQLActionBuilder}
-import za.co.absa.fadb.DBEngine.Query
+import za.co.absa.fadb.DBFunctionFabric.Query
 
-case class SlickQuery[R](sql: SQLActionBuilder, getResult: GetResult[R]) extends Query {
-
-}
+class SlickQuery[R](val sql: SQLActionBuilder, val getResult: GetResult[R]) extends Query[R]
 

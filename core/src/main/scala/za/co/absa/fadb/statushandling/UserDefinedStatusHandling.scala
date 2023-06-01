@@ -18,7 +18,7 @@ package za.co.absa.fadb.statushandling
 
 import scala.util.{Failure, Success, Try}
 
-trait UserDefinedStatusHandling extends StatusHandling{
+trait UserDefinedStatusHandling extends StatusHandling {
   def OKStatuses: Set[Integer]
 
   def checkStatus(status: Integer, statusText: String): Try[Unit] = {

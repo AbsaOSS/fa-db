@@ -16,12 +16,21 @@
 
 package za.co.absa.fadb
 
+import za.co.absa.fadb.DBFunctionFabric.Query
+
+import scala.language.higherKinds
+
 /**
   * This trait serves the purpose of introducing functions that are common to all DB Function objects and mix-in traits
   * that offer certain implementations. This trait should help with the inheritance of all of these
   */
 trait DBFunctionFabric {
+
   def functionName: String
 
   protected def fieldsToSelect: Seq[String] = Seq.empty
+}
+
+object DBFunctionFabric {
+  trait Query[R]
 }

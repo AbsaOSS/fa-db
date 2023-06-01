@@ -23,18 +23,16 @@ import za.co.absa.fadb.DBEngine
 import scala.concurrent.Future
 import slick.jdbc.PostgresProfile.api._
 
+import scala.language.higherKinds
+
 class SlickPgEngine(val db: Database) extends DBEngine {
 
-  type QueryType[R] = SlickQuery[R]
+  override type QueryType[R] = SlickQuery[R]
 
-  override protected def run[QR >: PositionedResult, R](query: SlickQuery, converter: QR => R): Future[Seq[R]] = {
+  override protected def run[R](query: QueryType[R]): Future[Seq[R]] = {
     // It can be expected that a GetResult will be passed into the run function as converter.
     // Unfortunately it has to be recreated to be used by Slick
-    val getResult: GetResult[R] = GetResult{ r =>
-      val pr: PositionedResult = r
-      converter(pr)
-    }
-    val slickAction = query.sql.as[R](getResult)
+    val slickAction = query.sql.as[R](query.getResult)
     db.run(slickAction)
   }
 

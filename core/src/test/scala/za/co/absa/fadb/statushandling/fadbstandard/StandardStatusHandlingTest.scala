@@ -17,17 +17,19 @@
 package za.co.absa.fadb.statushandling.fadbstandard
 
 import org.scalatest.funsuite.AnyFunSuite
+import za.co.absa.fadb.naming_conventions.{NamingConvention, SnakeCaseNaming}
 import za.co.absa.fadb.statushandling.StatusException
 import za.co.absa.fadb.statushandling.StatusException._
 
 import scala.reflect.ClassTag
-import scala.util.{Failure, Try}
+import scala.util.Try
 
 class StandardStatusHandlingTest extends AnyFunSuite {
   test("Verify checkStatus error mapping") {
     class StandardStatusHandlingForTest extends StandardStatusHandling {
       override def checkStatus(status: Integer, statusText: String): Try[Unit] = super.checkStatus(status, statusText)
       override def functionName: String = "Never needed"
+      override def namingConvention: NamingConvention = SnakeCaseNaming.Implicits.namingConvention
     }
 
     def assertCheckStatusFailure[F <: StatusException](status: Int, statusText: String)

@@ -16,29 +16,30 @@
 
 package za.co.absa.fadb
 
-import za.co.absa.fadb.DBEngine.Query
+import za.co.absa.fadb.DBFunctionFabric.Query
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.language.higherKinds
 
 trait DBEngine {
 
-  type QueryType[_]
+  type QueryType[R] <: Query[R]
 
   // in future implementation the convertor might not be needed (ideally)
   protected def run[R](query: QueryType[R]): Future[Seq[R]]
 
   def execute[R](query: QueryType[R]): Future[Seq[R]] = run(query)
 
-  def unique[QR, R](query: QueryType, converter: QR => R): Future[R] = {
-    run(query, converter).map(_.head)
+  def unique[R](query: QueryType[R]): Future[R] = {
+    run(query).map(_.head)
   }
 
-  def option[QR, R](query: QueryType, converter: QR => R): Future[Option[R]] = {
-    run(query, converter).map(_.headOption)
+  def option[R](query: QueryType[R]): Future[Option[R]] = {
+    run(query).map(_.headOption)
   }
 }
 
 object DBEngine {
-  trait Query
+  // trait Query[R] TODO ---
 }

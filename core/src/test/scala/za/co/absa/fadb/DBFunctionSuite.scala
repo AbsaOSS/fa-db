@@ -22,22 +22,20 @@ import scala.concurrent.Future
 import za.co.absa.fadb.naming_conventions.SnakeCaseNaming.Implicits.namingConvention
 
 class DBFunctionSuite extends AnyFunSuite {
-  private type Engine = String // just an engine type, not relevant Here
-
-  private object ExecutorThrow extends DBExecutor[String] {
-    override def run[R](fnc: QueryFunction[Engine, R]): Future[Seq[R]] = {
+  private object EngineThrow extends DBEngine {
+    override def run[R](query: QueryType[R]): Future[Seq[R]] = {
       throw new Exception("Should never get here")
     }
   }
 
-  private object FooNamed extends DBSchema(ExecutorThrow)
-  private object FooNameless extends DBSchema(ExecutorThrow, Some(""))
+  private object FooNamed extends DBSchema(EngineThrow)
+  private object FooNameless extends DBSchema(EngineThrow, Some(""))
 
   test("Function name check"){
-    case class MyFunction(schema: DBSchema[Engine]) extends DBFunction(schema) {
-      override protected def queryFunction(values: Nothing): QueryFunction[Engine, Nothing] = {
-        throw new Exception("Should never get here")
-      }
+    case class MyFunction(override val schema: DBSchema) extends DBFunction(schema) {
+      //override protected def query(values: Nothing): schema.dBEngine.QueryType[Nothing] = throw new Exception("Should never get here")
+
+      override protected def query[Q >: schema.dBEngine.QueryType[Nothing]](values: Nothing): Q = ??? //TODO
     }
 
     val fnc1 = MyFunction(FooNamed)
@@ -48,10 +46,9 @@ class DBFunctionSuite extends AnyFunSuite {
   }
 
   test("Function name override check"){
-    case class MyFunction(schema: DBSchema[Engine]) extends DBFunction(schema, Some("bar")) {
-      override protected def queryFunction(values: Nothing): QueryFunction[Engine, Nothing] = {
-        throw new Exception("Should never get here")
-      }
+    case class MyFunction(override val schema: DBSchema) extends DBFunction(schema, Some("bar")) {
+//      override protected def query(values: Nothing): schema.dBEngine.QueryType[Nothing] = throw new Exception("Should never get here")
+      override protected def query[Q >: schema.dBEngine.QueryType[Nothing]](values: Nothing): Q = ??? //TODO
     }
 
     val fnc1 = MyFunction(FooNamed)

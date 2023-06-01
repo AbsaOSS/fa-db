@@ -16,10 +16,13 @@
 
 package za.co.absa.fadb.slick
 
-import slick.jdbc.{GetResult, PositionedResult}
-import za.co.absa.fadb.{DBFunction, DBFunctionFabric}
+import slick.jdbc.{GetResult, PositionedResult, SQLActionBuilder}
+import za.co.absa.fadb.{DBFunction, DBFunctionFabric, DBSchema}
 
 trait SlickPgFunction[T, R] extends DBFunctionFabric {
+
+  val schema: DBSchema
+
   protected val alias = "A"
 
   protected def selectEntry: String = {
@@ -36,16 +39,12 @@ trait SlickPgFunction[T, R] extends DBFunctionFabric {
     }
   }
 
-  protected def query(values: T): SlickQuery
+  protected def query[Q >: schema.dBEngine.QueryType[R]](values: T): Q = {
+    val   
+    new QueryType(sql(values), slickConverter)
+  }
 
+  protected def sql(values: T): SQLActionBuilder
   protected def slickConverter: GetResult[R]
 
-  protected def converter: PositionedResult => R = slickConverter
 }
-
-object SlickPgFunction {
-  type DBSeqFunction[T, R] = DBFunction.DBSeqFunction[T, R, SlickQuery, PositionedResult] with SlickPgFunction[T, R]
-  type DBUniqueFunction[T, R] = DBFunction.DBUniqueFunction[T, R, SlickQuery, PositionedResult] with SlickPgFunction[T, R]
-  type DBOptionFunction[T, R] = DBFunction.DBOptionFunction[T, R, SlickQuery, PositionedResult] with SlickPgFunction[T, R]
-}
-
