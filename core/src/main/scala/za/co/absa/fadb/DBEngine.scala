@@ -16,8 +16,6 @@
 
 package za.co.absa.fadb
 
-import za.co.absa.fadb.DBFunctionFabric.Query
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.language.higherKinds
@@ -38,8 +36,4 @@ trait DBEngine {
   def option[R](query: QueryType[R]): Future[Option[R]] = {
     run(query).map(_.headOption)
   }
-}
-
-object DBEngine {
-  // trait Query[R] TODO ---
 }

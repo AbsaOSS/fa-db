@@ -32,9 +32,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * @tparam T                   - the type covering the input fields of the database function
   * @tparam R                   - the type covering the returned fields from the database function
   */
-abstract class DBFunction[T, R](val schema: DBSchema, functionNameOverride: Option[String] = None)  extends DBFunctionFabric[T,R] {
-
-  override type QueryType[X] = schema.dBEngine.QueryType[X]
+abstract class DBFunction[T, R](val schema: DBSchema, functionNameOverride: Option[String] = None)  extends DBFunctionFabric {
 
   val functionName: String = {
     val fn = functionNameOverride.getOrElse(schema.objectNameFromClassName(getClass))
@@ -49,7 +47,7 @@ abstract class DBFunction[T, R](val schema: DBSchema, functionNameOverride: Opti
 
   override protected def fieldsToSelect: Seq[String] = super.fieldsToSelect //TODO should get the names from R #6
 
-  //protected def query[Q >: QueryType[R]](values: T): Q
+  protected def query[Q <: schema.dBEngine.QueryType[R]](values: T): Q
 
   /**
     * For the given output it returns a function to execute the SQL query and interpret the results.

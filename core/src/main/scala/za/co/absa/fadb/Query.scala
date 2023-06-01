@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 ABSA Group Limited
+ * Copyright 2023 ABSA Group Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,6 @@
 
 package za.co.absa.fadb
 
-import scala.language.higherKinds
-
-/**
-  * This trait serves the purpose of introducing functions that are common to all DB Function objects and mix-in traits
-  * that offer certain implementations. This trait should help with the inheritance of all of these
-  */
-trait DBFunctionFabric {
-
-  def functionName: String
-
-  protected def fieldsToSelect: Seq[String] = Seq.empty
+class Query[R] {
+  val foo = "bar" //TODO ---
 }

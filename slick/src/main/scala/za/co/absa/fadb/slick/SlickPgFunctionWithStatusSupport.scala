@@ -32,8 +32,6 @@ trait SlickPgFunctionWithStatusSupport[T, R] extends SlickPgFunction[T, R] {
     actualConverter(queryResult)
   }
 
-  override protected def query[Q >: QueryType[R]](values: T): Q = {
-    val original = super.query(values)
-    new QueryType(original.sql, GetResult{converterWithStatus(_, original.getResult)})
-  }
+  //TODO missing query function
+
 }
