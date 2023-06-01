@@ -23,18 +23,20 @@ import scala.language.higherKinds
 
 trait SlickPgFunction[T, R] extends DBFunctionFabric {
 
+  type Q = SlickQuery[R]
+
   val schema: DBSchema
 
 
-  trait Foo[A] {} //Query
-
-  type MyFunction[A] = Foo[A]
-
-  class MyFunction2[A1] extends MyFunction[A1] //SlickQuery
-
-  def bar[Q[String]  >: MyFunction[String] ]: Q[String]  = {
-    new MyFunction2[String]
-  }
+//  trait Foo[A] {} //Query
+//
+//  type MyFunction[A] = Foo[A]
+//
+//  class MyFunction2[A1] extends MyFunction[A1] //SlickQuery
+//
+//  def bar[Q[String]  >: MyFunction[String] ]: Q[String]  = {
+//    new MyFunction2[String]
+//  }
 
 
   protected val alias = "A"
@@ -55,15 +57,15 @@ trait SlickPgFunction[T, R] extends DBFunctionFabric {
     }
   }
 
-//  type MyQueryType[A]  = Query[A]
-//  protected def query[Q[String] >: MyQueryType[String]](values: T): Q[String] = {
-  protected def query[Q <: schema.dBEngine.QueryType[R]](values: T): Q = {
-//     val q: Q = new SlickQuery(sql(values), slickConverter)
-//    val q2: Q = ???
-////    q2.foo
-////    val q: (Q <: Query[R]) = new Query[R] {}
-//    new Q{} //TODO
-    ???
+  //  type MyQueryType[A]  = Query[A]
+  //  protected def query[Q[String] >: MyQueryType[String]](values: T): Q[String] = {
+  protected def query(values: T): Q = {
+    //     val q: Q = new SlickQuery(sql(values), slickConverter)
+    //    val q2: Q = ???
+    ////    q2.foo
+    ////    val q: (Q <: Query[R]) = new Query[R] {}
+    //    new Q{} //TODO
+    new SlickQuery(sql(values), slickConverter)
   }
 
 //  protected def query(values: T): schema.dBEngine.QueryType[R] = {

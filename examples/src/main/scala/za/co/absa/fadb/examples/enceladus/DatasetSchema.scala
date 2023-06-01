@@ -91,20 +91,21 @@ object DatasetSchema {
 
   }
 
-  final class GetSchema(implicit schema: DBSchema)
+  final class GetSchema(implicit override val schema: DBSchema)
     extends DBUniqueFunction[(String, Option[Int]), Schema](schema)
     with SlickPgFunctionWithStatusSupport[(String, Option[Int]), Schema]
     with UserDefinedStatusHandling {
 
-//  TODO +++
-//    def apply(id: Long): Future[Schema] = {
-//      val sql =
-//        sql"""SELECT A.*
-//             FROM #$functionName($id) A;"""
+//  def apply(id: Long): Future[Schema] = {
+//    val sql =
+//      sql"""SELECT A.*
+//           FROM #$functionName($id) A;"""
 //
-//      val slickQuery: schema.QueryType[Schema] = SlickQuery(sql, slickConverter)
-//      schema.dBEngine.unique[Schema](slickQuery)
-//    }
+//    type X = schema.dBEngine.QueryType[Schema]
+//    val slickQuery: X = ??? // new SlickQuery(sql, slickConverter) TODO
+//    val slickQuery2: X = new X()
+//    schema.dBEngine.unique[Schema](slickQuery)
+//  }
 
     override protected def sql(values: (String, Option[Int])): SQLActionBuilder = {
       sql"""SELECT A.*

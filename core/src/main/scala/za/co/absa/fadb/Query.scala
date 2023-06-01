@@ -16,6 +16,18 @@
 
 package za.co.absa.fadb
 
-class Query[R] {
-  val foo = "bar" //TODO ---
+trait Query {
+  type RESULT
+//  type SQL
+//  def sql: SQL
+}
+
+object Query {
+//  type Aux[R, S] = Query {
+//    type RESULT = R
+//    type SQL = S
+//  }
+  type Aux[R] = Query {
+    type RESULT = R
+  }
 }

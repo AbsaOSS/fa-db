@@ -21,6 +21,15 @@ import za.co.absa.fadb.naming_conventions.NamingConvention
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
+
+/*
+
+overriding method query in     class DBFunction                       of type [Q >: CreateQuestion.this.QueryType[Unit]](values: za.co.absa.fadb.examples.aul.Questions.QuestionInput)Q;
+           method query in     trait SlickPgFunctionWithStatusSupport of type [Q >: CreateQuestion.this.QueryType[Unit]](values: za.co.absa.fadb.examples.aul.Questions.QuestionInput)Q has incompatible type;
+ other members with override errors are: QueryType
+  case class CreateQuestion(implicit override val schema: DBSchema)
+ */
+
 /**
   * The most general abstraction of database function representation
   * The database name of the function is derives from the class name based on the provided naming convention (in schema)
@@ -33,6 +42,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * @tparam R                   - the type covering the returned fields from the database function
   */
 abstract class DBFunction[T, R](val schema: DBSchema, functionNameOverride: Option[String] = None)  extends DBFunctionFabric {
+
+  //type Q <: Query.Aux[R]
 
   val functionName: String = {
     val fn = functionNameOverride.getOrElse(schema.objectNameFromClassName(getClass))
@@ -47,7 +58,7 @@ abstract class DBFunction[T, R](val schema: DBSchema, functionNameOverride: Opti
 
   override protected def fieldsToSelect: Seq[String] = super.fieldsToSelect //TODO should get the names from R #6
 
-  protected def query[Q <: schema.dBEngine.QueryType[R]](values: T): Q
+  protected def query(values: T): Query.Aux[R]
 
   /**
     * For the given output it returns a function to execute the SQL query and interpret the results.
@@ -58,7 +69,7 @@ abstract class DBFunction[T, R](val schema: DBSchema, functionNameOverride: Opti
     */
 
   protected def execute(values: T): Future[Seq[R]] = {
-    schema.dBEngine.execute(query(values))
+    schema.dBEngine.execute[R, Query.Aux[R]](query(values))
   }
 
   protected def unique(values: T): Future[R] = {

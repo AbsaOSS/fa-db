@@ -22,18 +22,20 @@ import scala.language.higherKinds
 
 trait DBEngine {
 
-  type QueryType[R] <: Query[R]
-
   // in future implementation the convertor might not be needed (ideally)
-  protected def run[R](query: QueryType[R]): Future[Seq[R]]
+  protected def run[R, Q <: Query.Aux[R]](query: Q): Future[Seq[R]]
 
-  def execute[R](query: QueryType[R]): Future[Seq[R]] = run(query)
+  def execute[R, Q <: Query.Aux[R]](query: Q): Future[Seq[query.RESULT]] = run[R, Q](query)
 
-  def unique[R](query: QueryType[R]): Future[R] = {
-    run(query).map(_.head)
+  def unique[R, Q <: Query.Aux[R]](query: Q): Future[query.RESULT] = {
+    run[R, Q](query).map(_.head)
   }
 
-  def option[R](query: QueryType[R]): Future[Option[R]] = {
-    run(query).map(_.headOption)
+  def option[R, Q <: Query.Aux[R]](query: Q): Future[Option[query.RESULT]] = {
+    run[R, Q](query).map(_.headOption)
   }
+}
+
+object DBEngine {
+  type Aux[Q, R]
 }
