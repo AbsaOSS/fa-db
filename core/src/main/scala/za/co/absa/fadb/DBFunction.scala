@@ -19,8 +19,6 @@ package za.co.absa.fadb
 import za.co.absa.fadb.naming_conventions.NamingConvention
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
-
 
 /*
 
@@ -37,13 +35,41 @@ overriding method query in     class DBFunction                       of type [Q
   * @param schema               - the schema the function belongs into
   * @param functionNameOverride - in case the class name would not match the database function name, this gives the
   *                             possibility of override
-  * @tparam E                   - the type of the [[DBExecutor]] engine
+  */
+
+/**
+  *
+  * @param functionNameOverride- in case the class name would not match the database function name, this gives the
+  *                             possibility of override
+  * @param schema               - the schema the function belongs into
+  * @param dBEngine             - the database engine that is supposed to execute the function (persumable contains
+  *                             connection to the database
   * @tparam T                   - the type covering the input fields of the database function
   * @tparam R                   - the type covering the returned fields from the database function
+  * @tparam E                   - the type of the [[DBEngine]] engine
   */
-abstract class DBFunction[T, R](val schema: DBSchema, functionNameOverride: Option[String] = None)  extends DBFunctionFabric {
+abstract class DBFunction[T, R, E <: DBEngine](functionNameOverride: Option[String] = None)
+                                              (implicit val schema: DBSchema, val dBEngine: E)  extends DBFunctionFabric {
 
-  //type Q <: Query.Aux[R]
+  def this(schema: DBSchema, functionNameOverride: String)
+         (implicit dBEngine: E) = {
+    this(Option(functionNameOverride))(schema, dBEngine)
+  }
+
+  def this(schema: DBSchema)
+          (implicit dBEngine: E) = {
+    this(None)(schema, dBEngine)
+  }
+
+  def this(dBEngine: E, functionNameOverride: String)
+          (implicit schema: DBSchema)  = {
+    this(Option(functionNameOverride))(schema, dBEngine)
+  }
+
+  def this(dBEngine: E)
+          (implicit schema: DBSchema)  = {
+    this(None)(schema, dBEngine)
+  }
 
   val functionName: String = {
     val fn = functionNameOverride.getOrElse(schema.objectNameFromClassName(getClass))
@@ -58,7 +84,7 @@ abstract class DBFunction[T, R](val schema: DBSchema, functionNameOverride: Opti
 
   override protected def fieldsToSelect: Seq[String] = super.fieldsToSelect //TODO should get the names from R #6
 
-  protected def query(values: T): Query.Aux[R]
+  protected def query(values: T): dBEngine.QueryType[R]
 
   /**
     * For the given output it returns a function to execute the SQL query and interpret the results.
@@ -69,15 +95,15 @@ abstract class DBFunction[T, R](val schema: DBSchema, functionNameOverride: Opti
     */
 
   protected def execute(values: T): Future[Seq[R]] = {
-    schema.dBEngine.execute[R, Query.Aux[R]](query(values))
+    dBEngine.execute[R](query(values))
   }
 
   protected def unique(values: T): Future[R] = {
-    schema.dBEngine.unique(query(values))
+    dBEngine.unique(query(values))
   }
 
   protected def option(values: T): Future[Option[R]] = {
-    schema.dBEngine.option(query(values))
+    dBEngine.option(query(values))
   }
 
 }
@@ -93,8 +119,29 @@ object DBFunction {
     * @tparam T                   - the type covering the input fields of the database function
     * @tparam R                   - the type covering the returned fields from the database function
     */
-  abstract class DBSeqFunction[T, R](schema: DBSchema, functionNameOverride: Option[String] = None)
-    extends DBFunction[T, R](schema, functionNameOverride) {
+  abstract class DBSeqFunction[T, R, E <: DBEngine](functionNameOverride: Option[String] = None)(implicit schema: DBSchema, dBEngine: E)
+    extends DBFunction[T, R, E](functionNameOverride) {
+
+    def this(schema: DBSchema, functionNameOverride: String)
+            (implicit dBEngine: E) = {
+      this(Option(functionNameOverride))(schema, dBEngine)
+    }
+
+    def this(schema: DBSchema)
+            (implicit dBEngine: E) = {
+      this(None)(schema, dBEngine)
+    }
+
+    def this(dBEngine: E, functionNameOverride: String)
+            (implicit schema: DBSchema)  = {
+      this(Option(functionNameOverride))(schema, dBEngine)
+    }
+
+    def this(dBEngine: E)
+            (implicit schema: DBSchema)  = {
+      this(None)(schema, dBEngine)
+    }
+
     def apply(values: T): Future[Seq[R]] = execute(values)
   }
 
@@ -108,8 +155,29 @@ object DBFunction {
     * @tparam T                   - the type covering the input fields of the database function
     * @tparam R                   - the type covering the returned fields from the database function
     */
-  abstract class DBUniqueFunction[T, R](schema: DBSchema, functionNameOverride: Option[String] = None)
-    extends DBFunction[T, R](schema, functionNameOverride) {
+  abstract class DBUniqueFunction[T, R, E <: DBEngine](functionNameOverride: Option[String] = None)(implicit schema: DBSchema, dBEngine: E)
+    extends DBFunction[T, R, E](functionNameOverride) {
+
+    def this(schema: DBSchema, functionNameOverride: String)
+            (implicit dBEngine: E) = {
+      this(Option(functionNameOverride))(schema, dBEngine)
+    }
+
+    def this(schema: DBSchema)
+            (implicit dBEngine: E) = {
+      this(None)(schema, dBEngine)
+    }
+
+    def this(dBEngine: E, functionNameOverride: String)
+            (implicit schema: DBSchema)  = {
+      this(Option(functionNameOverride))(schema, dBEngine)
+    }
+
+    def this(dBEngine: E)
+            (implicit schema: DBSchema)  = {
+      this(None)(schema, dBEngine)
+    }
+
     def apply(values: T): Future[R] = unique(values)
   }
 
@@ -123,8 +191,29 @@ object DBFunction {
     * @tparam T                   - the type covering the input fields of the database function
     * @tparam R                   - the type covering the returned fields from the database function
     */
-  abstract class DBOptionFunction[T, R](schema: DBSchema, functionNameOverride: Option[String] = None)
-    extends DBFunction[T, R](schema, functionNameOverride) {
+  abstract class DBOptionFunction[T, R, E <: DBEngine](functionNameOverride: Option[String] = None)(implicit schema: DBSchema, dBEngine: E)
+    extends DBFunction[T, R, E](functionNameOverride) {
+
+    def this(schema: DBSchema, functionNameOverride: String)
+            (implicit dBEngine: E) = {
+      this(Option(functionNameOverride))(schema, dBEngine)
+    }
+
+    def this(schema: DBSchema)
+            (implicit dBEngine: E) = {
+      this(None)(schema, dBEngine)
+    }
+
+    def this(dBEngine: E, functionNameOverride: String)
+            (implicit schema: DBSchema)  = {
+      this(Option(functionNameOverride))(schema, dBEngine)
+    }
+
+    def this(dBEngine: E)
+            (implicit schema: DBSchema)  = {
+      this(None)(schema, dBEngine)
+    }
+
     def apply(values: T): Future[Option[R]] = option(values)
   }
 }

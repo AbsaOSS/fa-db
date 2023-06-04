@@ -17,7 +17,7 @@
 package za.co.absa.fadb.statushandling.fadbstandard
 
 import za.co.absa.fadb.exceptions.DBFailException
-import za.co.absa.fadb.statushandling.StatusHandling
+import za.co.absa.fadb.statushandling.{FunctionStatus, StatusHandling}
 import za.co.absa.fadb.statushandling.StatusException._
 
 import scala.util.{Failure, Success, Try}
@@ -26,15 +26,15 @@ import scala.util.{Failure, Success, Try}
   * A mix in trait for [[DBFunction]] for standard handling of `status` and `status_text` fields.
   */
 trait StandardStatusHandling extends StatusHandling {
-  override protected def checkStatus(status: Integer, statusText: String): Try[Unit] = {
-    status / 10 match {
-      case 1              => Success(Unit)
-      case 2              => Failure(new ServerMisconfigurationException(status, statusText))
-      case 3              => Failure(new DataConflictException(status, statusText))
-      case 4              => Failure(new DataNotFoundException(status, statusText))
-      case 5 | 6 | 7 | 8  => Failure(new ErrorInDataException(status, statusText))
-      case 9              => Failure(new OtherStatusException(status, statusText))
-      case _              => Failure(DBFailException(s"Status out of range - with status: $status and status text: '$statusText'"))
+  override protected def checkStatus(status: FunctionStatus): Try[FunctionStatus] = {
+    status.status / 10 match {
+      case 1              => Success(status)
+      case 2              => Failure(ServerMisconfigurationException(status))
+      case 3              => Failure(DataConflictException(status))
+      case 4              => Failure(DataNotFoundException(status))
+      case 5 | 6 | 7 | 8  => Failure(ErrorInDataException(status))
+      case 9              => Failure(OtherStatusException(status))
+      case _              => Failure(DBFailException(s"Status out of range - with status: $status and status text: '${status.statusText}'"))
     }
   }
 }

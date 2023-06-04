@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 ABSA Group Limited
+ * Copyright 2022 ABSA Group Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +17,24 @@
 package za.co.absa.fadb.slick
 
 import slick.jdbc.{GetResult, PositionedResult}
-import za.co.absa.fadb.DBFunction
+import za.co.absa.fadb.statushandling.FunctionStatus
 
 import scala.util.Try
 
 trait SlickPgFunctionWithStatusSupport[T, R] extends SlickPgFunction[T, R] {
 
-  protected def checkStatus(status: Integer, statusText: String): Try[Unit]
+  protected def checkStatus(status: FunctionStatus): Try[FunctionStatus]
 
   private def converterWithStatus(queryResult: PositionedResult, actualConverter: GetResult[R]): R = {
-    val status: Int = queryResult.<<
+    val status:Int = queryResult.<<
     val statusText: String = queryResult.<<
-    checkStatus(status, statusText).get //throw exception if status was off
+    checkStatus(FunctionStatus(status, statusText)).get //throw exception if status was off
     actualConverter(queryResult)
   }
 
-  //TODO missing query function
+  override protected def query(values: T): dbEngine.QueryType[R] = {
+    val original = super.query(values)
+    new SlickQuery[R](original.sql, GetResult{converterWithStatus(_, original.getResult)})
+  }
 
 }

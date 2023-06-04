@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 ABSA Group Limited
+ * Copyright 2022 ABSA Group Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,17 @@ package za.co.absa.fadb.statushandling
 
 import scala.util.{Failure, Success, Try}
 
+/**
+  *
+  */
 trait UserDefinedStatusHandling extends StatusHandling {
   def OKStatuses: Set[Integer]
 
-  def checkStatus(status: Integer, statusText: String): Try[Unit] = {
-    if (OKStatuses.contains(status)) {
-      Success(Unit)
+  def checkStatus(status: FunctionStatus): Try[FunctionStatus] = {
+    if (OKStatuses.contains(status.status)) {
+      Success(status)
     } else {
-      Failure(new StatusException(status, statusText))
+      Failure(StatusException(status))
     }
   }
 }

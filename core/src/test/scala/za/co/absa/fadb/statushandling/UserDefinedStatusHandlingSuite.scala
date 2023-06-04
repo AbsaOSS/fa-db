@@ -17,27 +17,25 @@
 package za.co.absa.fadb.statushandling
 
 import org.scalatest.funsuite.AnyFunSuite
-import za.co.absa.fadb.DBFunctionFabric
 import za.co.absa.fadb.naming_conventions.{NamingConvention, SnakeCaseNaming}
 
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
-class StatusHandlingTest extends AnyFunSuite {
-  test("Fields to select filled with default values") {
-    trait FooDBFunction extends DBFunctionFabric {
-      override def fieldsToSelect: Seq[String] = Seq("alpha", "beta")
-    }
-
-    class StatusHandlingForTest extends FooDBFunction with StatusHandling {
+class UserDefinedStatusHandlingSuite extends AnyFunSuite {
+  test("") {
+    class UserDefinedStatusHandlingForTest(val OKStatuses: Set[Integer]) extends UserDefinedStatusHandling {
+      override def checkStatus(status: FunctionStatus): Try[FunctionStatus] = super.checkStatus(status)
       override def functionName: String = "Never needed"
       override def namingConvention: NamingConvention = SnakeCaseNaming.Implicits.namingConvention
-
-      override protected def checkStatus(status: Integer, statusText: String): Try[Unit] = ???
-      override def fieldsToSelect: Seq[String] = super.fieldsToSelect
     }
 
-    val statusHandling = new StatusHandlingForTest
-    assert(statusHandling.fieldsToSelect == Seq("status", "status_text", "alpha", "beta"))
+    val statusHandling = new UserDefinedStatusHandlingForTest(Set(200, 201))
 
+    val oK = FunctionStatus(200, "OK")
+    val alsoOK = FunctionStatus(201, "Also OK")
+    val notOK = FunctionStatus(500, "Not OK")
+    assert(statusHandling.checkStatus(oK) == Success(oK))
+    assert(statusHandling.checkStatus(alsoOK) == Success(alsoOK))
+    assert(statusHandling.checkStatus(notOK) == Failure(new StatusException(notOK)))
   }
 }

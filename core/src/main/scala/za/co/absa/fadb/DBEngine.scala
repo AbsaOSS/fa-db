@@ -20,22 +20,52 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.language.higherKinds
 
+/**
+  * A basis to represent a database executor
+  */
 trait DBEngine {
 
-  // in future implementation the convertor might not be needed (ideally)
-  protected def run[R, Q <: Query.Aux[R]](query: Q): Future[Seq[R]]
+  /**
+    * A type repesenting the (SQL) query within the engine
+    * @tparam X - the return type of the query
+    */
+  type QueryType[X] <: Query[X]
 
-  def execute[R, Q <: Query.Aux[R]](query: Q): Future[Seq[query.RESULT]] = run[R, Q](query)
+  /**
+    * The actual query executioner of the queries of the engine
+    * @param query  - the query to execute
+    * @tparam R     - return the of the query
+    * @return       - sequence of the results of database query
+    */
+  protected def run[R](query: QueryType[R]): Future[Seq[R]]
 
-  def unique[R, Q <: Query.Aux[R]](query: Q): Future[query.RESULT] = {
-    run[R, Q](query).map(_.head)
+  /**
+    * Public method to execute when query is expected to return multiple results
+    * @param query  - the query to execute
+    * @tparam R     - return the of the query
+    * @return       - sequence of the results of database query
+    */
+  def execute[R](query: QueryType[R]): Future[Seq[R]] = run(query)
+
+  /**
+    * Public method to execute when query is expected to return exactly one row
+    * @param query  - the query to execute
+    * @tparam R     - return the of the query
+    * @return       - sequence of the results of database query
+    */
+  def unique[R](query: QueryType[R]): Future[R] = {
+    run(query).map(_.head)
   }
 
-  def option[R, Q <: Query.Aux[R]](query: Q): Future[Option[query.RESULT]] = {
-    run[R, Q](query).map(_.headOption)
+  /**
+    * Public method to execute when query is expected to return one or no results
+    * @param query  - the query to execute
+    * @tparam R     - return the of the query
+    * @return       - sequence of the results of database query
+    */
+
+  def option[R](query:  QueryType[R]): Future[Option[R]] = {
+    run(query).map(_.headOption)
   }
 }
 
-object DBEngine {
-  type Aux[Q, R]
-}

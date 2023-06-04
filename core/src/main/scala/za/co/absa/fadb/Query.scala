@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 ABSA Group Limited
+ * Copyright 2022 ABSA Group Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,6 @@
 
 package za.co.absa.fadb
 
-trait Query {
-  type RESULT
-//  type SQL
-//  def sql: SQL
-}
-
-object Query {
-//  type Aux[R, S] = Query {
-//    type RESULT = R
-//    type SQL = S
-//  }
-  type Aux[R] = Query {
-    type RESULT = R
-  }
+trait Query[R] {
+  type RESULT = R
 }

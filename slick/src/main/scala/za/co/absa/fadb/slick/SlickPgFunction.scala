@@ -16,32 +16,17 @@
 
 package za.co.absa.fadb.slick
 
-import slick.jdbc.{GetResult, PositionedResult, SQLActionBuilder}
-import za.co.absa.fadb.{DBFunction, DBFunctionFabric, DBSchema, Query}
-
-import scala.language.higherKinds
+import slick.jdbc.{GetResult, SQLActionBuilder}
+import za.co.absa.fadb.DBFunctionFabric
 
 trait SlickPgFunction[T, R] extends DBFunctionFabric {
 
-  type Q = SlickQuery[R]
+  implicit val dbEngine: SlickPgEngine
 
-  val schema: DBSchema
-
-
-//  trait Foo[A] {} //Query
-//
-//  type MyFunction[A] = Foo[A]
-//
-//  class MyFunction2[A1] extends MyFunction[A1] //SlickQuery
-//
-//  def bar[Q[String]  >: MyFunction[String] ]: Q[String]  = {
-//    new MyFunction2[String]
-//  }
-
+  protected def sql(values: T): SQLActionBuilder
+  protected def slickConverter: GetResult[R]
 
   protected val alias = "A"
-
-  val set: Set[String] = Set("a")
 
   protected def selectEntry: String = {
     val fieldsSeq = fieldsToSelect
@@ -57,25 +42,7 @@ trait SlickPgFunction[T, R] extends DBFunctionFabric {
     }
   }
 
-  //  type MyQueryType[A]  = Query[A]
-  //  protected def query[Q[String] >: MyQueryType[String]](values: T): Q[String] = {
-  protected def query(values: T): Q = {
-    //     val q: Q = new SlickQuery(sql(values), slickConverter)
-    //    val q2: Q = ???
-    ////    q2.foo
-    ////    val q: (Q <: Query[R]) = new Query[R] {}
-    //    new Q{} //TODO
+  protected def query(values: T): dbEngine.QueryType[R] = {
     new SlickQuery(sql(values), slickConverter)
   }
-
-//  protected def query(values: T): schema.dBEngine.QueryType[R] = {
-//    new SlickQuery(sql(values), slickConverter)
-//    ???
-//    //new Query[R] {}
-//  }
-
-
-  protected def sql(values: T): SQLActionBuilder
-  protected def slickConverter: GetResult[R]
-
 }

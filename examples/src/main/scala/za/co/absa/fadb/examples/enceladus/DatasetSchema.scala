@@ -17,7 +17,7 @@
 package za.co.absa.fadb.examples.enceladus
 
 import za.co.absa.fadb.DBSchema
-import za.co.absa.fadb.slick.{SlickPgEngine, SlickPgFunction, SlickPgFunctionWithStatusSupport, SlickQuery}
+import za.co.absa.fadb.slick.{SlickPgEngine, SlickPgFunction, SlickPgFunctionWithStatusSupport}
 import za.co.absa.fadb.naming_conventions.SnakeCaseNaming.Implicits.namingConvention
 import slick.jdbc.{GetResult, SQLActionBuilder}
 import slick.jdbc.PostgresProfile.api._
@@ -28,14 +28,11 @@ import DatasetSchema._
 import za.co.absa.fadb.DBFunction.{DBSeqFunction, DBUniqueFunction}
 import za.co.absa.fadb.statushandling.{StatusException, UserDefinedStatusHandling}
 
-class DatasetSchema(engine: SlickPgEngine) extends DBSchema(engine) {
+class DatasetSchema(implicit engine: SlickPgEngine) extends DBSchema {
 
-
-
-  private implicit val schema: DBSchema = this
   val addSchema = new AddSchema
   val getSchema = new GetSchema
-  val listSchemas = new ListSchemas
+  val list = new List
 }
 
 
@@ -61,28 +58,20 @@ object DatasetSchema {
                     deletedBy: Option[String],
                     deletedWhen: Option[Timestamp])
 
-  case class SchemaHeader(schemaName: String, schemaLatestVersion: Int)
+  case class SchemaHeader(entityName: String, entityLatestVersion: Int)
 
-  private implicit val SchemaHeaderImplicit: GetResult[SchemaHeader] = GetResult(r => {SchemaHeader(r.<<, r.<<)})
-  private implicit val GetSchemaImplicit: GetResult[Schema] = GetResult(r => {
-    val status: Int = r.<<
-    val statusText: String = r.<<
-    if (status != 200) {
-      throw new StatusException(status, statusText)
-    }
-    Schema(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<)
-  })
-
-  final class AddSchema(implicit schema: DBSchema)
-    extends DBUniqueFunction[SchemaInput, Long](schema)
+  final class AddSchema(implicit override val schema: DBSchema, override val dbEngine: SlickPgEngine)
+    extends DBUniqueFunction[SchemaInput, Long, SlickPgEngine]
     with SlickPgFunction[SchemaInput, Long]
     with UserDefinedStatusHandling {
 
     override protected def sql(values: SchemaInput): SQLActionBuilder = {
-      sql"""SELECT A.status, A.status_text, A.id_schema_version
+      val r = sql"""SELECT A.status, A.status_text, A.id_schema_version
             FROM #$functionName(${values.schemaName}, ${values.schemaVersion}, ${values.schemaDescription},
               ${values.fields}::JSONB, ${values.userName}
             ) A;"""
+      //println(r)
+      r
     }
 
     override protected def slickConverter: GetResult[Long] = GetResult.GetLong
@@ -91,21 +80,19 @@ object DatasetSchema {
 
   }
 
-  final class GetSchema(implicit override val schema: DBSchema)
-    extends DBUniqueFunction[(String, Option[Int]), Schema](schema)
+  final class GetSchema(implicit override val schema: DBSchema, override val dbEngine: SlickPgEngine)
+    extends DBUniqueFunction[(String, Option[Int]), Schema, SlickPgEngine]
     with SlickPgFunctionWithStatusSupport[(String, Option[Int]), Schema]
     with UserDefinedStatusHandling {
 
-//  def apply(id: Long): Future[Schema] = {
-//    val sql =
-//      sql"""SELECT A.*
-//           FROM #$functionName($id) A;"""
-//
-//    type X = schema.dBEngine.QueryType[Schema]
-//    val slickQuery: X = ??? // new SlickQuery(sql, slickConverter) TODO
-//    val slickQuery2: X = new X()
-//    schema.dBEngine.unique[Schema](slickQuery)
-//  }
+    def apply(id: Long): Future[Schema] = {
+      val sql =
+        sql"""SELECT A.*
+             FROM #$functionName($id) A;"""
+
+      val slickQuery = new dBEngine.QueryType(sql, slickConverter)
+      dBEngine.unique[Schema](slickQuery)
+    }
 
     override protected def sql(values: (String, Option[Int])): SQLActionBuilder = {
       sql"""SELECT A.*
@@ -119,15 +106,17 @@ object DatasetSchema {
     override val OKStatuses: Set[Integer] = Set(200)
   }
 
-  final class ListSchemas(implicit schema: DBSchema)
-    extends DBSeqFunction[Boolean, SchemaHeader](schema)
+  final class List(implicit override val schema: DBSchema, override val dbEngine: SlickPgEngine)
+    extends DBSeqFunction[Boolean, SchemaHeader, SlickPgEngine]()
     with SlickPgFunction[Boolean, SchemaHeader] {
 
     override def apply(values: Boolean = false): Future[Seq[SchemaHeader]] = super.apply(values)
 
     override protected def sql(values: Boolean): SQLActionBuilder = {
-      sql"""SELECT A.schema_name, A.schema_latest_version
+      val r =sql"""SELECT A.entity_name, A.entity_latest_version
             FROM #$functionName($values) as A;"""
+      println(r)
+      r
     }
 
     override protected val slickConverter: GetResult[SchemaHeader] = GetResult(r => {SchemaHeader(r.<<, r.<<)})

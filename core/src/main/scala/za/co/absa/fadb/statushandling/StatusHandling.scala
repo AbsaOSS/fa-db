@@ -27,15 +27,31 @@ import scala.util.Try
   */
 trait StatusHandling extends DBFunctionFabric {
 
+  /**
+    * @return - the naming convention to use when convertin the internal status and status text fields to DB fields
+    */
   def namingConvention: NamingConvention
 
-  protected def checkStatus(status: Integer, statusText: String): Try[Unit]
+  /**
+    * Verifies if the give status means success or failure
+    * @param status - the staus to check
+    * @return       - Success or failure the status means
+    */
+  protected def checkStatus(status: FunctionStatus): Try[FunctionStatus]
+  protected def checkStatus(status: Integer, statusText: String): Try[FunctionStatus] = checkStatus((FunctionStatus(status, statusText)))
 
   def statusFieldName: String = namingConvention.stringPerConvention(defaultStatusFieldName)
   def statusTextFieldName: String = namingConvention.stringPerConvention(defaultStatusTextFieldName)
 
+  /**
+    * A mixin to add the status fields into the SELECT statement
+    * @return a sequence of fields to use in SELECT
+    */
   override protected def fieldsToSelect: Seq[String] = {
-    Seq(statusFieldName, statusTextFieldName) ++ super.fieldsToSelect
+    Seq(
+      namingConvention.stringPerConvention(statusFieldName),
+      namingConvention.stringPerConvention(statusTextFieldName)
+    ) ++ super.fieldsToSelect
   }
 
 }

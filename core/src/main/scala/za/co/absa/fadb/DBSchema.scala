@@ -28,10 +28,32 @@ import za.co.absa.fadb.naming_conventions.NamingConvention
   * @param namingConvention   - the [[za.co.absa.fadb.naming_conventions.NamingConvention]](NamingConvention) prescribing how to convert a class name into a db object name
   * @tparam E                 - the engine of the executor type, e.g. Slick Database
   */
-abstract class DBSchema(val dBEngine: DBEngine, schemaNameOverride: Option[String] = None)
-                                    (implicit val namingConvention: NamingConvention) {
+abstract class DBSchema(schemaNameOverride: Option[String] = None)
+                       (implicit dBEngine: DBEngine, implicit val namingConvention: NamingConvention) {
+
+  def this(dBEngine: DBEngine, schemaNameOverride: String)
+          (implicit namingConvention: NamingConvention) {
+    this(Option(schemaNameOverride))(dBEngine, namingConvention)
+  }
+
+
+  def this(dBEngine: DBEngine)
+          (implicit namingConvention: NamingConvention) {
+    this(None)(dBEngine, namingConvention)
+  }
+
+  def this(namingConvention: NamingConvention, schemaNameOverride:String)
+          (implicit dBEngine: DBEngine) {
+    this(Option(schemaNameOverride))(dBEngine, namingConvention)
+  }
+
+  def this(namingConvention: NamingConvention)
+          (implicit dBEngine: DBEngine) {
+    this(None)(dBEngine, namingConvention)
+  }
 
   //type QueryType[R] = dBEngine.QueryType[R]
+  protected implicit val schema: DBSchema = this
 
   def objectNameFromClassName(c: Class[_]): String = {
     namingConvention.fromClassNamePerConvention(c)
