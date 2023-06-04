@@ -66,12 +66,10 @@ object DatasetSchema {
     with UserDefinedStatusHandling {
 
     override protected def sql(values: SchemaInput): SQLActionBuilder = {
-      val r = sql"""SELECT A.status, A.status_text, A.id_schema_version
+      sql"""SELECT A.status, A.status_text, A.id_schema_version
             FROM #$functionName(${values.schemaName}, ${values.schemaVersion}, ${values.schemaDescription},
               ${values.fields}::JSONB, ${values.userName}
             ) A;"""
-      //println(r)
-      r
     }
 
     override protected def slickConverter: GetResult[Long] = GetResult.GetLong
@@ -113,10 +111,8 @@ object DatasetSchema {
     override def apply(values: Boolean = false): Future[Seq[SchemaHeader]] = super.apply(values)
 
     override protected def sql(values: Boolean): SQLActionBuilder = {
-      val r =sql"""SELECT A.entity_name, A.entity_latest_version
+      sql"""SELECT A.entity_name, A.entity_latest_version
             FROM #$functionName($values) as A;"""
-      println(r)
-      r
     }
 
     override protected val slickConverter: GetResult[SchemaHeader] = GetResult(r => {SchemaHeader(r.<<, r.<<)})
