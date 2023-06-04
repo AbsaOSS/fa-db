@@ -37,7 +37,7 @@ class DatasetSchemaSuite extends AnyWordSpec with Matchers {
 
   // test cases are set to be ignored now, as they are not idempotent and require other project's (Enceladus) data structures
 
-  "listSchemas" should {
+  "listSchemas" ignore {
     "list the schemas" should {
       val ls = schemas.list()
       val result = Await.result(ls, Duration.Inf)
@@ -45,35 +45,35 @@ class DatasetSchemaSuite extends AnyWordSpec with Matchers {
     }
   }
 
-  "getSchema" should {
+  "getSchema" ignore {
     "return the particular schema" when {
-      "given name and version" ignore {
+      "given name and version" should {
         val ls = schemas.getSchema(("aaa", Option(1)))
         val result = Await.result(ls, Duration.Inf)
         println(result)
       }
-      "given id" ignore {
+      "given id" should {
         val gs = schemas.getSchema(1000000000000051L)
         val result = Await.result(gs, Duration.Inf)
         println(result)
       }
     }
     "return the latest schema version" when {
-      "only the schema name is given" ignore {
+      "only the schema name is given" should {
         val ls = schemas.getSchema(("aaa", None))
         val result = Await.result(ls, Duration.Inf)
         println(result)
       }
     }
     "fail" when {
-      "schema does not exist" ignore {
+      "schema does not exist" should {
         val exception = intercept[StatusException] {
           val gs = schemas.getSchema(("xxx", None))
           Await.result(gs, Duration.Inf)
         }
         checkException(exception)
       }
-      "requested schema version does not exist" ignore {
+      "requested schema version does not exist" should {
         val exception = intercept[StatusException] {
           val gs = schemas.getSchema(("aaa", Some(1000)))
           Await.result(gs, Duration.Inf)
@@ -83,8 +83,8 @@ class DatasetSchemaSuite extends AnyWordSpec with Matchers {
     }
   }
 
-  "addSchema" should {
-    "add a schema" ignore  {
+  "addSchema" ignore {
+    "add a schema" should  {
       val schemaInput = SchemaInput(
         schemaName = "bbe",
         schemaVersion = 1,
@@ -96,7 +96,7 @@ class DatasetSchemaSuite extends AnyWordSpec with Matchers {
       println(result)
     }
     "fail" when {
-      "Schema already exists" ignore {
+      "Schema already exists" should {
         val schemaInput = SchemaInput(
           schemaName = "aaa",
           schemaVersion = 2,
@@ -109,7 +109,7 @@ class DatasetSchemaSuite extends AnyWordSpec with Matchers {
         }
         checkException(exception)
       }
-      "Schema version wrong" ignore {
+      "Schema version wrong" should {
         val schemaInput = SchemaInput(
           schemaName = "aaa",
           schemaVersion = 1000,
