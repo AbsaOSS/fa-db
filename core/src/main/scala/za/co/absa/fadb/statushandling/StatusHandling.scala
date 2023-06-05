@@ -18,7 +18,7 @@ package za.co.absa.fadb.statushandling
 
 import za.co.absa.fadb.DBFunctionFabric
 import za.co.absa.fadb.naming_conventions.NamingConvention
-import za.co.absa.fadb.statushandling.StatusHandling.{defaultStatusFieldName, defaultStatusTextFieldName}
+import za.co.absa.fadb.statushandling.StatusHandling.{defaultStatusField, defaultStatusTextField}
 
 import scala.util.Try
 
@@ -40,23 +40,23 @@ trait StatusHandling extends DBFunctionFabric {
   protected def checkStatus(status: FunctionStatus): Try[FunctionStatus]
   protected def checkStatus(status: Integer, statusText: String): Try[FunctionStatus] = checkStatus((FunctionStatus(status, statusText)))
 
-  def statusFieldName: String = namingConvention.stringPerConvention(defaultStatusFieldName)
-  def statusTextFieldName: String = namingConvention.stringPerConvention(defaultStatusTextFieldName)
+  def statusField: String = defaultStatusField
+  def statusTextField: String = defaultStatusTextField
 
   /**
-    * A mixin to add the status fields into the SELECT statement
+    * A mix-in to add the status fields into the SELECT statement
     * @return a sequence of fields to use in SELECT
     */
   override protected def fieldsToSelect: Seq[String] = {
     Seq(
-      namingConvention.stringPerConvention(statusFieldName),
-      namingConvention.stringPerConvention(statusTextFieldName)
+      namingConvention.stringPerConvention(statusField),
+      namingConvention.stringPerConvention(statusTextField)
     ) ++ super.fieldsToSelect
   }
 
 }
 
 object StatusHandling {
-  val defaultStatusFieldName = "status"
-  val defaultStatusTextFieldName = "statusText"
+  val defaultStatusField = "status"
+  val defaultStatusTextField = "statusText"
 }

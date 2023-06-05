@@ -23,7 +23,7 @@ import za.co.absa.fadb.naming_conventions.{NamingConvention, SnakeCaseNaming}
 class StatusHandlingSuite extends AnyFunSuite {
   test("Fields to select filled with default values") {
     trait FooDBFunction extends DBFunctionFabric {
-      override def fieldsToSelect: Seq[String] = Seq("Alpha", "beta")
+      override def fieldsToSelect: Seq[String] = Seq("alpha", "beta")
     }
 
     class StatusHandlingForTest extends FooDBFunction with StatusHandling {

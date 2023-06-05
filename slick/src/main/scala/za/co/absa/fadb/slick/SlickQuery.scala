@@ -20,9 +20,9 @@ import slick.jdbc.{GetResult, SQLActionBuilder}
 import za.co.absa.fadb.Query
 
 /**
-  *
+  * SQL query representation for Slick
   * @param sql        - the SQL query in Slick format
-  * @param getResult  - the converting function, that converts the [[slick.jdbc.PositionedResult]] (the result of Slick
+  * @param getResult  - the converting function, that converts the [[slick.jdbc.PositionedResult slick.PositionedResult]] (the result of Slick
   *                   execution) into the desire `R` type
   * @tparam R         - the return type of the query
   */

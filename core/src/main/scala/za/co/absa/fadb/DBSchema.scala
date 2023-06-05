@@ -25,7 +25,7 @@ import za.co.absa.fadb.naming_conventions.NamingConvention
   *                           possibility of override
   * @param dBEngine           - [[DBEngine]] to execute the functions with. Not directly needed for the DBSchema class, rather
   *                           to be passed on to [[DBFunction]] members of the schema
-  * @param namingConvention   - the [[za.co.absa.fadb.naming_conventions.NamingConvention]](NamingConvention) prescribing how to convert a class name into a db object name
+  * @param namingConvention   - the [[za.co.absa.fadb.naming_conventions.NamingConvention NamingConvention]] prescribing how to convert a class name into a db object name
   */
 abstract class DBSchema(schemaNameOverride: Option[String] = None)
                        (implicit dBEngine: DBEngine, implicit val namingConvention: NamingConvention) {

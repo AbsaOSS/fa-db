@@ -20,6 +20,4 @@ package za.co.absa.fadb
   * The basis for all query types of [[DBEngine]] implementations
   * @tparam R - the return type of the query
   */
-trait Query[R] {
-  type RESULT = R
-}
+trait Query[R]

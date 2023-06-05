@@ -23,7 +23,7 @@ import za.co.absa.fadb.statushandling.StatusException._
 import scala.util.{Failure, Success, Try}
 
 /**
-  * A mix in trait for [[za.co.absa.fadb.DBFunction DBFunction]] for standard handling of `status` and `statusText` fields.
+  * A mix-in trait for [[za.co.absa.fadb.DBFunction DBFunction]] for standard handling of `status` and `statusText` fields.
   */
 trait StandardStatusHandling extends StatusHandling {
   override protected def checkStatus(status: FunctionStatus): Try[FunctionStatus] = {

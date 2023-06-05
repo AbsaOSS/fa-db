@@ -23,7 +23,7 @@ import scala.util.Try
 
 /**
   * An extension of the [[SlickPgFunction]] mix-in trait to add support of status handling
-  * This trait expects another mix-in of [[za.co.absa.fadb.statushandling.StatusHandling]] (or implementation of `checkStatus` function)
+  * This trait expects another mix-in of [[za.co.absa.fadb.statushandling.StatusHandling StatusHandling]] (or implementation of `checkStatus` function)
   * @tparam T - The input type of the function
   * @tparam R - The return type of the function
   */
@@ -31,7 +31,7 @@ trait SlickPgFunctionWithStatusSupport[T, R] extends SlickPgFunction[T, R] {
 
   /**
     * Function which should actually check the status code returned by the DB function. Expected to got implemented by
-    * [[za.co.absa.fadb.statushandling.StatusHandling]] successor trait. But of course can be implemented directly.
+    * [[za.co.absa.fadb.statushandling.StatusHandling StatusHandling]] successor trait. But of course can be implemented directly.
     * @param status - the status to check
     * @return       - Success or failure the status means
     */
