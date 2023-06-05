@@ -26,7 +26,7 @@ import scala.language.higherKinds
 trait DBEngine {
 
   /**
-    * A type repesenting the (SQL) query within the engine
+    * A type representing the (SQL) query within the engine
     * @tparam X - the return type of the query
     */
   type QueryType[X] <: Query[X]

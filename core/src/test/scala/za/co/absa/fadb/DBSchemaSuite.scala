@@ -20,26 +20,26 @@ import za.co.absa.fadb.naming_conventions.SnakeCaseNaming.Implicits.namingConven
 
 import scala.concurrent.{Await, Future}
 
-//class DBSchemaSuite extends AnyFunSuite {
-//
-//  private object EngineThrow extends DBEngine {
-//    override def run[R](query: QueryType[R]): Future[Seq[R]] = {
-//      throw new Exception("Should never get here")
-//    }
-//  }
-//
-//  test("schema name default") {
-//
-//    class Foo extends DBSchema(EngineThrow)
-//    val schema = new Foo
-//    assert(schema.schemaName == "foo")
-//  }
-//
-//  test("schema name overridden") {
-//    class Foo extends DBSchema(EngineThrow, Some("bar"))
-//
-//    val schema = new Foo
-//    assert(schema.schemaName == "bar")
-//  }
-//
-//}
+class DBSchemaSuite extends AnyFunSuite {
+
+  private object EngineThrow extends DBEngine {
+    override def run[R](query: QueryType[R]): Future[Seq[R]] = {
+      throw new Exception("Should never get here")
+    }
+  }
+
+  test("schema name default") {
+
+    class Foo extends DBSchema(EngineThrow)
+    val schema = new Foo
+    assert(schema.schemaName == "foo")
+  }
+
+  test("schema name overridden") {
+    class Foo extends DBSchema(EngineThrow, "bar")
+
+    val schema = new Foo
+    assert(schema.schemaName == "bar")
+  }
+
+}

@@ -20,8 +20,6 @@ import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBFunctionFabric
 import za.co.absa.fadb.naming_conventions.{NamingConvention, SnakeCaseNaming}
 
-import scala.util.Try
-
 class StatusHandlingSuite extends AnyFunSuite {
   test("Fields to select filled with default values") {
     trait FooDBFunction extends DBFunctionFabric {

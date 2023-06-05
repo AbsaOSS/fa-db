@@ -19,16 +19,42 @@ package za.co.absa.fadb.slick
 import slick.jdbc.{GetResult, SQLActionBuilder}
 import za.co.absa.fadb.DBFunctionFabric
 
+/**
+  * Mix-in trait to use [[za.co.absa.fadb.DBFunction]] with [[SlickPgEngine]]. Implements the abstract function `query`
+  * @tparam T - The input type of the function
+  * @tparam R - The return type of the function
+  */
 trait SlickPgFunction[T, R] extends DBFunctionFabric {
 
+  /**
+    * A reference to the [[SlickPgEngine]] to use the [[za.co.absa.fadb.DBFunction]] with
+    */
   implicit val dbEngine: SlickPgEngine
 
+  /**
+    * This is expected to return SQL part of the [[SlickQuery]] (eventually returned by the `SlickPgFunction.query` function
+    * @param values - the values to pass over to the database function
+    * @return       - the Slick representation of the SQL
+    */
   protected def sql(values: T): SQLActionBuilder
+
+  /**
+    * This is expected to return a method to convert the [[slick.jdbc.PositionedResult]], the Slick general SQL result
+    * format into the `R` type
+    * @return - the converting function
+    */
   protected def slickConverter: GetResult[R]
 
+  /**
+    * Alias to use within the SQL query
+    */
   protected val alias = "A"
 
-  protected def selectEntry: String = {
+  /**
+    * Helper function to use in the actual DB function class
+    * @return the SELECT part of the function call SQL query
+    */
+  protected def selectEntry: String = { // TODO Not suggested to use until #6 will be implemented
     val fieldsSeq = fieldsToSelect
     if (fieldsSeq.isEmpty) {
       "*"
@@ -42,6 +68,11 @@ trait SlickPgFunction[T, R] extends DBFunctionFabric {
     }
   }
 
+  /**
+    * This mix-in main reason of existence. It implements the `query` function for [[za.co.absa.fadb.DBFunction]] for [[SlickPgEngine]]
+    * @param values - the values to pass over to the database function
+    * @return       - the SQL query in [[SlickQuery]] form
+    */
   protected def query(values: T): dbEngine.QueryType[R] = {
     new SlickQuery(sql(values), slickConverter)
   }

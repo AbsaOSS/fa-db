@@ -24,10 +24,24 @@ import slick.jdbc.PostgresProfile.api._
 
 import scala.language.higherKinds
 
+/**
+  * [[DBEngine]] based on the Slick library in the Postgres flavor
+  * @param db - the Slick database
+  */
 class SlickPgEngine(val db: Database) extends DBEngine {
 
+  /**
+    * The type of Queries for Slick
+    * @tparam X - the return type of the query
+    */
   type QueryType[X] = SlickQuery[X]
 
+  /**
+    * Execution using Slick
+    * @param query  - the Slick query to execute
+    * @tparam R     - return the of the query
+    * @return       - sequence of the results of database query
+    */
   override protected def run[R](query: QueryType[R]): Future[Seq[R]] = {
     // It can be expected that a GetResult will be passed into the run function as converter.
     // Unfortunately it has to be recreated to be used by Slick

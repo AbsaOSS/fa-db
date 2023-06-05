@@ -23,7 +23,7 @@ import za.co.absa.fadb.statushandling.StatusHandling.{defaultStatusFieldName, de
 import scala.util.Try
 
 /**
-  * A basis for mix-in traits for [[DBFunction]] that support `status` and `status text` for easier handling
+  * A basis for mix-in traits for [[za.co.absa.fadb.DBFunction]] that support `status` and `status text` for easier handling
   */
 trait StatusHandling extends DBFunctionFabric {
 
@@ -34,7 +34,7 @@ trait StatusHandling extends DBFunctionFabric {
 
   /**
     * Verifies if the give status means success or failure
-    * @param status - the staus to check
+    * @param status - the status to check
     * @return       - Success or failure the status means
     */
   protected def checkStatus(status: FunctionStatus): Try[FunctionStatus]

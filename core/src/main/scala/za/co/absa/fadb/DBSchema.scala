@@ -20,13 +20,12 @@ import za.co.absa.fadb.naming_conventions.NamingConvention
 
 /**
   * An abstract class, an ancestor to represent a database schema (each database function should be placed in a schema)
-  * The database name of the schema is derives from the class name based on the provided naming convention
-  *
-  * @param executor           - executor to execute the queries through
+  * The database name of the schema is derived from the class name based on the provided naming convention
   * @param schemaNameOverride - in case the class name would not match the database schema name, this gives the
   *                           possibility of override
+  * @param dBEngine           - [[DBEngine]] to execute the functions with. Not directly needed for the DBSchema class, rather
+  *                           to be passed on to [[DBFunction]] members of the schema
   * @param namingConvention   - the [[za.co.absa.fadb.naming_conventions.NamingConvention]](NamingConvention) prescribing how to convert a class name into a db object name
-  * @tparam E                 - the engine of the executor type, e.g. Slick Database
   */
 abstract class DBSchema(schemaNameOverride: Option[String] = None)
                        (implicit dBEngine: DBEngine, implicit val namingConvention: NamingConvention) {
@@ -52,13 +51,24 @@ abstract class DBSchema(schemaNameOverride: Option[String] = None)
     this(None)(dBEngine, namingConvention)
   }
 
-  //type QueryType[R] = dBEngine.QueryType[R]
+  /**
+    * To easy pass over to [[DBFunction]] members of the schema
+    */
   protected implicit val schema: DBSchema = this
 
+  /**
+    * Function to convert a class to the associated DB object name, based on the class' name. For transformation from the
+    * class name to usual db name the schema's [[za.co.absa.fadb.naming_conventions.NamingConvention NamingConvention]] is used.
+    * @param c  - class which name to use to get the DB object name
+    * @return   - the db object name
+    */
   def objectNameFromClassName(c: Class[_]): String = {
     namingConvention.fromClassNamePerConvention(c)
   }
 
+  /**
+    * Name of the schema. Based on the schema's class name or provided override
+    */
   val schemaName: String = schemaNameOverride.getOrElse(objectNameFromClassName(getClass))
 
 }

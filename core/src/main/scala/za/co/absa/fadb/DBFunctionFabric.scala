@@ -22,7 +22,14 @@ package za.co.absa.fadb
   */
 trait DBFunctionFabric {
 
+  /**
+    * Name of the function the class represents
+    */
   def functionName: String
 
+  /**
+    * List of fields to select from the DB function.
+    * @return - list of fields to select
+    */
   protected def fieldsToSelect: Seq[String] = Seq.empty
 }
