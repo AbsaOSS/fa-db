@@ -17,7 +17,7 @@
 package za.co.absa.fadb
 
 /**
-  * Tha basis for all query types of [[DBEngine]] implementations
+  * The basis for all query types of [[DBEngine]] implementations
   * @tparam R - the return type of the query
   */
 trait Query[R] {

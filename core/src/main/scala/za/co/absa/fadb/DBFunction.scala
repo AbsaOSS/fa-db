@@ -22,7 +22,7 @@ import scala.concurrent.Future
 
 /**
   *
-  * @param functionNameOverride- in case the class name would not match the database function name, this gives the
+  * @param functionNameOverride - in case the class name would not match the database function name, this gives the
   *                             possibility of override
   * @param schema               - the schema the function belongs into
   * @param dBEngine             - the database engine that is supposed to execute the function (presumably contains
@@ -94,7 +94,7 @@ abstract class DBFunction[T, R, E <: DBEngine](functionNameOverride: Option[Stri
 object DBFunction {
   /**
     * Represents a function returning a set (in DB sense) of rows
-    * @param functionNameOverride- in case the class name would not match the database function name, this gives the
+    * @param functionNameOverride - in case the class name would not match the database function name, this gives the
     *                             possibility of override
     * @param schema               - the schema the function belongs into
     * @param dBEngine             - the database engine that is supposed to execute the function (presumably contains
@@ -137,7 +137,7 @@ object DBFunction {
 
   /**
     * Represents a function returning exactly one record
-    * @param functionNameOverride- in case the class name would not match the database function name, this gives the
+    * @param functionNameOverride - in case the class name would not match the database function name, this gives the
     *                             possibility of override
     * @param schema               - the schema the function belongs into
     * @param dBEngine             - the database engine that is supposed to execute the function (presumably contains
@@ -179,7 +179,7 @@ object DBFunction {
 
   /**
     * Represents a function returning one optional record
-    * @param functionNameOverride- in case the class name would not match the database function name, this gives the
+    * @param functionNameOverride - in case the class name would not match the database function name, this gives the
     *                             possibility of override
     * @param schema               - the schema the function belongs into
     * @param dBEngine             - the database engine that is supposed to execute the function (presumably contains

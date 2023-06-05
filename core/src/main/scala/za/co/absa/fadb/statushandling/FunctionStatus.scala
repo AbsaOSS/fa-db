@@ -17,7 +17,7 @@
 package za.co.absa.fadb.statushandling
 
 /**
-  * Class represents the status of calling an fa-db function (if it supports status that is)
+  * Class represents the status of calling a fa-db function (if it supports status that is)
   * @param status     - status code identifying if the function call succeeded or failed and how
   * @param statusText - human readable description of the status returned
   */

@@ -22,7 +22,7 @@ import za.co.absa.fadb.naming_conventions.{NamingConvention, SnakeCaseNaming}
 import scala.util.{Failure, Success, Try}
 
 class UserDefinedStatusHandlingSuite extends AnyFunSuite {
-  test("") {
+  test("Check user defined status") {
     class UserDefinedStatusHandlingForTest(val OKStatuses: Set[Integer]) extends UserDefinedStatusHandling {
       override def checkStatus(status: FunctionStatus): Try[FunctionStatus] = super.checkStatus(status)
       override def functionName: String = "Never needed"

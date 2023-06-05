@@ -26,7 +26,7 @@ import java.sql.Timestamp
 import scala.concurrent.Future
 import DatasetSchema._
 import za.co.absa.fadb.DBFunction.{DBSeqFunction, DBUniqueFunction}
-import za.co.absa.fadb.statushandling.{StatusException, UserDefinedStatusHandling}
+import za.co.absa.fadb.statushandling.UserDefinedStatusHandling
 
 class DatasetSchema(implicit engine: SlickPgEngine) extends DBSchema {
 

@@ -23,12 +23,12 @@ import za.co.absa.fadb.statushandling.StatusHandling.{defaultStatusFieldName, de
 import scala.util.Try
 
 /**
-  * A basis for mix-in traits for [[za.co.absa.fadb.DBFunction]] that support `status` and `status text` for easier handling
+  * A basis for mix-in traits for [[za.co.absa.fadb.DBFunction DBFunction]] that support `status` and `status text` for easier handling
   */
 trait StatusHandling extends DBFunctionFabric {
 
   /**
-    * @return - the naming convention to use when convertin the internal status and status text fields to DB fields
+    * @return - the naming convention to use when converting the internal status and status text fields to DB fields
     */
   def namingConvention: NamingConvention
 
