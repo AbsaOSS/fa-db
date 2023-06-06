@@ -42,4 +42,11 @@ class StatusExceptionSuite extends AnyFunSuite {
 
     assert(statusException != otherStatusException)
   }
+
+  test("Test equals - when values are same but classes inheritance differ") {
+    val statusException = StatusException(10, "OK")
+    val otherException = new ClassNotFoundException()
+
+    assert(statusException != otherException)
+  }
 }
