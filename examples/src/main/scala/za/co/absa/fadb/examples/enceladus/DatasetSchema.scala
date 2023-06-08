@@ -28,6 +28,7 @@ import DatasetSchema._
 import za.co.absa.fadb.DBFunction.{DBSeqFunction, DBUniqueFunction}
 import za.co.absa.fadb.statushandling.UserDefinedStatusHandling
 
+/* The Schema doesn't need the dBEngine directly, but it seems cleaner this way to hand it over to schema's functions */
 class DatasetSchema(implicit engine: SlickPgEngine) extends DBSchema {
 
   val addSchema = new AddSchema
@@ -62,7 +63,7 @@ object DatasetSchema {
 
   final class AddSchema(implicit override val schema: DBSchema, override val dbEngine: SlickPgEngine)
     extends DBUniqueFunction[SchemaInput, Long, SlickPgEngine]
-    with SlickPgFunction[SchemaInput, Long]
+    with SlickPgFunctionWithStatusSupport[SchemaInput, Long]
     with UserDefinedStatusHandling {
 
     override protected def sql(values: SchemaInput): SQLActionBuilder = {
