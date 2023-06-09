@@ -1,7 +1,7 @@
 ---
 name: Question
 about: Ask a question
-labels: 'question, DB, priority: undecided'
+labels: 'question'
 
 ---
 
