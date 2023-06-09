@@ -12,6 +12,8 @@ ___
 <!-- toc -->
 - [What is fa-db](#what-is-fa-db)
 - [Usage](#usage)
+- [How to generate code coverage report](#how-to-generate-code-coverage-report)
+- [How to Release](#how-to-release)
 <!-- tocstop -->
 
 ## What is fa-db
@@ -96,7 +98,7 @@ Modules:
 </dependency>
 ```
 
-### How to generate Code coverage report
+### How to generate code coverage report
 ```sbt
 sbt jacoco
 ```
@@ -104,3 +106,7 @@ Code coverage will be generated on path:
 ```
 {project-root}/fa-db/{module}/target/scala-{scala_version}/jacoco/report/html
 ```
+
+## How to Release
+
+Please see [this file](RELEASE.md) for more details.
