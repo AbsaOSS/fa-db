@@ -33,12 +33,12 @@ trait StatusHandling extends DBFunctionFabric {
   def namingConvention: NamingConvention
 
   /**
-    * Verifies if the give status means success or failure
+    * Verifies if the given status means success or failure
     * @param status - the status to check
     * @return       - Success or failure the status means
     */
   protected def checkStatus(status: FunctionStatus): Try[FunctionStatus]
-  protected def checkStatus(status: Integer, statusText: String): Try[FunctionStatus] = checkStatus((FunctionStatus(status, statusText)))
+  protected def checkStatus(status: Integer, statusText: String): Try[FunctionStatus] = checkStatus(FunctionStatus(status, statusText))
 
   def statusField: String = defaultStatusField
   def statusTextField: String = defaultStatusTextField
