@@ -1,8 +1,8 @@
 ---
 name: Epic
 about: A larger task consisting of more deliverables
-labels: 'Epic, DB, priority: undecided'
-pipelines: Epics
+labels: 'epic'
+
 ---
 
 ## Background

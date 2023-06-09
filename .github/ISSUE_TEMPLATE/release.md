@@ -2,7 +2,7 @@
 title: Release vX.Y.0
 name: Release
 about: Create release notes
-labels: 'DB, release, priority: high'
+labels: 'release'
 
 ---
 
