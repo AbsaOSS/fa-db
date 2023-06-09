@@ -32,9 +32,9 @@ class SlickPgEngine(val db: Database) extends DBEngine {
 
   /**
     * The type of Queries for Slick
-    * @tparam X - the return type of the query
+    * @tparam T - the return type of the query
     */
-  type QueryType[X] = SlickQuery[X]
+  type QueryType[T] = SlickQuery[T]
 
   /**
     * Execution using Slick

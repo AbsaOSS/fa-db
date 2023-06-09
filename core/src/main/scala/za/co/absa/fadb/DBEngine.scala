@@ -27,9 +27,9 @@ trait DBEngine {
 
   /**
     * A type representing the (SQL) query within the engine
-    * @tparam X - the return type of the query
+    * @tparam T - the return type of the query
     */
-  type QueryType[X] <: Query[X]
+  type QueryType[T] <: Query[T]
 
   /**
     * The actual query executioner of the queries of the engine

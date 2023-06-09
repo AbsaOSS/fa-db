@@ -27,11 +27,11 @@ import scala.concurrent.Future
   * @param schema               - the schema the function belongs into
   * @param dBEngine             - the database engine that is supposed to execute the function (presumably contains
   *                             connection to the database
-  * @tparam T                   - the type covering the input fields of the database function
+  * @tparam I                   - the type covering the input fields of the database function
   * @tparam R                   - the type covering the returned fields from the database function
   * @tparam E                   - the type of the [[DBEngine]] engine
   */
-abstract class DBFunction[T, R, E <: DBEngine](functionNameOverride: Option[String] = None)
+abstract class DBFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
                                               (implicit val schema: DBSchema, val dBEngine: E) extends DBFunctionFabric {
 
   /* alternative constructors for different availability of input parameters */
@@ -62,7 +62,7 @@ abstract class DBFunction[T, R, E <: DBEngine](functionNameOverride: Option[Stri
     * @param values - the values to pass over to the database function
     * @return       - the SQL query in the format specific to the provided [[DBEngine]]
     */
-  protected def query(values: T): dBEngine.QueryType[R]
+  protected def query(values: I): dBEngine.QueryType[R]
 
   /**
     * Name of the function, based on the class name, unless it is overridden in the constructor
@@ -85,9 +85,9 @@ abstract class DBFunction[T, R, E <: DBEngine](functionNameOverride: Option[Stri
   override protected def fieldsToSelect: Seq[String] = super.fieldsToSelect //TODO should get the names from R #6
 
   /*these 3 functions has to be defined here and not in the ancestors, as there the query type is not compatible - path-dependent types*/
-  protected def execute(values: T): Future[Seq[R]] = dBEngine.execute[R](query(values))
-  protected def unique(values: T): Future[R] = dBEngine.unique(query(values))
-  protected def option(values: T): Future[Option[R]] = dBEngine.option(query(values))
+  protected def execute(values: I): Future[Seq[R]] = dBEngine.execute[R](query(values))
+  protected def unique(values: I): Future[R] = dBEngine.unique(query(values))
+  protected def option(values: I): Future[Option[R]] = dBEngine.option(query(values))
 
 }
 
@@ -99,13 +99,13 @@ object DBFunction {
     * @param schema               - the schema the function belongs into
     * @param dBEngine             - the database engine that is supposed to execute the function (presumably contains
     *                             connection to the database
-    * @tparam T                   - the type covering the input fields of the database function
+    * @tparam I                   - the type covering the input fields of the database function
     * @tparam R                   - the type covering the returned fields from the database function
     * @tparam E                   - the type of the [[DBEngine]] engine
     */
-  abstract class DBSeqFunction[T, R, E <: DBEngine](functionNameOverride: Option[String] = None)
+  abstract class DBSeqFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
                                                    (implicit schema: DBSchema, dBEngine: E)
-    extends DBFunction[T, R, E](functionNameOverride) {
+    extends DBFunction[I, R, E](functionNameOverride) {
 
     def this(schema: DBSchema, functionNameOverride: String)
             (implicit dBEngine: E) = {
@@ -133,7 +133,7 @@ object DBFunction {
       * @return       - a sequence of values, each coming from a row returned from the DB function transformed to scala
       *               type `R`
       */
-    def apply(values: T): Future[Seq[R]] = execute(values)
+    def apply(values: I): Future[Seq[R]] = execute(values)
   }
 
   /**
@@ -143,13 +143,13 @@ object DBFunction {
     * @param schema               - the schema the function belongs into
     * @param dBEngine             - the database engine that is supposed to execute the function (presumably contains
     *                             connection to the database
-    * @tparam T                   - the type covering the input fields of the database function
+    * @tparam I                   - the type covering the input fields of the database function
     * @tparam R                   - the type covering the returned fields from the database function
     * @tparam E                   - the type of the [[DBEngine]] engine
     */
-  abstract class DBUniqueFunction[T, R, E <: DBEngine](functionNameOverride: Option[String] = None)
+  abstract class DBUniqueFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
                                                       (implicit schema: DBSchema, dBEngine: E)
-    extends DBFunction[T, R, E](functionNameOverride) {
+    extends DBFunction[I, R, E](functionNameOverride) {
 
     def this(schema: DBSchema, functionNameOverride: String)
             (implicit dBEngine: E) = {
@@ -176,7 +176,7 @@ object DBFunction {
       * @param values - the values to pass over to the database function
       * @return       - the value returned from the DB function transformed to scala type `R`
       */
-    def apply(values: T): Future[R] = unique(values)
+    def apply(values: I): Future[R] = unique(values)
   }
 
   /**
@@ -186,13 +186,13 @@ object DBFunction {
     * @param schema               - the schema the function belongs into
     * @param dBEngine             - the database engine that is supposed to execute the function (presumably contains
     *                             connection to the database
-    * @tparam T                   - the type covering the input fields of the database function
+    * @tparam I                   - the type covering the input fields of the database function
     * @tparam R                   - the type covering the returned fields from the database function
     * @tparam E                   - the type of the [[DBEngine]] engine
     */
-  abstract class DBOptionFunction[T, R, E <: DBEngine](functionNameOverride: Option[String] = None)
+  abstract class DBOptionFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
                                                       (implicit schema: DBSchema, dBEngine: E)
-    extends DBFunction[T, R, E](functionNameOverride) {
+    extends DBFunction[I, R, E](functionNameOverride) {
 
     def this(schema: DBSchema, functionNameOverride: String)
             (implicit dBEngine: E) = {
@@ -219,6 +219,6 @@ object DBFunction {
       * @param values - the values to pass over to the database function
       * @return       - the value returned from the DB function transformed to scala type `R` if a row is returned, otherwise `None`
       */
-    def apply(values: T): Future[Option[R]] = option(values)
+    def apply(values: I): Future[Option[R]] = option(values)
   }
 }

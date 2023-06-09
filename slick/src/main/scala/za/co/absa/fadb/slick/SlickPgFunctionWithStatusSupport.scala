@@ -24,10 +24,10 @@ import scala.util.Try
 /**
   * An extension of the [[SlickPgFunction]] mix-in trait to add support of status handling
   * This trait expects another mix-in of [[za.co.absa.fadb.statushandling.StatusHandling StatusHandling]] (or implementation of `checkStatus` function)
-  * @tparam T - The input type of the function
+  * @tparam I - The input type of the function
   * @tparam R - The return type of the function
   */
-trait SlickPgFunctionWithStatusSupport[T, R] extends SlickPgFunction[T, R] {
+trait SlickPgFunctionWithStatusSupport[I, R] extends SlickPgFunction[I, R] {
 
   /**
     * Function which should actually check the status code returned by the DB function. Expected to got implemented by
@@ -56,7 +56,7 @@ trait SlickPgFunctionWithStatusSupport[T, R] extends SlickPgFunction[T, R] {
     * @param values - the values to pass over to the database function
     * @return       - the SQL query in [[SlickQuery]] form
     */
-  override protected def query(values: T): dbEngine.QueryType[R] = {
+  override protected def query(values: I): dbEngine.QueryType[R] = {
     val original = super.query(values)
     new SlickQuery[R](original.sql, GetResult{converterWithStatus(_, original.getResult)})
   }

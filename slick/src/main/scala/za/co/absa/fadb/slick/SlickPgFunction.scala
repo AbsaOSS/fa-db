@@ -21,10 +21,10 @@ import za.co.absa.fadb.DBFunctionFabric
 
 /**
   * Mix-in trait to use [[za.co.absa.fadb.DBFunction DBFunction]] with [[SlickPgEngine]]. Implements the abstract function `query`
-  * @tparam T - The input type of the function
+  * @tparam I - The input type of the function
   * @tparam R - The return type of the function
   */
-trait SlickPgFunction[T, R] extends DBFunctionFabric {
+trait SlickPgFunction[I, R] extends DBFunctionFabric {
 
   /**
     * A reference to the [[SlickPgEngine]] to use the [[za.co.absa.fadb.DBFunction DBFunction]] with
@@ -36,7 +36,7 @@ trait SlickPgFunction[T, R] extends DBFunctionFabric {
     * @param values - the values to pass over to the database function
     * @return       - the Slick representation of the SQL
     */
-  protected def sql(values: T): SQLActionBuilder
+  protected def sql(values: I): SQLActionBuilder
 
   /**
     * This is expected to return a method to convert the [[slick.jdbc.PositionedResult slick.PositionedResult]], the Slick general SQL result
@@ -48,7 +48,7 @@ trait SlickPgFunction[T, R] extends DBFunctionFabric {
   /**
     * Alias to use within the SQL query
     */
-  protected val alias = "A"
+  protected val alias = "FNC"
 
   /**
     * Helper function to use in the actual DB function class
@@ -73,7 +73,7 @@ trait SlickPgFunction[T, R] extends DBFunctionFabric {
     * @param values - the values to pass over to the database function
     * @return       - the SQL query in [[SlickQuery]] form
     */
-  protected def query(values: T): dbEngine.QueryType[R] = {
+  protected def query(values: I): dbEngine.QueryType[R] = {
     new SlickQuery(sql(values), slickConverter)
   }
 }
