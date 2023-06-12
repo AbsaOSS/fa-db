@@ -27,14 +27,14 @@ import scala.util.{Failure, Success, Try}
   */
 trait StandardStatusHandling extends StatusHandling {
   override protected def checkStatus(status: FunctionStatus): Try[FunctionStatus] = {
-    status.status / 10 match {
+    status.statusCode / 10 match {
       case 1              => Success(status)
       case 2              => Failure(ServerMisconfigurationException(status))
       case 3              => Failure(DataConflictException(status))
       case 4              => Failure(DataNotFoundException(status))
       case 5 | 6 | 7 | 8  => Failure(ErrorInDataException(status))
       case 9              => Failure(OtherStatusException(status))
-      case _              => Failure(DBFailException(s"Status out of range - with status: $status and status text: '${status.statusText}'"))
+      case _              => Failure(DBFailException(s"Status out of range - with status: ${status.statusCode} and status text: '${status.statusText}'"))
     }
   }
 }

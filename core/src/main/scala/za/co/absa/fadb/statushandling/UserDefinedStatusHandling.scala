@@ -25,7 +25,7 @@ trait UserDefinedStatusHandling extends StatusHandling {
   def OKStatuses: Set[Integer]
 
   def checkStatus(status: FunctionStatus): Try[FunctionStatus] = {
-    if (OKStatuses.contains(status.status)) {
+    if (OKStatuses.contains(status.statusCode)) {
       Success(status)
     } else {
       Failure(StatusException(status))

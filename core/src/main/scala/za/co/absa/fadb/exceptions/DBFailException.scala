@@ -20,7 +20,14 @@ package za.co.absa.fadb.exceptions
   * General Fa-DB exception class
   * @param message  - the message describing the reason of exception
   */
-class DBFailException(message: String) extends Exception(message)
+class DBFailException(message: String) extends Exception(message) {
+  override def equals(obj: Any): Boolean = {
+    obj match {
+      case other: DBFailException => (other.getMessage == message)  && (getClass == other.getClass)
+      case _ => false
+    }
+  }
+}
 
 object DBFailException {
   def apply(message: String): DBFailException = new DBFailException(message)

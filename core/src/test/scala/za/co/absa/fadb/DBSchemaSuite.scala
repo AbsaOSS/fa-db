@@ -29,8 +29,8 @@ class DBSchemaSuite extends AnyFunSuite {
   }
 
   test("schema name default") {
-
     class Foo extends DBSchema(EngineThrow)
+
     val schema = new Foo
     assert(schema.schemaName == "foo")
   }

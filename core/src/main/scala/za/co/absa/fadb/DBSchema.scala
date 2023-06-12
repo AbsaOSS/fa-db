@@ -35,7 +35,6 @@ abstract class DBSchema(schemaNameOverride: Option[String] = None)
     this(Option(schemaNameOverride))(dBEngine, namingConvention)
   }
 
-
   def this(dBEngine: DBEngine)
           (implicit namingConvention: NamingConvention) {
     this(None)(dBEngine, namingConvention)

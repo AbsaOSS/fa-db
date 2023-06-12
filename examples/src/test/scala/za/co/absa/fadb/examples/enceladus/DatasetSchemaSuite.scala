@@ -32,7 +32,7 @@ class DatasetSchemaSuite extends AnyWordSpec with Matchers {
   private val schemas = new DatasetSchema
 
   private def checkException(exception: StatusException): Unit = {
-    println(s"Requested failed with: ${exception.status.status} - ${exception.status.statusText}")
+    println(s"Requested failed with: ${exception.status.statusCode} - ${exception.status.statusText}")
   }
 
   // test cases are set to be ignored now, as they are not idempotent and require other project's (Enceladus) data structures
