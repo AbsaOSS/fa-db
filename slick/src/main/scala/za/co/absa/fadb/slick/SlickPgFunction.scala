@@ -17,24 +17,63 @@
 package za.co.absa.fadb.slick
 
 import slick.jdbc.{GetResult, SQLActionBuilder}
-import slick.jdbc.PostgresProfile.api._
-import za.co.absa.fadb.{DBFunctionFabric, QueryFunction}
+import za.co.absa.fadb.DBFunctionFabric
 
-trait SlickPgFunction[T, R] extends DBFunctionFabric {
+/**
+  * Mix-in trait to use [[za.co.absa.fadb.DBFunction DBFunction]] with [[SlickPgEngine]]. Implements the abstract function `query`
+  * @tparam I - The input type of the function
+  * @tparam R - The return type of the function
+  */
+trait SlickPgFunction[I, R] extends DBFunctionFabric {
 
-  protected def sqlToCallFunction(values: T): SQLActionBuilder
+  /**
+    * A reference to the [[SlickPgEngine]] to use the [[za.co.absa.fadb.DBFunction DBFunction]] with
+    */
+  implicit val dbEngine: SlickPgEngine
 
-  protected def resultConverter: GetResult[R]
+  /**
+    * This is expected to return SQL part of the [[SlickQuery]] (eventually returned by the `SlickPgFunction.query` function
+    * @param values - the values to pass over to the database function
+    * @return       - the Slick representation of the SQL
+    */
+  protected def sql(values: I): SQLActionBuilder
 
-  protected def makeQueryFunction(sql: SQLActionBuilder)(implicit rconv: GetResult[R]): QueryFunction[Database, R] = {
-    val query = sql.as[R]
-    val resultFnc = {db: Database => db.run(query)}
-    resultFnc
+  /**
+    * This is expected to return a method to convert the [[slick.jdbc.PositionedResult slick.PositionedResult]], the Slick general SQL result
+    * format into the `R` type
+    * @return - the converting function
+    */
+  protected def slickConverter: GetResult[R]
+
+  /**
+    * Alias to use within the SQL query
+    */
+  protected val alias = "FNC"
+
+  /**
+    * Helper function to use in the actual DB function class
+    * @return the SELECT part of the function call SQL query
+    */
+  protected def selectEntry: String = { // TODO Not suggested to use until #6 will be implemented
+    val fieldsSeq = fieldsToSelect
+    if (fieldsSeq.isEmpty) {
+      "*"
+    } else {
+      val aliasToUse = if (alias.isEmpty) {
+        ""
+      } else {
+        s"$alias."
+      }
+      fieldsToSelect.map(aliasToUse + _).mkString(",")
+    }
   }
 
-  protected def queryFunction(values: T): QueryFunction[Database, R] = {
-    val converter = resultConverter
-    val functionSql = sqlToCallFunction(values)
-    makeQueryFunction(functionSql)(converter)
+  /**
+    * This mix-in main reason of existence. It implements the `query` function for [[za.co.absa.fadb.DBFunction DBFunction]] for [[SlickPgEngine]]
+    * @param values - the values to pass over to the database function
+    * @return       - the SQL query in [[SlickQuery]] form
+    */
+  protected def query(values: I): dbEngine.QueryType[R] = {
+    new SlickQuery(sql(values), slickConverter)
   }
 }

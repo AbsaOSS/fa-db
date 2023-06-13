@@ -18,42 +18,56 @@ package za.co.absa.fadb
 
 import za.co.absa.fadb.naming_conventions.NamingConvention
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
-
 /**
   * An abstract class, an ancestor to represent a database schema (each database function should be placed in a schema)
-  * The database name of the schema is derives from the class name based on the provided naming convention
-  *
-  * @param executor           - executor to execute the queries through
+  * The database name of the schema is derived from the class name based on the provided naming convention
   * @param schemaNameOverride - in case the class name would not match the database schema name, this gives the
   *                           possibility of override
-  * @param namingConvention   - the [[za.co.absa.fadb.naming_conventions.NamingConvention]](NamingConvention) prescribing how to convert a class name into a db object name
-  * @tparam E                 - the engine of the executor type, e.g. Slick Database
+  * @param dBEngine           - [[DBEngine]] to execute the functions with. Not directly needed for the DBSchema class, rather
+  *                           to be passed on to [[DBFunction]] members of the schema
+  * @param namingConvention   - the [[za.co.absa.fadb.naming_conventions.NamingConvention NamingConvention]] prescribing how to convert a class name into a db object name
   */
-abstract class DBSchema[E](val executor: DBExecutor[E], schemaNameOverride: Option[String] = None)
-                          (implicit namingConvention: NamingConvention) {
+abstract class DBSchema(schemaNameOverride: Option[String] = None)
+                       (implicit dBEngine: DBEngine, implicit val namingConvention: NamingConvention) {
 
+  def this(dBEngine: DBEngine, schemaNameOverride: String)
+          (implicit namingConvention: NamingConvention) {
+    this(Option(schemaNameOverride))(dBEngine, namingConvention)
+  }
 
+  def this(dBEngine: DBEngine)
+          (implicit namingConvention: NamingConvention) {
+    this(None)(dBEngine, namingConvention)
+  }
+
+  def this(namingConvention: NamingConvention, schemaNameOverride:String)
+          (implicit dBEngine: DBEngine) {
+    this(Option(schemaNameOverride))(dBEngine, namingConvention)
+  }
+
+  def this(namingConvention: NamingConvention)
+          (implicit dBEngine: DBEngine) {
+    this(None)(dBEngine, namingConvention)
+  }
+
+  /**
+    * To easy pass over to [[DBFunction]] members of the schema
+    */
+  protected implicit val schema: DBSchema = this
+
+  /**
+    * Function to convert a class to the associated DB object name, based on the class' name. For transformation from the
+    * class name to usual db name the schema's [[za.co.absa.fadb.naming_conventions.NamingConvention NamingConvention]] is used.
+    * @param c  - class which name to use to get the DB object name
+    * @return   - the db object name
+    */
   def objectNameFromClassName(c: Class[_]): String = {
     namingConvention.fromClassNamePerConvention(c)
   }
 
+  /**
+    * Name of the schema. Based on the schema's class name or provided override
+    */
   val schemaName: String = schemaNameOverride.getOrElse(objectNameFromClassName(getClass))
 
-  def execute[R](query: QueryFunction[E, R]): Future[Seq[R]] = {
-    executor.run(query)
-  }
-
-  def unique[R](query: QueryFunction[E, R]): Future[R] = {
-    for {
-      all <- execute(query)
-    } yield all.head
-  }
-
-  def option[R](query: QueryFunction[E, R]): Future[Option[R]] = {
-    for {
-      all <- execute(query)
-    } yield all.headOption
-  }
 }

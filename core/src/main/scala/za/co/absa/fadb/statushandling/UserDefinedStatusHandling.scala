@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb
+package za.co.absa.fadb.statushandling
+
+import scala.util.{Failure, Success, Try}
 
 /**
-  * This trait serves the purpose of introducing functions that are common to all DB Function objects and mix-in traits
-  * that offer certain implementations. This trait should help with the inheritance of all of these
+  *
   */
-trait DBFunctionFabric {
+trait UserDefinedStatusHandling extends StatusHandling {
+  def OKStatuses: Set[Integer]
 
-  /**
-    * Name of the function the class represents
-    */
-  def functionName: String
-
-  /**
-    * List of fields to select from the DB function.
-    * @return - list of fields to select
-    */
-  protected def fieldsToSelect: Seq[String] = Seq.empty
+  def checkStatus(status: FunctionStatus): Try[FunctionStatus] = {
+    if (OKStatuses.contains(status.statusCode)) {
+      Success(status)
+    } else {
+      Failure(StatusException(status))
+    }
+  }
 }

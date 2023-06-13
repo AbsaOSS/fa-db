@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-package za.co.absa
+package za.co.absa.fadb.statushandling
 
-import scala.concurrent.Future
-
-package object fadb {
-  /**
-    * Represents a database query call (in the model of Fa-Db a call to a DB stored procedure). When provided a DB
-    * connection (of type [[DBExecutor]]) it executes the query and transforms it to the desired result type sequence.
-    * @tparam E - the type of the DB connection to execute on
-    * @tparam R - the type of result
-    */
-  type QueryFunction[E, R] = E => Future[Seq[R]]
-}
+/**
+  * Class represents the status of calling a fa-db function (if it supports status that is)
+  * @param statusCode - status code identifying if the function call succeeded or failed and how
+  * @param statusText - human readable description of the status returned
+  */
+case class FunctionStatus(statusCode: Int, statusText: String)

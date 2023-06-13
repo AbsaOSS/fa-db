@@ -16,13 +16,8 @@
 
 package za.co.absa.fadb
 
-import scala.concurrent.Future
-
 /**
-  * And abstraction to make it possible to execute queries through regardless of the provided database engine library
-  *
-  * @tparam E - the type of the engine, E.g. a Slick Postgres Database
+  * The basis for all query types of [[DBEngine]] implementations
+  * @tparam R - the return type of the query
   */
-trait DBExecutor[E] {
-  def run[R](fnc: QueryFunction[E, R]): Future[Seq[R]]
-}
+trait Query[R]

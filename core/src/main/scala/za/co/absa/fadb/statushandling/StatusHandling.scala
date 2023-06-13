@@ -17,26 +17,46 @@
 package za.co.absa.fadb.statushandling
 
 import za.co.absa.fadb.DBFunctionFabric
-import za.co.absa.fadb.statushandling.StatusHandling.{defaultStatusFieldName, defaultStatusTextFieldName}
+import za.co.absa.fadb.naming_conventions.NamingConvention
+import za.co.absa.fadb.statushandling.StatusHandling.{defaultStatusField, defaultStatusTextField}
 
 import scala.util.Try
 
 /**
-  * A basis for mix-in traits for [[DBFunction]] that support `status` and `status_text` for easier handling
+  * A basis for mix-in traits for [[za.co.absa.fadb.DBFunction DBFunction]] that support `status` and `status text` for easier handling
   */
-trait StatusHandling extends DBFunctionFabric{
+trait StatusHandling extends DBFunctionFabric {
 
-  def statusFieldName: String = defaultStatusFieldName
-  def statusTextFieldName: String = defaultStatusTextFieldName
+  /**
+    * @return - the naming convention to use when converting the internal status and status text fields to DB fields
+    */
+  def namingConvention: NamingConvention
 
+  /**
+    * Verifies if the given status means success or failure
+    * @param status - the status to check
+    * @return       - Success or failure the status means
+    */
+  protected def checkStatus(status: FunctionStatus): Try[FunctionStatus]
+  protected def checkStatus(status: Integer, statusText: String): Try[FunctionStatus] = checkStatus(FunctionStatus(status, statusText))
+
+  def statusField: String = defaultStatusField
+  def statusTextField: String = defaultStatusTextField
+
+  /**
+    * A mix-in to add the status fields into the SELECT statement
+    * @return a sequence of fields to use in SELECT
+    */
   override protected def fieldsToSelect: Seq[String] = {
-    Seq(statusFieldName, statusTextFieldName) ++ super.fieldsToSelect
+    Seq(
+      namingConvention.stringPerConvention(statusField),
+      namingConvention.stringPerConvention(statusTextField)
+    ) ++ super.fieldsToSelect
   }
 
-  protected def checkStatus(status: Integer, statusTex: String): Try[Unit]
 }
 
 object StatusHandling {
-  val defaultStatusFieldName = "status"
-  val defaultStatusTextFieldName = "status_text"
+  val defaultStatusField = "status"
+  val defaultStatusTextField = "statusText"
 }

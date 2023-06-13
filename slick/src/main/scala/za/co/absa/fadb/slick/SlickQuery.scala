@@ -16,21 +16,14 @@
 
 package za.co.absa.fadb.slick
 
+import slick.jdbc.{GetResult, SQLActionBuilder}
+import za.co.absa.fadb.Query
 
-import scala.concurrent.Future
-import slick.jdbc.PostgresProfile.api._
-import za.co.absa.fadb.{DBExecutor, QueryFunction}
-
-
-class SlickPgExecutor(db: Database) extends DBExecutor[Database] {
-  override def run[R](fnc: QueryFunction[Database, R]): Future[Seq[R]] = {
-    fnc(db)
-  }
-}
-
-object SlickPgExecutor {
-  def forConfig(dbConfig: String): SlickPgExecutor = {
-    val db = Database.forConfig(dbConfig)
-    new SlickPgExecutor(db)
-  }
-}
+/**
+  * SQL query representation for Slick
+  * @param sql        - the SQL query in Slick format
+  * @param getResult  - the converting function, that converts the [[slick.jdbc.PositionedResult slick.PositionedResult]] (the result of Slick
+  *                   execution) into the desire `R` type
+  * @tparam R         - the return type of the query
+  */
+class SlickQuery[R](val sql: SQLActionBuilder, val getResult: GetResult[R]) extends Query[R]
