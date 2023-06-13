@@ -19,7 +19,7 @@ package za.co.absa.fadb.slick
 
 import za.co.absa.fadb.DBEngine
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import slick.jdbc.PostgresProfile.api._
 
 import scala.language.higherKinds
@@ -28,7 +28,7 @@ import scala.language.higherKinds
   * [[DBEngine]] based on the Slick library in the Postgres flavor
   * @param db - the Slick database
   */
-class SlickPgEngine(val db: Database) extends DBEngine {
+class SlickPgEngine(val db: Database)(implicit val executor: ExecutionContext) extends DBEngine {
 
   /**
     * The type of Queries for Slick

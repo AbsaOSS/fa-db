@@ -25,6 +25,7 @@ import za.co.absa.fadb.statushandling.StatusException
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class DatasetSchemaSuite extends AnyWordSpec with Matchers {
   private val db = Database.forConfig("menasdb")
