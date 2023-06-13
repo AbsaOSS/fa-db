@@ -84,6 +84,7 @@ object DatasetSchema {
     with SlickPgFunctionWithStatusSupport[(String, Option[Int]), Schema]
     with UserDefinedStatusHandling {
 
+    /* This is an example of how to deal with overloaded DB functions - see different input type: Long vs what's in the class type: (String, Option[Int]) */
     def apply(id: Long): Future[Schema] = {
       val sql =
         sql"""SELECT A.*
