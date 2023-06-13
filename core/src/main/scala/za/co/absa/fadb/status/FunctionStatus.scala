@@ -14,20 +14,11 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.naming_conventions.letters_case
+package za.co.absa.fadb.status
 
-sealed trait LettersCase {
-  def convert(s: String): String
-}
-
-object LettersCase {
-  case object AsIs extends LettersCase {
-    override def convert(s: String): String = s
-  }
-  case object LowerCase extends LettersCase {
-    override def convert(s: String): String = s.toLowerCase
-  }
-  case object UpperCase extends LettersCase {
-    override def convert(s: String): String = s.toUpperCase
-  }
-}
+/**
+  * Class represents the status of calling a fa-db function (if it supports status that is)
+  * @param statusCode - status code identifying if the function call succeeded or failed and how
+  * @param statusText - human readable description of the status returned
+  */
+case class FunctionStatus(statusCode: Int, statusText: String)

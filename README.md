@@ -12,6 +12,7 @@ ___
 <!-- toc -->
 - [What is fa-db](#what-is-fa-db)
 - [Usage](#usage)
+- [Concepts] (#concepts)
 - [How to generate code coverage report](#how-to-generate-code-coverage-report)
 - [How to Release](#how-to-release)
 <!-- tocstop -->
@@ -98,7 +99,13 @@ Modules:
 </dependency>
 ```
 
-### How to generate code coverage report
+## Concepts
+
+### Status codes
+
+Text about status codes returned from the database function can be found [here](core/src/main/scala/za/co/absa/fadb/status/README.md).
+
+## How to generate code coverage report
 ```sbt
 sbt jacoco
 ```

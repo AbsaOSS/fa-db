@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.statushandling
+package za.co.absa.fadb.naming.implementations
 
-import scala.util.{Failure, Success, Try}
+import za.co.absa.fadb.naming.{LettersCase, NamingConvention}
+import LettersCase.AsIs
 
-/**
-  *
-  */
-trait UserDefinedStatusHandling extends StatusHandling {
-  def OKStatuses: Set[Integer]
+class AsIsNaming(lettersCase: LettersCase) extends NamingConvention{
+  override def stringPerConvention(original: String): String = {
+    lettersCase.convert(original)
+  }
+}
 
-  def checkStatus(status: FunctionStatus): Try[FunctionStatus] = {
-    if (OKStatuses.contains(status.statusCode)) {
-      Success(status)
-    } else {
-      Failure(StatusException(status))
-    }
+object AsIsNaming {
+  object Implicits {
+    implicit val namingConvention: NamingConvention = new AsIsNaming(AsIs)
   }
 }

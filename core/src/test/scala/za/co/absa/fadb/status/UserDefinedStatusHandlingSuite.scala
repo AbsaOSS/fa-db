@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.statushandling
+package za.co.absa.fadb.status
 
 import org.scalatest.funsuite.AnyFunSuite
-import za.co.absa.fadb.naming_conventions.{NamingConvention, SnakeCaseNaming}
+import za.co.absa.fadb.naming.NamingConvention
+import za.co.absa.fadb.naming.implementations.SnakeCaseNaming
+import za.co.absa.fadb.status.handling.implementations.UserDefinedStatusHandling
 
 import scala.util.{Failure, Success, Try}
 

@@ -3,6 +3,7 @@ package za.co.absa.fadb.naming_conventions
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import za.co.absa.fadb.exceptions.NamingException
+import za.co.absa.fadb.naming.ExplicitNamingRequired
 
 class ExplicitNamingRequiredSuite extends AnyWordSpec with Matchers {
   private val explicitNamingRequired = new ExplicitNamingRequired()

@@ -17,13 +17,15 @@
 package za.co.absa.fadb.slick
 
 import slick.jdbc.{GetResult, PositionedResult}
-import za.co.absa.fadb.statushandling.FunctionStatus
+import za.co.absa.fadb.status.FunctionStatus
+import za.co.absa.fadb.status.handling.StatusHandling
 
 import scala.util.Try
 
 /**
   * An extension of the [[SlickPgFunction]] mix-in trait to add support of status handling
-  * This trait expects another mix-in of [[za.co.absa.fadb.statushandling.StatusHandling StatusHandling]] (or implementation of `checkStatus` function)
+  * This trait expects another mix-in of [[za.co.absa.fadb.status.handling.StatusHandling StatusHandling]] (or implementation of `checkStatus` function)
+  *
   * @tparam I - The input type of the function
   * @tparam R - The return type of the function
   */
@@ -31,7 +33,8 @@ trait SlickPgFunctionWithStatusSupport[I, R] extends SlickPgFunction[I, R] {
 
   /**
     * Function which should actually check the status code returned by the DB function. Expected to got implemented by
-    * [[za.co.absa.fadb.statushandling.StatusHandling StatusHandling]] successor trait. But of course can be implemented directly.
+    * [[za.co.absa.fadb.status.handling.StatusHandling StatusHandling]] successor trait. But of course can be implemented directly.
+    *
     * @param status - the status to check
     * @return       - Success or failure the status means
     */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 ABSA Group Limited
+ * Copyright 2023 ABSA Group Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,24 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.statushandling
+package za.co.absa.fadb.status.handling.implementations
+
+import za.co.absa.fadb.status.handling.StatusHandling
+import za.co.absa.fadb.status.{FunctionStatus, StatusException}
+
+import scala.util.{Failure, Success, Try}
 
 /**
-  * Class represents the status of calling a fa-db function (if it supports status that is)
-  * @param statusCode - status code identifying if the function call succeeded or failed and how
-  * @param statusText - human readable description of the status returned
+  *
   */
-case class FunctionStatus(statusCode: Int, statusText: String)
+trait UserDefinedStatusHandling extends StatusHandling {
+  def OKStatuses: Set[Integer]
+
+  def checkStatus(status: FunctionStatus): Try[FunctionStatus] = {
+    if (OKStatuses.contains(status.statusCode)) {
+      Success(status)
+    } else {
+      Failure(StatusException(status))
+    }
+  }
+}

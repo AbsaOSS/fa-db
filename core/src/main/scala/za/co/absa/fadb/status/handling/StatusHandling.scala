@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.statushandling
+package za.co.absa.fadb.status.handling
 
 import za.co.absa.fadb.DBFunctionFabric
-import za.co.absa.fadb.naming_conventions.NamingConvention
-import za.co.absa.fadb.statushandling.StatusHandling.{defaultStatusField, defaultStatusTextField}
+import za.co.absa.fadb.naming.NamingConvention
+import za.co.absa.fadb.status.FunctionStatus
+import za.co.absa.fadb.status.handling.StatusHandling.{defaultStatusField, defaultStatusTextField}
 
 import scala.util.Try
 

@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.naming_conventions
+package za.co.absa.fadb.naming
 
-import za.co.absa.fadb.exceptions.NamingException
-
-class ExplicitNamingRequired extends NamingConvention {
-  override def stringPerConvention(original: String): String = {
-    val message = s"No convention for '$original', explicit naming required."
-    throw NamingException(message)
+trait NamingConvention {
+  def fromClassNamePerConvention(c: Class[_]): String = {
+    val className = c.getSimpleName
+    val cleanClassName = className.lastIndexOf('$') match {
+      case -1 => className
+      case x => className.substring(0, x)
+    }
+    stringPerConvention(cleanClassName)
   }
-}
 
-object ExplicitNamingRequired {
-  object Implicits {
-    implicit val namingConvention: NamingConvention = new ExplicitNamingRequired()
+  def fromClassNamePerConvention(instance: AnyRef): String = {
+    fromClassNamePerConvention(instance.getClass)
   }
+
+  def stringPerConvention(original: String): String
 }
