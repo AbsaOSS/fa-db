@@ -21,7 +21,6 @@ import org.scalatest.funsuite.AnyFunSuite
 import scala.concurrent.Future
 import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits.namingConvention
 
-
 class DBFunctionSuite extends AnyFunSuite {
 
   private def neverHappens: Nothing = {
@@ -30,6 +29,8 @@ class DBFunctionSuite extends AnyFunSuite {
 
   private implicit object EngineThrow extends DBEngine {
     override def run[R](query: QueryType[R]): Future[Seq[R]] = neverHappens
+
+    override implicit val executor: ExecutionContext = ExecutionContext.Implicits.global
   }
 
   private object FooNamed extends DBSchema(EngineThrow)

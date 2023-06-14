@@ -18,7 +18,7 @@ package za.co.absa.fadb
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits.namingConvention
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 class DBSchemaSuite extends AnyFunSuite {
 
@@ -26,6 +26,8 @@ class DBSchemaSuite extends AnyFunSuite {
     override def run[R](query: QueryType[R]): Future[Seq[R]] = {
       throw new Exception("Should never get here")
     }
+
+    override implicit val executor: ExecutionContext = ExecutionContext.Implicits.global
   }
 
   test("schema name default") {

@@ -16,8 +16,7 @@
 
 package za.co.absa.fadb
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.language.higherKinds
 
 /**
@@ -30,6 +29,8 @@ trait DBEngine {
     * @tparam T - the return type of the query
     */
   type QueryType[T] <: Query[T]
+
+  implicit val executor: ExecutionContext
 
   /**
     * The actual query executioner of the queries of the engine
