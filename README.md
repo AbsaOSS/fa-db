@@ -12,7 +12,7 @@ ___
 <!-- toc -->
 - [What is fa-db](#what-is-fa-db)
 - [Usage](#usage)
-- [Concepts] (#concepts)
+- [Concepts](#concepts)
 - [How to generate code coverage report](#how-to-generate-code-coverage-report)
 - [How to Release](#how-to-release)
 <!-- tocstop -->
