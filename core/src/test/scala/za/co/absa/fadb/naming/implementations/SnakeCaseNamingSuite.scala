@@ -1,8 +1,7 @@
-package za.co.absa.fadb.naming_conventions
+package za.co.absa.fadb.naming.implementations
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import za.co.absa.fadb.naming.implementations.SnakeCaseNaming
 import za.co.absa.fadb.naming.LettersCase._
 
 class SnakeCaseNamingSuite extends AnyWordSpec with Matchers {
