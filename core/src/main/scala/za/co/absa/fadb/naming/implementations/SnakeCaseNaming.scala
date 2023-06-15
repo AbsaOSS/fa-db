@@ -14,19 +14,35 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.naming_conventions
+package za.co.absa.fadb.naming.implementations
 
-import za.co.absa.fadb.naming_conventions.letters_case.LettersCase
-import za.co.absa.fadb.naming_conventions.letters_case.LettersCase.AsIs
+import za.co.absa.fadb.naming.{LettersCase, NamingConvention}
+import LettersCase.LowerCase
 
-class AsIsNaming(lettersCase: LettersCase) extends NamingConvention{
+class SnakeCaseNaming(lettersCase: LettersCase) extends NamingConvention {
+  private def camelCaseToSnakeCase(s: String): String = {
+    s.replaceAll("([A-Z])", "_$1")
+  }
+
+  private def stripIfFirstChar(s: String, ch: Char): String = {
+    if (s == "") {
+      s
+    } else if (s(0) == ch){
+      s.substring(1)
+    } else {
+      s
+    }
+  }
+
   override def stringPerConvention(original: String): String = {
-    lettersCase.convert(original)
+    lettersCase.convert(
+    stripIfFirstChar(
+    camelCaseToSnakeCase(original), '_'))
   }
 }
 
-object AsIsNaming {
+object SnakeCaseNaming {
   object Implicits {
-    implicit val namingConvention: NamingConvention = new AsIsNaming(AsIs)
+    implicit val namingConvention: NamingConvention = new SnakeCaseNaming(LowerCase)
   }
 }

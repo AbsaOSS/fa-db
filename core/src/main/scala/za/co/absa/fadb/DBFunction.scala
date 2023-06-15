@@ -16,8 +16,7 @@
 
 package za.co.absa.fadb
 
-import za.co.absa.fadb.naming_conventions.NamingConvention
-
+import za.co.absa.fadb.naming.NamingConvention
 import scala.concurrent.Future
 
 /**
@@ -85,9 +84,9 @@ abstract class DBFunction[I, R, E <: DBEngine](functionNameOverride: Option[Stri
   override protected def fieldsToSelect: Seq[String] = super.fieldsToSelect //TODO should get the names from R #6
 
   /*these 3 functions has to be defined here and not in the ancestors, as there the query type is not compatible - path-dependent types*/
-  protected def execute(values: I): Future[Seq[R]] = dBEngine.execute[R](query(values))
-  protected def unique(values: I): Future[R] = dBEngine.unique(query(values))
-  protected def option(values: I): Future[Option[R]] = dBEngine.option(query(values))
+  protected def multipleResults(values: I): Future[Seq[R]] = dBEngine.fetchAll(query(values))
+  protected def singleResult(values: I): Future[R] = dBEngine.fetchHead(query(values))
+  protected def optionalResult(values: I): Future[Option[R]] = dBEngine.fetchHeadOption(query(values))
 
 }
 
@@ -103,8 +102,8 @@ object DBFunction {
     * @tparam R                   - the type covering the returned fields from the database function
     * @tparam E                   - the type of the [[DBEngine]] engine
     */
-  abstract class DBSeqFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
-                                                   (implicit schema: DBSchema, dBEngine: E)
+  abstract class DBMultipleResultFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
+                                                              (implicit schema: DBSchema, dBEngine: E)
     extends DBFunction[I, R, E](functionNameOverride) {
 
     def this(schema: DBSchema, functionNameOverride: String)
@@ -133,7 +132,7 @@ object DBFunction {
       * @return       - a sequence of values, each coming from a row returned from the DB function transformed to scala
       *               type `R`
       */
-    def apply(values: I): Future[Seq[R]] = execute(values)
+    def apply(values: I): Future[Seq[R]] = multipleResults(values)
   }
 
   /**
@@ -147,8 +146,8 @@ object DBFunction {
     * @tparam R                   - the type covering the returned fields from the database function
     * @tparam E                   - the type of the [[DBEngine]] engine
     */
-  abstract class DBUniqueFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
-                                                      (implicit schema: DBSchema, dBEngine: E)
+  abstract class DBSingleResultFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
+                                                            (implicit schema: DBSchema, dBEngine: E)
     extends DBFunction[I, R, E](functionNameOverride) {
 
     def this(schema: DBSchema, functionNameOverride: String)
@@ -176,7 +175,7 @@ object DBFunction {
       * @param values - the values to pass over to the database function
       * @return       - the value returned from the DB function transformed to scala type `R`
       */
-    def apply(values: I): Future[R] = unique(values)
+    def apply(values: I): Future[R] = singleResult(values)
   }
 
   /**
@@ -190,8 +189,8 @@ object DBFunction {
     * @tparam R                   - the type covering the returned fields from the database function
     * @tparam E                   - the type of the [[DBEngine]] engine
     */
-  abstract class DBOptionFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
-                                                      (implicit schema: DBSchema, dBEngine: E)
+  abstract class DBOptionalResultFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
+                                                              (implicit schema: DBSchema, dBEngine: E)
     extends DBFunction[I, R, E](functionNameOverride) {
 
     def this(schema: DBSchema, functionNameOverride: String)
@@ -219,6 +218,6 @@ object DBFunction {
       * @param values - the values to pass over to the database function
       * @return       - the value returned from the DB function transformed to scala type `R` if a row is returned, otherwise `None`
       */
-    def apply(values: I): Future[Option[R]] = option(values)
+    def apply(values: I): Future[Option[R]] = optionalResult(values)
   }
 }

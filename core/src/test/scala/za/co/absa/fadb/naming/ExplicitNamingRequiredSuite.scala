@@ -1,4 +1,4 @@
-package za.co.absa.fadb.naming_conventions
+package za.co.absa.fadb.naming
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

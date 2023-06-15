@@ -14,11 +14,19 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.statushandling
+package za.co.absa.fadb.naming
 
-/**
-  * Class represents the status of calling a fa-db function (if it supports status that is)
-  * @param statusCode - status code identifying if the function call succeeded or failed and how
-  * @param statusText - human readable description of the status returned
-  */
-case class FunctionStatus(statusCode: Int, statusText: String)
+import za.co.absa.fadb.exceptions.NamingException
+
+class ExplicitNamingRequired extends NamingConvention {
+  override def stringPerConvention(original: String): String = {
+    val message = s"No convention for '$original', explicit naming required."
+    throw NamingException(message)
+  }
+}
+
+object ExplicitNamingRequired {
+  object Implicits {
+    implicit val namingConvention: NamingConvention = new ExplicitNamingRequired()
+  }
+}

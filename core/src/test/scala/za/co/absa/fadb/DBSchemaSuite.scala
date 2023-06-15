@@ -16,9 +16,9 @@
 package za.co.absa.fadb
 
 import org.scalatest.funsuite.AnyFunSuite
-import za.co.absa.fadb.naming_conventions.SnakeCaseNaming.Implicits.namingConvention
+import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits.namingConvention
 
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 class DBSchemaSuite extends AnyFunSuite {
 

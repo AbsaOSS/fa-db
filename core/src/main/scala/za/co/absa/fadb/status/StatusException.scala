@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.statushandling
+package za.co.absa.fadb.status
 
 import za.co.absa.fadb.exceptions.DBFailException
 

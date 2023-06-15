@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.statushandling.fadbstandard
+package za.co.absa.fadb.status.implementations
 
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.exceptions.DBFailException
-import za.co.absa.fadb.naming_conventions.{NamingConvention, SnakeCaseNaming}
-import za.co.absa.fadb.statushandling.{FunctionStatus, StatusException}
-import za.co.absa.fadb.statushandling.StatusException._
+import za.co.absa.fadb.naming.NamingConvention
+import za.co.absa.fadb.naming.implementations.SnakeCaseNaming
+import za.co.absa.fadb.status.{FunctionStatus, StatusException}
+import za.co.absa.fadb.status.StatusException._
+import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
 
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
@@ -53,7 +55,7 @@ class StandardStatusHandlingSuite extends AnyFunSuite {
     assertCheckStatusFailure[ErrorInDataException](73, "Value ABC is out of range")
     assertCheckStatusFailure[ErrorInDataException](84, "Json value of field FF is missing property PPP")
     assertCheckStatusFailure[OtherStatusException](95, "This is a special error")
-    
+
     val status = 101
     val statusText = "Server is wrongly set up"
     val expectedFailure = Failure(DBFailException(s"Status out of range - with status: $status and status text: '${statusText}'"))

@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.naming_conventions
+package za.co.absa.fadb.naming.implementations
 
-import za.co.absa.fadb.exceptions.NamingException
+import za.co.absa.fadb.naming.{LettersCase, NamingConvention}
+import LettersCase.AsIs
 
-class ExplicitNamingRequired extends NamingConvention {
+class AsIsNaming(lettersCase: LettersCase) extends NamingConvention{
   override def stringPerConvention(original: String): String = {
-    val message = s"No convention for '$original', explicit naming required."
-    throw NamingException(message)
+    lettersCase.convert(original)
   }
 }
 
-object ExplicitNamingRequired {
+object AsIsNaming {
   object Implicits {
-    implicit val namingConvention: NamingConvention = new ExplicitNamingRequired()
+    implicit val namingConvention: NamingConvention = new AsIsNaming(AsIs)
   }
 }

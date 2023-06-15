@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.statushandling.fadbstandard
+package za.co.absa.fadb.status.handling.implementations
 
 import za.co.absa.fadb.exceptions.DBFailException
-import za.co.absa.fadb.statushandling.{FunctionStatus, StatusHandling}
-import za.co.absa.fadb.statushandling.StatusException._
+import za.co.absa.fadb.status.FunctionStatus
+import za.co.absa.fadb.status.StatusException._
+import za.co.absa.fadb.status.handling.StatusHandling
 
 import scala.util.{Failure, Success, Try}
 

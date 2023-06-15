@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.statushandling
+package za.co.absa.fadb.naming
 
-import scala.util.{Failure, Success, Try}
+sealed trait LettersCase {
+  def convert(s: String): String
+}
 
-/**
-  *
-  */
-trait UserDefinedStatusHandling extends StatusHandling {
-  def OKStatuses: Set[Integer]
-
-  def checkStatus(status: FunctionStatus): Try[FunctionStatus] = {
-    if (OKStatuses.contains(status.statusCode)) {
-      Success(status)
-    } else {
-      Failure(StatusException(status))
-    }
+object LettersCase {
+  case object AsIs extends LettersCase {
+    override def convert(s: String): String = s
+  }
+  case object LowerCase extends LettersCase {
+    override def convert(s: String): String = s.toLowerCase
+  }
+  case object UpperCase extends LettersCase {
+    override def convert(s: String): String = s.toUpperCase
   }
 }

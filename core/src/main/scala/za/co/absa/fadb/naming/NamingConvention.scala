@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.naming_conventions.letters_case
+package za.co.absa.fadb.naming
 
-sealed trait LettersCase {
-  def convert(s: String): String
-}
+trait NamingConvention {
+  def fromClassNamePerConvention(c: Class[_]): String = {
+    val className = c.getSimpleName
+    val cleanClassName = className.lastIndexOf('$') match {
+      case -1 => className
+      case x => className.substring(0, x)
+    }
+    stringPerConvention(cleanClassName)
+  }
 
-object LettersCase {
-  case object AsIs extends LettersCase {
-    override def convert(s: String): String = s
+  def fromClassNamePerConvention(instance: AnyRef): String = {
+    fromClassNamePerConvention(instance.getClass)
   }
-  case object LowerCase extends LettersCase {
-    override def convert(s: String): String = s.toLowerCase
-  }
-  case object UpperCase extends LettersCase {
-    override def convert(s: String): String = s.toUpperCase
-  }
+
+  def stringPerConvention(original: String): String
 }

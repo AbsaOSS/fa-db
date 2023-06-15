@@ -14,21 +14,11 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.naming_conventions
+package za.co.absa.fadb.status
 
-trait NamingConvention {
-  def fromClassNamePerConvention(c: Class[_]): String = {
-    val className = c.getSimpleName
-    val cleanClassName = className.lastIndexOf('$') match {
-      case -1 => className
-      case x => className.substring(0, x)
-    }
-    stringPerConvention(cleanClassName)
-  }
-
-  def fromClassNamePerConvention(instance: AnyRef): String = {
-    fromClassNamePerConvention(instance.getClass)
-  }
-
-  def stringPerConvention(original: String): String
-}
+/**
+  * Class represents the status of calling a fa-db function (if it supports status that is)
+  * @param statusCode - status code identifying if the function call succeeded or failed and how
+  * @param statusText - human readable description of the status returned
+  */
+case class FunctionStatus(statusCode: Int, statusText: String)

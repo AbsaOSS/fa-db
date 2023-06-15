@@ -46,7 +46,7 @@ trait DBEngine {
     * @tparam R     - return the of the query
     * @return       - sequence of the results of database query
     */
-  def execute[R](query: QueryType[R]): Future[Seq[R]] = run(query)
+  def fetchAll[R](query: QueryType[R]): Future[Seq[R]] = run(query)
 
   /**
     * Public method to execute when query is expected to return exactly one row
@@ -54,7 +54,7 @@ trait DBEngine {
     * @tparam R     - return the of the query
     * @return       - sequence of the results of database query
     */
-  def unique[R](query: QueryType[R]): Future[R] = {
+  def fetchHead[R](query: QueryType[R]): Future[R] = {
     run(query).map(_.head)
   }
 
@@ -65,7 +65,7 @@ trait DBEngine {
     * @return       - sequence of the results of database query
     */
 
-  def option[R](query:  QueryType[R]): Future[Option[R]] = {
+  def fetchHeadOption[R](query:  QueryType[R]): Future[Option[R]] = {
     run(query).map(_.headOption)
   }
 }
