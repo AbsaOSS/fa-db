@@ -18,7 +18,6 @@ package za.co.absa.fadb.slick
 
 import slick.jdbc.{GetResult, PositionedResult}
 import za.co.absa.fadb.status.FunctionStatus
-import za.co.absa.fadb.status.handling.StatusHandling
 
 import scala.util.Try
 
