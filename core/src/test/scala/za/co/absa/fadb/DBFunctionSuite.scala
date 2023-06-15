@@ -18,7 +18,7 @@ package za.co.absa.fadb
 
 import org.scalatest.funsuite.AnyFunSuite
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits.namingConvention
 
 class DBFunctionSuite extends AnyFunSuite {
