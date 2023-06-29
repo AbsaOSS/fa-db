@@ -174,9 +174,9 @@ class FaDbPostgresProfileSuite extends AnyFunSuite {
         r.<<,
         r.<<,
         r.<<,
-        r.nextHStoreOption(),
+        r.nextHStoreOption,
         r.<<,
-        r.nextMacAddrOption()
+        r.nextMacAddrOption
       )}
     }
 

@@ -119,6 +119,26 @@ It brings:
 * `trait FaDbPostgresProfile` - to bring support for Postgres and its extended data types in one class (except JSON, as there are multiple implementations for this data type in _Slick-Pg_)
 * `object FaDbPostgresProfile` - instance of the above trait for direct use
 
+#### Known issues
+
+When getting result from `PositionedResult` for these types `HStore` -> `Option[Map[String, String]]` and 
+`macaddr` -> `MacAddrString` type inference doesn't work well.
+So instead of:
+```scala
+val pr: PositionedResult = ???
+val hStore: Option[Map[String, String]] = pr.<<
+val macAddr: Option[MacAddrString] = pr.<<
+```
+
+explicit extraction needs to be used:
+```scala
+val pr: PositionedResult = ???
+val hStore: Option[Map[String, String]] = pr.nextHStoreOption
+val macAddr: Option[MacAddrString] = pr.nextMacAddrOption
+```
+
+
+
 ## How to generate code coverage report
 ```sbt
 sbt jacoco
