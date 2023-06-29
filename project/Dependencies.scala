@@ -38,7 +38,7 @@ object Dependencies {
       "org.slf4j"            % "slf4j-nop"                    % "1.7.26",
       "com.typesafe.slick"  %% "slick-hikaricp"               % "3.3.3",
       "org.postgresql"       % "postgresql"                   % "42.6.0",
-      "com.github.tminglei" %% "slick-pg"                     % "0.20.4"
+      "com.github.tminglei" %% "slick-pg"                     % "0.20.4"   % Optional
     )
   }
 

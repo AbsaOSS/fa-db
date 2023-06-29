@@ -30,6 +30,11 @@ import za.co.absa.fadb.naming.NamingConvention
 abstract class DBSchema(schemaNameOverride: Option[String] = None)
                        (implicit dBEngine: DBEngine, implicit val namingConvention: NamingConvention) {
 
+  def this(schemaNameOverride: String)
+          (implicit dBEngine: DBEngine, namingConvention: NamingConvention) {
+    this(Option(schemaNameOverride))(dBEngine, namingConvention)
+  }
+
   def this(dBEngine: DBEngine, schemaNameOverride: String)
           (implicit namingConvention: NamingConvention) {
     this(Option(schemaNameOverride))(dBEngine, namingConvention)

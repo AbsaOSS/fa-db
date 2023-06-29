@@ -17,7 +17,7 @@
 package za.co.absa.fadb.examples.enceladus
 
 import za.co.absa.fadb.DBSchema
-import za.co.absa.fadb.slick.{SlickPgEngine, SlickPgFunction, SlickPgFunctionWithStatusSupport}
+import za.co.absa.fadb.slick.{SlickPgEngine, SlickFunction, SlickFunctionWithStatusSupport}
 import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits.namingConvention
 import slick.jdbc.{GetResult, SQLActionBuilder}
 import slick.jdbc.PostgresProfile.api._
@@ -63,7 +63,7 @@ object DatasetSchema {
 
   final class AddSchema(implicit override val schema: DBSchema, override val dbEngine: SlickPgEngine)
     extends DBSingleResultFunction[SchemaInput, Long, SlickPgEngine]
-    with SlickPgFunctionWithStatusSupport[SchemaInput, Long]
+    with SlickFunctionWithStatusSupport[SchemaInput, Long]
     with UserDefinedStatusHandling {
 
     override protected def sql(values: SchemaInput): SQLActionBuilder = {
@@ -81,7 +81,7 @@ object DatasetSchema {
 
   final class GetSchema(implicit override val schema: DBSchema, override val dbEngine: SlickPgEngine)
     extends DBSingleResultFunction[(String, Option[Int]), Schema, SlickPgEngine]
-    with SlickPgFunctionWithStatusSupport[(String, Option[Int]), Schema]
+    with SlickFunctionWithStatusSupport[(String, Option[Int]), Schema]
     with UserDefinedStatusHandling {
 
     /* This is an example of how to deal with overloaded DB functions - see different input type: Long vs what's in the class type: (String, Option[Int]) */
@@ -108,7 +108,7 @@ object DatasetSchema {
 
   final class List(implicit override val schema: DBSchema, override val dbEngine: SlickPgEngine)
     extends DBMultipleResultFunction[Boolean, SchemaHeader, SlickPgEngine]()
-    with SlickPgFunction[Boolean, SchemaHeader] {
+    with SlickFunction[Boolean, SchemaHeader] {
 
     override def apply(values: Boolean = false): Future[Seq[SchemaHeader]] = super.apply(values)
 

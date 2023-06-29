@@ -13,6 +13,7 @@ ___
 - [What is fa-db](#what-is-fa-db)
 - [Usage](#usage)
 - [Concepts](#concepts)
+- [Slick module](#slick-module)
 - [How to generate code coverage report](#how-to-generate-code-coverage-report)
 - [How to Release](#how-to-release)
 <!-- tocstop -->
@@ -49,7 +50,7 @@ within the application.**
 Currently, the library is developed with Postgres as the target DB. But the approach is applicable to any DB supporting stored procedure/functions – Oracle, MS-SQL, ...
 
 
-### Usage
+## Usage
 
 #### Sbt
 
@@ -104,6 +105,19 @@ Modules:
 ### Status codes
 
 Text about status codes returned from the database function can be found [here](core/src/main/scala/za/co/absa/fadb/status/README.md).
+
+
+## Slick module
+
+Slick module is the first (and so far only) implementation of fa-db able to execute. As the name suggests it runs on 
+[Slick library](https://github.com/slick/slick) and also brings in the [Slickpg library](https://github.com/tminglei/slick-pg/) for extended Postgres type support.
+
+It brings:
+
+* `class SlickPgEngine` - implementation of _Core_'s `DBEngine` executing the queries via Slick
+* `trait SlickFunction` and `trait SlickFunctionWithStatusSupport` - mix-in traits to use with `FaDbFunction` descendants
+* `trait FaDbPostgresProfile` - to bring support for Postgres and its extended data types in one class (except JSON, as there are multiple implementations for this data type in _Slick-Pg_)
+* `object FaDbPostgresProfile` - instance of the above trait for direct use
 
 ## How to generate code coverage report
 ```sbt
