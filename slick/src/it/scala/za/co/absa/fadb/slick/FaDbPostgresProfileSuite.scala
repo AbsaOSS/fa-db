@@ -37,12 +37,11 @@ class FaDbPostgresProfileSuite extends AnyFunSuite {
   implicit def javaDurationToScalaDuration(duration: Duration): ScalaDuration = {
     FiniteDuration(duration.toNanos, TimeUnit.NANOSECONDS)
   }
+  private val database = Database.forConfig("postgrestestdb")
+  private val testDBEngine: SlickPgEngine = new SlickPgEngine(database)
 
 
-  test("Test query types support") {
-    val database = Database.forConfig("postgrestestdb")
-    val testDBEngine: SlickPgEngine = new SlickPgEngine(database)
-
+  test("Test query types support with actual values") {
 
     case class InputOutput(
                     uuid1:      UUID,               //uuid
@@ -125,5 +124,87 @@ class FaDbPostgresProfileSuite extends AnyFunSuite {
     val result = Await.result(new TestSchema()(testDBEngine).testFunction(input), timeout)
     assert(result == expected)
   }
+
+  test("Test query types support with NULL values") {
+
+    case class InputOutput(
+                            uuid1:      Option[UUID],                 //uuid
+                            dateTime1:  Option[LocalDate],            //date
+                            dateTime2:  Option[LocalTime],            //time
+                            dateTime3:  Option[LocalDateTime],        //timestamp
+                            dateTime4:  Option[Duration],             //interval
+                            dateTime5:  Option[ZonedDateTime],        //timestamptz
+                            dateTime6:  Option[OffsetDateTime],       //timestamptz
+                            range1:     Option[Range[Int]],           //range
+                            lTree1:     Option[LTree],                //ltree
+                            map1:       Option[Map[String, String]],  //hstore
+                            inet1:      Option[InetString],           //inet
+                            macaddr1:   Option[MacAddrString]          //macaddr
+                          )
+
+    class TestFunction(implicit override val schema: DBSchema, override val dbEngine: SlickPgEngine)
+      extends DBSingleResultFunction[InputOutput, InputOutput, SlickPgEngine]
+        with SlickFunction[InputOutput, InputOutput] {
+
+      override protected def sql(values: InputOutput): SQLActionBuilder = {
+        sql"""SELECT #$selectEntry
+            FROM #$functionName(
+              ${values.uuid1},
+              ${values.dateTime1},
+              ${values.dateTime2},
+              ${values.dateTime3},
+              ${values.dateTime4},
+              ${values.dateTime5},
+              ${values.dateTime6},
+              ${values.range1},
+              ${values.lTree1},
+              ${values.map1},
+              ${values.inet1},
+              ${values.macaddr1}
+            ) #$alias;"""
+      }
+
+      override protected def slickConverter: GetResult[InputOutput] = GetResult{r => InputOutput(
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.nextHStoreOption(),
+        r.<<,
+        r.nextMacAddrOption()
+      )}
+    }
+
+    class TestSchema (implicit dBEngine: SlickPgEngine) extends DBSchema("public"){
+
+      val testFunction = new TestFunction
+    }
+
+
+    val inputOutput = InputOutput(
+      None,
+      None,
+      None,
+      None,
+      None,
+      None,
+      None,
+      None,
+      None,
+      None,
+      None,
+      None
+    )
+
+    val timeout = Duration.ofMinutes(1)
+    val result = Await.result(new TestSchema()(testDBEngine).testFunction(inputOutput), timeout)
+    assert(result == inputOutput)
+  }
+
 }
 

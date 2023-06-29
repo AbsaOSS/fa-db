@@ -55,16 +55,18 @@ lazy val parent = (project in file("."))
     libraryDependencies ++= rootDependencies(scalaVersion.value),
     javacOptions ++= commonJavacOptions,
     scalacOptions ++= commonScalacOptions,
-    publish / skip := true
+    publish / skip := true,
+    Defaults.itSettings
   )
 
 lazy val faDbCore = (project in file("core"))
+  .configs(IntegrationTest)
   .settings(
     name := "core",
     libraryDependencies ++= coreDependencies(scalaVersion.value),
     javacOptions ++= commonJavacOptions,
     scalacOptions ++= commonScalacOptions,
-    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value // printScalaVersion is run with compile
+    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value, // printScalaVersion is run with compile
   )
   .settings(
     jacocoReportSettings := commonJacocoReportSettings.withTitle(s"fa-db:core Jacoco Report - scala:${scalaVersion.value}"),
@@ -72,12 +74,14 @@ lazy val faDbCore = (project in file("core"))
   )
 
 lazy val faDBSlick = (project in file("slick"))
+  .configs(IntegrationTest)
   .settings(
     name := "slick",
     libraryDependencies ++= slickDependencies(scalaVersion.value),
     javacOptions ++= commonJavacOptions,
     scalacOptions ++= commonScalacOptions,
-    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value // printScalaVersion is run with compile
+    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value, // printScalaVersion is run with compile
+    Defaults.itSettings,
   ).dependsOn(faDbCore)
   .settings(
     jacocoReportSettings := commonJacocoReportSettings.withTitle(s"fa-db:slick Jacoco Report - scala:${scalaVersion.value}"),
@@ -85,6 +89,7 @@ lazy val faDBSlick = (project in file("slick"))
   )
 
 lazy val faDBExamples = (project in file("examples"))
+  .configs(IntegrationTest)
   .settings(
     name := "examples",
     libraryDependencies ++= examplesDependencies(scalaVersion.value),

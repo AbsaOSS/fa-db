@@ -49,7 +49,16 @@ trait PgUUIDSupport extends PgCommonJdbcTypes { driver: PostgresProfile =>
     implicit val getUUID: GetResult[UUID] = mkGetResult(_.nextUUID)
     implicit val getUUIDOption: GetResult[Option[UUID]] = mkGetResult(_.nextUUIDOption)
     implicit val setUUID: SetParameter[UUID] = new SetParameter[UUID] { def apply(v: UUID, pp: PositionedParameters): Unit = { pp.setObject(v, JDBCType.BINARY.getVendorTypeNumber) } }
-    implicit val setUUIDOption: SetParameter[Option[UUID]] =  new SetParameter[Option[UUID]] { def apply(v: Option[UUID], pp: PositionedParameters): Unit = { pp.setObject(v.orNull, JDBCType.BINARY.getVendorTypeNumber) } }
+    implicit val setUUIDOption: SetParameter[Option[UUID]] =  new SetParameter[Option[UUID]] {
+      def apply(v: Option[UUID], pp: PositionedParameters): Unit = {
+        v.map(
+          pp.setObject(_, JDBCType.BINARY.getVendorTypeNumber)
+        ).getOrElse(
+          pp.setNull(java.sql.Types.OTHER)
+        )
+
+      }
+    }
 
   }
 }

@@ -20,9 +20,9 @@ object Dependencies {
 
 
   private def commonDependencies(scalaVersion: String): Seq[ModuleID] = Seq(
-    "org.scalatest"      %% "scalatest" % "3.1.0"           % Test,
-    "org.scalatest"      %% "scalatest-flatspec" % "3.2.0"  % Test,
-    "org.scalatestplus"  %% "mockito-1-10" % "3.1.0.0"      % Test
+    "org.scalatest"      %% "scalatest" % "3.1.0"           % "test,it",
+    "org.scalatest"      %% "scalatest-flatspec" % "3.2.0"  % "test,it",
+    "org.scalatestplus"  %% "mockito-1-10" % "3.1.0.0"      % "test,it"
   )
 
   def rootDependencies(scalaVersion: String): Seq[ModuleID] = Seq()
