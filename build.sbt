@@ -17,7 +17,6 @@
 import Dependencies._
 import com.github.sbt.jacoco.report.JacocoReportSettings
 
-ThisBuild / name := "fa-db"
 ThisBuild / organization := "za.co.absa.fa-db"
 
 lazy val scala211 = "2.11.12"
@@ -26,7 +25,7 @@ lazy val scala212 = "2.12.17"
 ThisBuild / scalaVersion := scala211
 ThisBuild / crossScalaVersions := Seq(scala211, scala212)
 
-ThisBuild/resolvers += Resolver.mavenLocal + "Local Maven" at Path.userHome.asFile.toURI.toURL + ".m2/repository"
+ThisBuild / versionScheme := Some("early-semver")
 
 lazy val printScalaVersion = taskKey[Unit]("Print Scala versions faDB is being built for.")
 lazy val commonJavacOptions = Seq("-source", "1.8", "-target", "1.8", "-Xlint")
@@ -41,7 +40,6 @@ ThisBuild / printScalaVersion := {
 lazy val commonJacocoReportSettings: JacocoReportSettings = JacocoReportSettings(
   formats = Seq(JacocoReportFormats.HTML, JacocoReportFormats.XML)
 )
-
 
 /**
   * add `za.co.absa.fadb.naming.NamingConvention`  to filter a class
