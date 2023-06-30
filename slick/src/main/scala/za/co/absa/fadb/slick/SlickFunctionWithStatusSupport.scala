@@ -22,13 +22,13 @@ import za.co.absa.fadb.status.FunctionStatus
 import scala.util.Try
 
 /**
-  * An extension of the [[SlickPgFunction]] mix-in trait to add support of status handling
+  * An extension of the [[SlickFunction]] mix-in trait to add support of status handling
   * This trait expects another mix-in of [[za.co.absa.fadb.status.handling.StatusHandling StatusHandling]] (or implementation of `checkStatus` function)
   *
   * @tparam I - The input type of the function
   * @tparam R - The return type of the function
   */
-trait SlickPgFunctionWithStatusSupport[I, R] extends SlickPgFunction[I, R] {
+trait SlickFunctionWithStatusSupport[I, R] extends SlickFunction[I, R] {
 
   /**
     * Function which should actually check the status code returned by the DB function. Expected to got implemented by

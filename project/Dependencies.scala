@@ -20,9 +20,9 @@ object Dependencies {
 
 
   private def commonDependencies(scalaVersion: String): Seq[ModuleID] = Seq(
-    "org.scalatest"      %% "scalatest" % "3.1.0"           % Test,
-    "org.scalatest"      %% "scalatest-flatspec" % "3.2.0"  % Test,
-    "org.scalatestplus"  %% "mockito-1-10" % "3.1.0.0"      % Test
+    "org.scalatest"      %% "scalatest" % "3.1.0"           % "test,it",
+    "org.scalatest"      %% "scalatest-flatspec" % "3.2.0"  % "test,it",
+    "org.scalatestplus"  %% "mockito-1-10" % "3.1.0.0"      % "test,it"
   )
 
   def rootDependencies(scalaVersion: String): Seq[ModuleID] = Seq()
@@ -35,9 +35,10 @@ object Dependencies {
   def slickDependencies(scalaVersion: String): Seq[ModuleID] = {
     commonDependencies(scalaVersion) ++ Seq(
       "com.typesafe.slick"  %% "slick"                        % "3.3.3",
-      "org.slf4j"            % "slf4j-nop"                    % "1.6.4",
+      "org.slf4j"            % "slf4j-nop"                    % "1.7.26",
       "com.typesafe.slick"  %% "slick-hikaricp"               % "3.3.3",
-      "org.postgresql"       % "postgresql"                   % "9.4-1206-jdbc42",
+      "org.postgresql"       % "postgresql"                   % "42.6.0",
+      "com.github.tminglei" %% "slick-pg"                     % "0.20.4"   % Optional
     )
   }
 

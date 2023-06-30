@@ -24,7 +24,7 @@ import za.co.absa.fadb.DBFunctionFabric
   * @tparam I - The input type of the function
   * @tparam R - The return type of the function
   */
-trait SlickPgFunction[I, R] extends DBFunctionFabric {
+trait SlickFunction[I, R] extends DBFunctionFabric {
 
   /**
     * A reference to the [[SlickPgEngine]] to use the [[za.co.absa.fadb.DBFunction DBFunction]] with

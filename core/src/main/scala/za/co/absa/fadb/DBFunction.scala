@@ -34,6 +34,11 @@ abstract class DBFunction[I, R, E <: DBEngine](functionNameOverride: Option[Stri
                                               (implicit val schema: DBSchema, val dBEngine: E) extends DBFunctionFabric {
 
   /* alternative constructors for different availability of input parameters */
+  def this(functionNameOverride: String)
+          (implicit schema: DBSchema, dBEngine: E) = {
+    this(Option(functionNameOverride))(schema, dBEngine)
+  }
+
   def this(schema: DBSchema, functionNameOverride: String)
           (implicit dBEngine: E) = {
     this(Option(functionNameOverride))(schema, dBEngine)
@@ -106,6 +111,11 @@ object DBFunction {
                                                               (implicit schema: DBSchema, dBEngine: E)
     extends DBFunction[I, R, E](functionNameOverride) {
 
+    def this(functionNameOverride: String)
+            (implicit schema: DBSchema, dBEngine: E) = {
+      this(Option(functionNameOverride))(schema, dBEngine)
+    }
+
     def this(schema: DBSchema, functionNameOverride: String)
             (implicit dBEngine: E) = {
       this(Option(functionNameOverride))(schema, dBEngine)
@@ -150,6 +160,11 @@ object DBFunction {
                                                             (implicit schema: DBSchema, dBEngine: E)
     extends DBFunction[I, R, E](functionNameOverride) {
 
+    def this(functionNameOverride: String)
+            (implicit schema: DBSchema, dBEngine: E) = {
+      this(Option(functionNameOverride))(schema, dBEngine)
+    }
+
     def this(schema: DBSchema, functionNameOverride: String)
             (implicit dBEngine: E) = {
       this(Option(functionNameOverride))(schema, dBEngine)
@@ -192,6 +207,11 @@ object DBFunction {
   abstract class DBOptionalResultFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
                                                               (implicit schema: DBSchema, dBEngine: E)
     extends DBFunction[I, R, E](functionNameOverride) {
+
+    def this(functionNameOverride: String)
+            (implicit schema: DBSchema, dBEngine: E) = {
+      this(Option(functionNameOverride))(schema, dBEngine)
+    }
 
     def this(schema: DBSchema, functionNameOverride: String)
             (implicit dBEngine: E) = {

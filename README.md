@@ -13,7 +13,8 @@ ___
 - [What is fa-db](#what-is-fa-db)
 - [Usage](#usage)
 - [Concepts](#concepts)
-- [How to generate code coverage report](#how-to-generate-code-coverage-report)
+- [Slick module](#slick-module)
+- [Testing](#testing)
 - [How to Release](#how-to-release)
 <!-- tocstop -->
 
@@ -49,7 +50,7 @@ within the application.**
 Currently, the library is developed with Postgres as the target DB. But the approach is applicable to any DB supporting stored procedure/functions – Oracle, MS-SQL, ...
 
 
-### Usage
+## Usage
 
 #### Sbt
 
@@ -105,13 +106,63 @@ Modules:
 
 Text about status codes returned from the database function can be found [here](core/src/main/scala/za/co/absa/fadb/status/README.md).
 
-## How to generate code coverage report
+
+## Slick module
+
+Slick module is the first (and so far only) implementation of fa-db able to execute. As the name suggests it runs on 
+[Slick library](https://github.com/slick/slick) and also brings in the [Slickpg library](https://github.com/tminglei/slick-pg/) for extended Postgres type support.
+
+It brings:
+
+* `class SlickPgEngine` - implementation of _Core_'s `DBEngine` executing the queries via Slick
+* `trait SlickFunction` and `trait SlickFunctionWithStatusSupport` - mix-in traits to use with `FaDbFunction` descendants
+* `trait FaDbPostgresProfile` - to bring support for Postgres and its extended data types in one class (except JSON, as there are multiple implementations for this data type in _Slick-Pg_)
+* `object FaDbPostgresProfile` - instance of the above trait for direct use
+
+#### Known issues
+
+When getting result from `PositionedResult` for these types `HStore` -> `Option[Map[String, String]]` and 
+`macaddr` -> `MacAddrString` type inference doesn't work well.
+So instead of:
+```scala
+val pr: PositionedResult = ???
+val hStore: Option[Map[String, String]] = pr.<<
+val macAddr: Option[MacAddrString] = pr.<<
+```
+
+explicit extraction needs to be used:
+```scala
+val pr: PositionedResult = ???
+val hStore: Option[Map[String, String]] = pr.nextHStoreOption
+val macAddr: Option[MacAddrString] = pr.nextMacAddrOption
+```
+
+## Testing
+
+### How to generate unit tests code coverage report
+
 ```sbt
 sbt jacoco
 ```
+
 Code coverage will be generated on path:
+
 ```
 {project-root}/fa-db/{module}/target/scala-{scala_version}/jacoco/report/html
+```
+
+### Integration tests
+
+There are now integration tests as part of the project (at the time of writing they are in the _Slick_ module).
+
+For the tests to work properly a running Postgres instance is needed. And then the following setup:
+* execute (content of) all `*.sql` files within `it/resources/sql/` folder within a posgres query tool
+* modify `it/resources/application.conf` to point to the database used in the previous point
+
+How to execute the tests:
+
+```sbt
+sbt it:test
 ```
 
 ## How to Release
