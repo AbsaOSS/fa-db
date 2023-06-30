@@ -101,3 +101,5 @@ lazy val faDBExamples = (project in file("examples"))
     jacocoReportSettings := commonJacocoReportSettings.withTitle(s"fa-db:examples Jacoco Report - scala:${scalaVersion.value}"),
     jacocoExcludes := commonJacocoExcludes
   )
+
+sonatypeProfileName := "za.co.absa"
