@@ -42,10 +42,12 @@ lazy val commonJacocoReportSettings: JacocoReportSettings = JacocoReportSettings
   formats = Seq(JacocoReportFormats.HTML, JacocoReportFormats.XML)
 )
 
+
+/**
+  * add `za.co.absa.fadb.naming.NamingConvention`  to filter a class
+  * or  `za.co.absa.fadb.naming.NamingConvention*` to filter the class and all related objects
+  */
 lazy val commonJacocoExcludes: Seq[String] = Seq(
-  "za.co.absa.fadb.package*"
-  //        "za.co.absa.fadb.naming_conventions.SnakeCaseNaming*", // class and related objects
-  //        "za.co.absa.fadb.naming_conventions.AsIsNaming" // class only
 )
 
 lazy val parent = (project in file("."))

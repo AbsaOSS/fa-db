@@ -14,7 +14,7 @@ ___
 - [Usage](#usage)
 - [Concepts](#concepts)
 - [Slick module](#slick-module)
-- [How to generate code coverage report](#how-to-generate-code-coverage-report)
+- [Testing](#testing)
 - [How to Release](#how-to-release)
 <!-- tocstop -->
 
@@ -137,15 +137,32 @@ val hStore: Option[Map[String, String]] = pr.nextHStoreOption
 val macAddr: Option[MacAddrString] = pr.nextMacAddrOption
 ```
 
+## Testing
 
+### How to generate unit tests code coverage report
 
-## How to generate code coverage report
 ```sbt
 sbt jacoco
 ```
+
 Code coverage will be generated on path:
+
 ```
 {project-root}/fa-db/{module}/target/scala-{scala_version}/jacoco/report/html
+```
+
+### Integration tests
+
+There are now integration tests as part of the project (at the time of writing they are in the _Slick_ module).
+
+For the tests to work properly a running Postgres instance is needed. And then the following setup:
+* execute (content of) all `*.sql` files within `it/resources/sql/` folder within a posgres query tool
+* modify `it/resources/application.conf` to point to the database used in the previous point
+
+How to execute the tests:
+
+```sbt
+sbt it:test
 ```
 
 ## How to Release
