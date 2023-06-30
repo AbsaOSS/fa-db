@@ -26,16 +26,9 @@ import org.scalatest.flatspec.AsyncFlatSpec
 
 import java.time.{Duration, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, ZonedDateTime}
 import java.util.UUID
-import java.util.concurrent.TimeUnit
-import scala.concurrent.duration.{FiniteDuration, Duration => ScalaDuration}
-import scala.language.implicitConversions
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class FaDbPostgresProfileSuite extends AsyncFlatSpec  {
 
-  implicit def javaDurationToScalaDuration(duration: Duration): ScalaDuration = {
-    FiniteDuration(duration.toNanos, TimeUnit.NANOSECONDS)
-  }
   private val database = Database.forConfig("postgrestestdb")
   private val testDBEngine: SlickPgEngine = new SlickPgEngine(database)
 
