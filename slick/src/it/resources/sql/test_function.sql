@@ -49,7 +49,7 @@ $$
 -------------------------------------------------------------------------------
 --
 -- Function: test_function(12)
---      A function to test Fa-Db Slick Posgres special time enhancement. Function wors as a mirror. Retruns what came in.
+--      A function to test Fa-Db Slick Posgres special time enhancement. Function works as a mirror. Returns what came in.
 --
 --
 -- Returns:
