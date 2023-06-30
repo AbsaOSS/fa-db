@@ -41,7 +41,6 @@ lazy val commonJacocoReportSettings: JacocoReportSettings = JacocoReportSettings
   formats = Seq(JacocoReportFormats.HTML, JacocoReportFormats.XML)
 )
 
-
 /**
   * add `za.co.absa.fadb.naming.NamingConvention`  to filter a class
   * or  `za.co.absa.fadb.naming.NamingConvention*` to filter the class and all related objects
