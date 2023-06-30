@@ -17,14 +17,14 @@
 import Dependencies._
 import com.github.sbt.jacoco.report.JacocoReportSettings
 
-ThisBuild / organization := "za.co.absa.fa-db"
+ThisBuild / organization := "za.co.absa"
 
 lazy val scala211 = "2.11.12"
 lazy val scala212 = "2.12.17"
 
 ThisBuild / scalaVersion := scala211
 ThisBuild / crossScalaVersions := Seq(scala211, scala212)
-					
+
 ThisBuild / versionScheme := Some("early-semver")
 
 lazy val printScalaVersion = taskKey[Unit]("Print Scala versions faDB is being built for.")
