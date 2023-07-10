@@ -18,7 +18,11 @@ package za.co.absa.fadb.slick.pg
 
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.slick.{SlickFunction, SlickFunctionWithStatusSupport, SlickPgEngine}
-import za.co.absa.fadb.DBFunction.{DBMultipleResultFunction => CoreDBMultipleResultFunction, DBOptionalResultFunction => CoreDBOptionalResultFunction, DBSingleResultFunction => CoreDBSingleResultFunction}
+import za.co.absa.fadb.DBFunction.{
+  DBMultipleResultFunction => CoreDBMultipleResultFunction, 
+  DBOptionalResultFunction => CoreDBOptionalResultFunction, 
+  DBSingleResultFunction => CoreDBSingleResultFunction
+}
 
 object DBFunction {
   /**
@@ -64,7 +68,7 @@ object DBFunction {
   }
 
   /**
-    * Represents a function returning exactly one record
+    @see [[za.co.absa.fadb.DBFunction.DBSingleResultFunction]]
     *
     * @param functionNameOverride - in case the class name would not match the database function name, this gives the
     *                             possibility of override
