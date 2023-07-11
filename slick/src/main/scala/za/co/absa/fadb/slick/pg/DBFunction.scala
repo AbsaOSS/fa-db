@@ -19,22 +19,15 @@ package za.co.absa.fadb.slick.pg
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.slick.{SlickFunction, SlickFunctionWithStatusSupport, SlickPgEngine}
 import za.co.absa.fadb.DBFunction.{
-  DBMultipleResultFunction => CoreDBMultipleResultFunction, 
-  DBOptionalResultFunction => CoreDBOptionalResultFunction, 
+  DBMultipleResultFunction => CoreDBMultipleResultFunction,
+  DBOptionalResultFunction => CoreDBOptionalResultFunction,
   DBSingleResultFunction => CoreDBSingleResultFunction
 }
 
 object DBFunction {
   /**
-    * Represents a function returning a set (in DB sense) of rows
-    *
-    * @param functionNameOverride - in case the class name would not match the database function name, this gives the
-    *                             possibility of override
-    * @param schema               - the schema the function belongs into
-    * @param dBEngine             - the database engine that is supposed to execute the function (presumably contains
-    *                             connection to the database
-    * @tparam I - the type covering the input fields of the database function
-    * @tparam R - the type covering the returned fields from the database function
+    * Combines [[za.co.absa.fadb.DBFunction.DBMultipleResultFunction DBMultipleResultFunction]] with Slick and Postgres support
+    * @see See [[za.co.absa.fadb.DBFunction.DBMultipleResultFunction]] and [[za.co.absa.fadb.slick.SlickFunction]] for methods description
     */
   abstract class DBMultipleResultFunction[I, R](functionNameOverride: Option[String] = None)
                                                (implicit schema: DBSchema, dBEngine: SlickPgEngine)
@@ -68,15 +61,8 @@ object DBFunction {
   }
 
   /**
-    @see [[za.co.absa.fadb.DBFunction.DBSingleResultFunction]]
-    *
-    * @param functionNameOverride - in case the class name would not match the database function name, this gives the
-    *                             possibility of override
-    * @param schema               - the schema the function belongs into
-    * @param dBEngine             - the database engine that is supposed to execute the function (presumably contains
-    *                             connection to the database
-    * @tparam I - the type covering the input fields of the database function
-    * @tparam R - the type covering the returned fields from the database function
+    * Combines [[za.co.absa.fadb.DBFunction.DBSingleResultFunction DBSingleResultFunction]] with Slick and Postgres support
+    * @see See [[za.co.absa.fadb.DBFunction.DBSingleResultFunction]] and [[za.co.absa.fadb.slick.SlickFunction]] for methods description
     */
   abstract class DBSingleResultFunction[I, R](functionNameOverride: Option[String] = None)
                                                             (implicit schema: DBSchema, dBEngine: SlickPgEngine)
@@ -110,15 +96,8 @@ object DBFunction {
   }
 
   /**
-    * Represents a function returning one optional record
-    *
-    * @param functionNameOverride - in case the class name would not match the database function name, this gives the
-    *                             possibility of override
-    * @param schema               - the schema the function belongs into
-    * @param dBEngine             - the database engine that is supposed to execute the function (presumably contains
-    *                             connection to the database
-    * @tparam I - the type covering the input fields of the database function
-    * @tparam R - the type covering the returned fields from the database function
+    * Combines [[za.co.absa.fadb.DBFunction.DBOptionalResultFunction DBOptionalResultFunction]] with Slick and Postgres support
+    * @see See [[za.co.absa.fadb.DBFunction.DBOptionalResultFunction]] and [[za.co.absa.fadb.slick.SlickFunction]] for methods description
     */
   abstract class DBOptionalResultFunction[I, R](functionNameOverride: Option[String] = None)
                                                               (implicit schema: DBSchema, dBEngine: SlickPgEngine)
@@ -154,15 +133,9 @@ object DBFunction {
 // ---------------------------------------------------------------------------------------------------------------------
 
   /**
-    * Represents a function returning a set (in DB sense) of rows
-    *
-    * @param functionNameOverride - in case the class name would not match the database function name, this gives the
-    *                             possibility of override
-    * @param schema               - the schema the function belongs into
-    * @param dBEngine             - the database engine that is supposed to execute the function (presumably contains
-    *                             connection to the database
-    * @tparam I - the type covering the input fields of the database function
-    * @tparam R - the type covering the returned fields from the database function
+    * Combines [[za.co.absa.fadb.DBFunction.DBMultipleResultFunction DBMultipleResultFunction]] with Slick, Postgres and
+    * status codes support
+    * @see See [[za.co.absa.fadb.DBFunction.DBMultipleResultFunction]] and [[za.co.absa.fadb.slick.SlickFunctionWithStatusSupport]] for methods description
     */
   abstract class DBMultipleResultFunctionWithStatusSupport[I, R](functionNameOverride: Option[String] = None)
                                                                 (implicit schema: DBSchema, dBEngine: SlickPgEngine)
@@ -196,15 +169,9 @@ object DBFunction {
   }
 
   /**
-    * Represents a function returning exactly one record
-    *
-    * @param functionNameOverride - in case the class name would not match the database function name, this gives the
-    *                             possibility of override
-    * @param schema               - the schema the function belongs into
-    * @param dBEngine             - the database engine that is supposed to execute the function (presumably contains
-    *                             connection to the database
-    * @tparam I - the type covering the input fields of the database function
-    * @tparam R - the type covering the returned fields from the database function
+    * Combines [[za.co.absa.fadb.DBFunction.DBSingleResultFunction DBSingleResultFunction]] with Slick, Postgres and
+    * status codes support
+    * @see See [[za.co.absa.fadb.DBFunction.DBSingleResultFunction]] and [[za.co.absa.fadb.slick.SlickFunctionWithStatusSupport]] for methods description
     */
   abstract class DBSingleResultFunctionWithStatusSupport[I, R](functionNameOverride: Option[String] = None)
                                                               (implicit schema: DBSchema, dBEngine: SlickPgEngine)
@@ -238,15 +205,9 @@ object DBFunction {
   }
 
   /**
-    * Represents a function returning one optional record
-    *
-    * @param functionNameOverride - in case the class name would not match the database function name, this gives the
-    *                             possibility of override
-    * @param schema               - the schema the function belongs into
-    * @param dBEngine             - the database engine that is supposed to execute the function (presumably contains
-    *                             connection to the database
-    * @tparam I - the type covering the input fields of the database function
-    * @tparam R - the type covering the returned fields from the database function
+    * Combines [[za.co.absa.fadb.DBFunction.DBOptionalResultFunction DBOptionalResultFunction]] with Slick, Postgres and
+    * status codes support
+    * @see See [[za.co.absa.fadb.DBFunction.DBOptionalResultFunction]] and [[za.co.absa.fadb.slick.SlickFunctionWithStatusSupport]] for methods description
     */
   abstract class DBOptionalResultFunctionWithStatusSupport[I, R](functionNameOverride: Option[String] = None)
                                                                 (implicit schema: DBSchema, dBEngine: SlickPgEngine)
