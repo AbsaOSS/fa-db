@@ -58,7 +58,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--create-db",
         action="store_true",
-        help="creates the target database (runs the scripts in the source root starting with '00_', which is/are expected creating the db",
+        help="creates the target database (runs the scripts in the source root starting with '00_', which is/are "
+             "expected to create the db",
     )
 
     return parser.parse_args()
