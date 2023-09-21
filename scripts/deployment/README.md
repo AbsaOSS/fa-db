@@ -11,3 +11,21 @@ Expectations are that the source files are placed in a directory structure of fo
 * DB functions are stored in files with `.sql` extension (conventions: file name equals function name)
 * tables are stored in files with `.ddl` extension (conventions: file name equals table name)
 * processing order is: schema -> functions (alphabetically) -> tables (alphabetically)
+
+The schema structure should look something like this:
+```
+my_basic_schema/
+    - _.ddl
+    - my_data_table.ddl
+    - my_function1.sql
+    - my_function2.sql
+public/
+    - some_general_function.sql
+random_data/
+    - _.ddl
+    - another_function.sql
+    - random_data_table.ddl
+00_databases.ddl
+01_users.ddl
+02_my_own_db.ddl        
+```

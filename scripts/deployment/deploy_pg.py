@@ -9,6 +9,13 @@ import psycopg2
 import copy
 
 
+FUNCTION_FILES = ".sql"
+DDL_FILES = ".ddl"
+DB_CREATION_FILES = "00_"
+SCHEMA_CREATION_FILE = "_" + DDL_FILES
+
+
+
 @dataclasses.dataclass
 class PostgresDBConn:
     """This dataclass contains all information related to making a connection to Postgres DB."""
@@ -34,6 +41,7 @@ def parse_args() -> argparse.Namespace:
         "-p", "--port",
         help="database server port (default: \"5432\")",
         default="5432",
+        type=int,
     )
     parser.add_argument(
         "-d", "--dbname",
@@ -73,46 +81,38 @@ def execute_sql(conn_config: PostgresDBConn, sql: str) -> None:
         host=conn_config.host,
         port=conn_config.port
     )
+    try:
+        conn.autocommit = True
+        cursor = conn.cursor()
 
-    conn.autocommit = True
-    cursor = conn.cursor()
+        cursor.execute(sql)
 
-    cursor.execute(sql)
-
-    conn.commit()
-    conn.close()
+        conn.commit()
+    finally:
+        conn.close()
 
 
 def read_file(file_name: str) -> str:
     logging.debug(f"    - reading file `{file_name}`")
-    file = open(file_name, "r")
-    result = file.read()
-    file.close()
-    return result
-
-
-def ensure_trailing_slash(path: str) -> str:
-    if path.endswith('/'):
-        return path
-    else:
-        return path + '/'
+    with open(file_name, "r") as file:
+        return file.read()
 
 
 def process_dir(directory: str, conn_config: PostgresDBConn, create_db: bool) -> None:
     logging.info(f"Picking up source files from directory `{directory}`")
     public_schema = "public"
-    root = next(os.walk(directory), (None, [], []))
-    schemas = list(root[1])
-    files = list(filter(lambda fn: fn.endswith(".ddl"), root[2]))
+    root_dir_content = next(os.walk(directory))
+    schemas = root_dir_content[1] # schemas equals directories
+    root_ddl_files = list(filter(lambda fn: fn.endswith(DDL_FILES), root_dir_content[2]))
 
     # process root files
-    database_creation_sqls = []
-    init_sqls = []
-    for filename in files:
-        if filename.startswith("00_"):
-            database_creation_sqls.append(os.path.join(directory, filename))
+    database_creation_files = []
+    database_init_files = []
+    for filename in root_ddl_files:
+        if filename.startswith(DB_CREATION_FILES):
+            database_creation_files.append(os.path.join(directory, filename))
         else:
-            init_sqls.append(os.path.join(directory, filename))
+            database_init_files.append(os.path.join(directory, filename))
     # process schemas
     schemas_sqls = []
     if public_schema in schemas:
@@ -124,45 +124,46 @@ def process_dir(directory: str, conn_config: PostgresDBConn, create_db: bool) ->
         schemas_sqls += process_schema(directory, schema, True)
 
     # execute the collected Sqls
-    if (len(database_creation_sqls) > 0) and create_db:
-        logging.info("Creating database")
+    if (len(database_creation_files) > 0) and create_db:
+        logging.info("Creating database...")
         db_conn_config = copy.copy(conn_config)
         db_conn_config.database = "postgres"
-        sql = "\n".join(map(read_file, database_creation_sqls))
-        execute_sql(db_conn_config, sql)
+        database_creation_sql = "\n".join(map(read_file, database_creation_files))
+        execute_sql(db_conn_config, database_creation_sql)
 
-    if len(init_sqls) > 0:
-        logging.info("Initializing the database")
-        sql = "\n".join(map(read_file, init_sqls))
-        execute_sql(conn_config, sql)
+    if len(database_init_files) > 0:
+        logging.info("Initializing the database...")
+        database_init_sql = "\n".join(map(read_file, database_init_files))
+        execute_sql(conn_config, database_init_sql)
     if len(schemas_sqls) > 0:
-        logging.info("Populating the schemas")
-        sql = "\n".join(schemas_sqls)
-        execute_sql(conn_config, sql)
+        logging.info("Populating the schemas...")
+        schemas_population_sql = "\n".join(schemas_sqls)
+        execute_sql(conn_config, schemas_population_sql)
+    logging.info("... all done.")
 
 
 def process_schema(base_dir: str, schema_name: str, expect_schema_creation: bool) -> list[str]:
     logging.info(f"  - schema '{schema_name}'")
-    schema_dir = ensure_trailing_slash(base_dir + schema_name)
+    schema_dir = os.path.join(base_dir, schema_name)
     schema_creation = []
-    functions = []
-    tables = []
+    functions_creation_sqls = []
+    tables_creation_sqls = []
     has_schema_creation = False
     files = os.listdir(schema_dir)
     files.sort()
     for input_file in files:
-        if input_file == "_.ddl":
+        if input_file == SCHEMA_CREATION_FILE:
             schema_creation = [read_file(os.path.join(schema_dir, input_file))]
             has_schema_creation = True
-        elif input_file.endswith(".sql"):
-            functions.append(read_file(schema_dir + input_file))
-        elif input_file.endswith(".ddl"):
-            tables.append(read_file(schema_dir + input_file))
+        elif input_file.endswith(FUNCTION_FILES):
+            functions_creation_sqls.append(read_file(os.path.join(schema_dir, input_file)))
+        elif input_file.endswith(DDL_FILES):
+            tables_creation_sqls.append(read_file(os.path.join(schema_dir, input_file)))
 
     if expect_schema_creation and not has_schema_creation:
         logging.warning(f"No schema creation found on path `{schema_dir}`")
 
-    return schema_creation + functions + tables
+    return schema_creation + functions_creation_sqls + tables_creation_sqls
 
 
 if __name__ == '__main__':
@@ -180,4 +181,4 @@ if __name__ == '__main__':
         port=parsed_args.port
     )
 
-    process_dir(ensure_trailing_slash(parsed_args.dir), db_conn_details, parsed_args.create_db)
+    process_dir(parsed_args.dir, db_conn_details, parsed_args.create_db)
