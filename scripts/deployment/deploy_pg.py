@@ -34,23 +34,23 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "-ph", "--host",
-        help="database server host (default: \"localhost\")",
+        help="database server host",
         default="localhost",
     )
     parser.add_argument(
         "-p", "--port",
-        help="database server port (default: \"5432\")",
+        help="database server port",
         default=5432,
         type=int,
     )
     parser.add_argument(
         "-d", "--dbname",
-        help="database name to connect to (default: \"ursa_unify_db\")",
+        help="database name to connect to",
         required=True,
     )
     parser.add_argument(
         "-U", "--username",
-        help="database user name, should be a high privileged account (default: \"postgres\")",
+        help="database user name, should be a high privileged account",
         default="postgres",
     )
     parser.add_argument(
@@ -60,7 +60,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "-dir", "--dir",
-        help="the directory of database source files (default: current directory)",
+        help="the directory of database source files, if not specified current directory is used",
         default=os.getcwd()
     )
     parser.add_argument(
