@@ -40,7 +40,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "-p", "--port",
         help="database server port (default: \"5432\")",
-        default="5432",
+        default=5432,
         type=int,
     )
     parser.add_argument(
