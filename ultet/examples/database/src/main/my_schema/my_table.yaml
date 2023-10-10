@@ -22,6 +22,7 @@ columns:
     type: bigint
     not_null: true
     description: Skype username
+    default: `SQL expression`
 - some_name:
     type: text
     not_null: false
@@ -30,6 +31,7 @@ columns:
     type: text[]
     not_null: true
     description: Array of values
+#    source: `SQL expression how to fill the column if newly created; not in scope yet`
 primary_key:
   pk_my_table:
     columns: [id_key_field]
