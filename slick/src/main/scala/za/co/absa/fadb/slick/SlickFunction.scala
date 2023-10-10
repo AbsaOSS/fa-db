@@ -20,7 +20,7 @@ import slick.jdbc.{GetResult, SQLActionBuilder}
 import za.co.absa.fadb.DBFunctionFabric
 
 /**
-  * Mix-in trait to use [[za.co.absa.fadb.DBFunction DBFunction]] with [[SlickPgEngine]]. Implements the abstract function `query`
+  * Mix-in trait to use with [[za.co.absa.fadb.DBFunction DBFunction]] and Slick engine like [[SlickPgEngine]]. Implements the abstract function `query`
   * @tparam I - The input type of the function
   * @tparam R - The return type of the function
   */
