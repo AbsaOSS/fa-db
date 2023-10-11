@@ -102,19 +102,4 @@ lazy val faDBExamples = (project in file("examples"))
     jacocoExcludes := commonJacocoExcludes
   )
 
-lazy val ultet = (project in file("ultet"))
-  .configs(IntegrationTest)
-  .settings(
-    name := "examples",
-    libraryDependencies ++= examplesDependencies(scalaVersion.value),
-    Test / parallelExecution := false,
-    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value, // printScalaVersion is run with compile
-    publish / skip := true
-  ).dependsOn(faDbCore, faDBSlick)
-  .settings(
-    jacocoReportSettings := commonJacocoReportSettings.withTitle(s"fa-db:ultet Jacoco Report - scala:${scalaVersion.value}"),
-    jacocoExcludes := commonJacocoExcludes
-  )
-
-
 sonatypeProfileName := "za.co.absa"
