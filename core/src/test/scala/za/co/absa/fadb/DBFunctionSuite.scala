@@ -33,8 +33,8 @@ class DBFunctionSuite extends AnyFunSuite {
     override implicit val executor: ExecutionContext = ExecutionContext.Implicits.global
   }
 
-  private object FooNamed extends DBSchema(EngineThrow)
-  private object FooNameless extends DBSchema(EngineThrow, "")
+  private object FooNamed extends DBSchema
+  private object FooNameless extends DBSchema("")
 
   test("Function name check"){
     case class MyFunction(override val schema: DBSchema) extends DBFunction[Unit, Unit, DBEngine](schema) {
