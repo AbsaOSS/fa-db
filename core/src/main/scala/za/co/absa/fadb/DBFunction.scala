@@ -30,34 +30,12 @@ import scala.concurrent.Future
   * @tparam R                   - the type covering the returned fields from the database function
   * @tparam E                   - the type of the [[DBEngine]] engine
   */
-abstract class DBFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
-                                              (implicit val schema: DBSchema, val dBEngine: E) extends DBFunctionFabric {
+abstract class DBFunction[I, R, E <: DBEngine](schemaName: String, functionNameOverride: Option[String] = None)
+                                              (implicit val dBEngine: E, namingConvention: NamingConvention) extends DBFunctionFabric {
 
-  /* alternative constructors for different availability of input parameters */
-  def this(functionNameOverride: String)
-          (implicit schema: DBSchema, dBEngine: E) = {
-    this(Option(functionNameOverride))(schema, dBEngine)
-  }
-
-  def this(schema: DBSchema, functionNameOverride: String)
-          (implicit dBEngine: E) = {
-    this(Option(functionNameOverride))(schema, dBEngine)
-  }
-
-  /* only one constructor of a class can have default values for parameters*/
-  def this(schema: DBSchema)
-          (implicit dBEngine: E) = {
-    this(None)(schema, dBEngine)
-  }
-
-  def this(dBEngine: E, functionNameOverride: String)
-          (implicit schema: DBSchema)  = {
-    this(Option(functionNameOverride))(schema, dBEngine)
-  }
-
-  def this(dBEngine: E)
-          (implicit schema: DBSchema)  = {
-    this(None)(schema, dBEngine)
+  // constructor that takes function name override as string instead of option
+  def this(schemaName: String, functionNameOverride: String)(implicit dBEngine: E, namingConvention: NamingConvention) {
+    this(schemaName, Option(functionNameOverride))
   }
 
   /**
@@ -72,15 +50,17 @@ abstract class DBFunction[I, R, E <: DBEngine](functionNameOverride: Option[Stri
     * Name of the function, based on the class name, unless it is overridden in the constructor
     */
   val functionName: String = {
-    val fn = functionNameOverride.getOrElse(schema.objectNameFromClassName(getClass))
-    if (schema.schemaName.isEmpty) {
-      fn
-    } else {
-      s"${schema.schemaName}.$fn"
+    val baseFunctionName = functionNameOverride.getOrElse {
+      val className = this.getClass.getSimpleName
+      val cleanClassName = className.lastIndexOf('$') match {
+        case -1 => className
+        case x => className.substring(0, x)
+      }
+      namingConvention.stringPerConvention(cleanClassName)
     }
+    if (schemaName.isEmpty) baseFunctionName
+    else s"$schemaName.$baseFunctionName"
   }
-
-  def namingConvention: NamingConvention = schema.namingConvention
 
   /**
     * List of fields to select from the DB function. Expected to be based on the return type `R`
@@ -107,34 +87,9 @@ object DBFunction {
     * @tparam R                   - the type covering the returned fields from the database function
     * @tparam E                   - the type of the [[DBEngine]] engine
     */
-  abstract class DBMultipleResultFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
-                                                              (implicit schema: DBSchema, dBEngine: E)
-    extends DBFunction[I, R, E](functionNameOverride) {
-
-    def this(functionNameOverride: String)
-            (implicit schema: DBSchema, dBEngine: E) = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(schema: DBSchema, functionNameOverride: String)
-            (implicit dBEngine: E) = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(schema: DBSchema)
-            (implicit dBEngine: E) = {
-      this(None)(schema, dBEngine)
-    }
-
-    def this(dBEngine: E, functionNameOverride: String)
-            (implicit schema: DBSchema)  = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(dBEngine: E)
-            (implicit schema: DBSchema)  = {
-      this(None)(schema, dBEngine)
-    }
+  abstract class DBMultipleResultFunction[I, R, E <: DBEngine](schemaName: String, functionNameOverride: Option[String] = None)
+                                                              (implicit dBEngine: E, namingConvention: NamingConvention)
+    extends DBFunction[I, R, E](schemaName, functionNameOverride) {
 
     /**
       * For easy and convenient execution of the DB function call
@@ -156,34 +111,9 @@ object DBFunction {
     * @tparam R                   - the type covering the returned fields from the database function
     * @tparam E                   - the type of the [[DBEngine]] engine
     */
-  abstract class DBSingleResultFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
-                                                            (implicit schema: DBSchema, dBEngine: E)
-    extends DBFunction[I, R, E](functionNameOverride) {
-
-    def this(functionNameOverride: String)
-            (implicit schema: DBSchema, dBEngine: E) = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(schema: DBSchema, functionNameOverride: String)
-            (implicit dBEngine: E) = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(schema: DBSchema)
-            (implicit dBEngine: E) = {
-      this(None)(schema, dBEngine)
-    }
-
-    def this(dBEngine: E, functionNameOverride: String)
-            (implicit schema: DBSchema)  = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(dBEngine: E)
-            (implicit schema: DBSchema)  = {
-      this(None)(schema, dBEngine)
-    }
+  abstract class DBSingleResultFunction[I, R, E <: DBEngine](schemaName: String, functionNameOverride: Option[String] = None)
+                                                            (implicit dBEngine: E, namingConvention: NamingConvention)
+    extends DBFunction[I, R, E](schemaName, functionNameOverride) {
 
     /**
       * For easy and convenient execution of the DB function call
@@ -204,34 +134,9 @@ object DBFunction {
     * @tparam R                   - the type covering the returned fields from the database function
     * @tparam E                   - the type of the [[DBEngine]] engine
     */
-  abstract class DBOptionalResultFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
-                                                              (implicit schema: DBSchema, dBEngine: E)
-    extends DBFunction[I, R, E](functionNameOverride) {
-
-    def this(functionNameOverride: String)
-            (implicit schema: DBSchema, dBEngine: E) = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(schema: DBSchema, functionNameOverride: String)
-            (implicit dBEngine: E) = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(schema: DBSchema)
-            (implicit dBEngine: E) = {
-      this(None)(schema, dBEngine)
-    }
-
-    def this(dBEngine: E, functionNameOverride: String)
-            (implicit schema: DBSchema)  = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(dBEngine: E)
-            (implicit schema: DBSchema)  = {
-      this(None)(schema, dBEngine)
-    }
+  abstract class DBOptionalResultFunction[I, R, E <: DBEngine](schemaName: String, functionNameOverride: Option[String] = None)
+                                                              (implicit dBEngine: E, namingConvention: NamingConvention)
+    extends DBFunction[I, R, E](schemaName, functionNameOverride) {
 
     /**
       * For easy and convenient execution of the DB function call

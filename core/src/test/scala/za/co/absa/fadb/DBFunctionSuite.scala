@@ -33,28 +33,25 @@ class DBFunctionSuite extends AnyFunSuite {
     override implicit val executor: ExecutionContext = ExecutionContext.Implicits.global
   }
 
-  private object FooNamed extends DBSchema
-  private object FooNameless extends DBSchema("")
-
   test("Function name check"){
-    case class MyFunction(override val schema: DBSchema) extends DBFunction[Unit, Unit, DBEngine](schema) {
+    case class MyFunction(schemaName: String) extends DBFunction[Unit, Unit, DBEngine](schemaName) {
       override protected def query(values: Unit): dBEngine.QueryType[Unit] = neverHappens
     }
 
-    val fnc1 = MyFunction(FooNamed)
-    val fnc2 = MyFunction(FooNameless)
+    val fnc1 = MyFunction("foo_named")
+    val fnc2 = MyFunction("")
 
     assert(fnc1.functionName == "foo_named.my_function")
     assert(fnc2.functionName == "my_function")
   }
 
   test("Function name override check"){
-    case class MyFunction(override val schema: DBSchema) extends DBFunction[Unit, Unit, DBEngine](schema, "bar") {
+    case class MyFunction(schemaName: String) extends DBFunction[Unit, Unit, DBEngine](schemaName, "bar") {
       override protected def query(values: Unit): dBEngine.QueryType[Unit] = neverHappens
     }
 
-    val fnc1 = MyFunction(FooNamed)
-    val fnc2 = MyFunction(FooNameless)
+    val fnc1 = MyFunction("foo_named")
+    val fnc2 = MyFunction("")
 
     assert(fnc1.functionName == "foo_named.bar")
     assert(fnc2.functionName == "bar")
