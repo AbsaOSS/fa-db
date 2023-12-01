@@ -39,7 +39,7 @@ class DBSchemaSuite extends AnyFunSuite {
     object LowerCaseNamingConvention extends NamingConvention {
       def stringPerConvention(original: String): String = original.toLowerCase
     }
-    class Bar extends DBSchema(LowerCaseNamingConvention, null)
+    class Bar extends DBSchema()(LowerCaseNamingConvention)
 
     val schema = new Bar
     assert(schema.schemaName == "bar") // Assuming the naming convention converts "Bar" to "bar"
@@ -49,7 +49,7 @@ class DBSchemaSuite extends AnyFunSuite {
     object LowerCaseNamingConvention extends NamingConvention {
       def stringPerConvention(original: String): String = original.toLowerCase
     }
-    class Bar extends DBSchema(LowerCaseNamingConvention, "bar")
+    class Bar extends DBSchema("bar")(LowerCaseNamingConvention)
 
     val schema = new Bar
     assert(schema.schemaName == "bar")

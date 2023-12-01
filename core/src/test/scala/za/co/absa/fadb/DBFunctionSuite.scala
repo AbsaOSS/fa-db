@@ -37,8 +37,8 @@ class DBFunctionSuite extends AnyFunSuite {
   private object FooNameless extends DBSchema("")
 
   test("Function name check"){
-    case class MyFunction(override val schema: DBSchema) extends DBFunction[Unit, Unit, DBEngine](schema) {
-      override protected def query(values: Unit): dBEngine.QueryType[Unit] = neverHappens
+    case class MyFunction(schema: DBSchema) extends DBFunction(schema) {
+      override protected def query(values: Nothing): dBEngine.QueryType[Nothing] = neverHappens
     }
 
     val fnc1 = MyFunction(FooNamed)
@@ -49,8 +49,8 @@ class DBFunctionSuite extends AnyFunSuite {
   }
 
   test("Function name override check"){
-    case class MyFunction(override val schema: DBSchema) extends DBFunction[Unit, Unit, DBEngine](schema, "bar") {
-      override protected def query(values: Unit): dBEngine.QueryType[Unit] = neverHappens
+    case class MyFunction(schema: DBSchema) extends DBFunction("bar", schema) {
+      override protected def query(values: Nothing): dBEngine.QueryType[Nothing] = neverHappens
     }
 
     val fnc1 = MyFunction(FooNamed)
@@ -59,5 +59,15 @@ class DBFunctionSuite extends AnyFunSuite {
     assert(fnc1.functionName == "foo_named.bar")
     assert(fnc2.functionName == "bar")
   }
+
+  test("Function name check with no schema"){
+  case class MyFunction() extends DBFunction(None, None) {
+    override protected def query(values: Nothing): dBEngine.QueryType[Nothing] = neverHappens
+  }
+
+  val fnc = MyFunction()
+
+  assert(fnc.functionName == "my_function")
+}
 
 }
