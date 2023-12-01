@@ -16,31 +16,42 @@
 package za.co.absa.fadb
 
 import org.scalatest.funsuite.AnyFunSuite
+import za.co.absa.fadb.naming.NamingConvention
 import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits.namingConvention
-
-import scala.concurrent.{ExecutionContext, Future}
 
 class DBSchemaSuite extends AnyFunSuite {
 
-  private object EngineThrow extends DBEngine {
-    override def run[R](query: QueryType[R]): Future[Seq[R]] = {
-      throw new Exception("Should never get here")
-    }
-
-    override implicit val executor: ExecutionContext = ExecutionContext.Implicits.global
-  }
-
   test("schema name default") {
-    class Foo extends DBSchema(EngineThrow)
+    class Foo extends DBSchema
 
     val schema = new Foo
     assert(schema.schemaName == "foo")
   }
 
   test("schema name overridden") {
-    class Foo extends DBSchema(EngineThrow, "bar")
+    class Foo extends DBSchema("bar")
 
     val schema = new Foo
+    assert(schema.schemaName == "bar")
+  }
+
+  test("schema name with naming convention without override") {
+    object LowerCaseNamingConvention extends NamingConvention {
+      def stringPerConvention(original: String): String = original.toLowerCase
+    }
+    class Bar extends DBSchema()(LowerCaseNamingConvention)
+
+    val schema = new Bar
+    assert(schema.schemaName == "bar") // Assuming the naming convention converts "Bar" to "bar"
+  }
+
+  test("schema name with naming convention with override") {
+    object LowerCaseNamingConvention extends NamingConvention {
+      def stringPerConvention(original: String): String = original.toLowerCase
+    }
+    class Bar extends DBSchema("bar")(LowerCaseNamingConvention)
+
+    val schema = new Bar
     assert(schema.schemaName == "bar")
   }
 
