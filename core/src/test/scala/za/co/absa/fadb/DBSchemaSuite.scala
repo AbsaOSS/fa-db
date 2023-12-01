@@ -16,6 +16,7 @@
 package za.co.absa.fadb
 
 import org.scalatest.funsuite.AnyFunSuite
+import za.co.absa.fadb.naming.NamingConvention
 import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits.namingConvention
 
 class DBSchemaSuite extends AnyFunSuite {
@@ -31,6 +32,26 @@ class DBSchemaSuite extends AnyFunSuite {
     class Foo extends DBSchema("bar")
 
     val schema = new Foo
+    assert(schema.schemaName == "bar")
+  }
+
+  test("schema name with naming convention without override") {
+    object LowerCaseNamingConvention extends NamingConvention {
+      def stringPerConvention(original: String): String = original.toLowerCase
+    }
+    class Bar extends DBSchema(LowerCaseNamingConvention, null)
+
+    val schema = new Bar
+    assert(schema.schemaName == "bar") // Assuming the naming convention converts "Bar" to "bar"
+  }
+
+  test("schema name with naming convention with override") {
+    object LowerCaseNamingConvention extends NamingConvention {
+      def stringPerConvention(original: String): String = original.toLowerCase
+    }
+    class Bar extends DBSchema(LowerCaseNamingConvention, "bar")
+
+    val schema = new Bar
     assert(schema.schemaName == "bar")
   }
 
