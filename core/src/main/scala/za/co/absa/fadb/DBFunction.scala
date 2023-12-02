@@ -16,8 +16,10 @@
 
 package za.co.absa.fadb
 
+import cats.Monad
 import za.co.absa.fadb.naming.NamingConvention
-import scala.concurrent.Future
+
+import scala.language.higherKinds
 
 /**
   *
@@ -30,35 +32,11 @@ import scala.concurrent.Future
   * @tparam R                   - the type covering the returned fields from the database function
   * @tparam E                   - the type of the [[DBEngine]] engine
   */
-abstract class DBFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
+abstract class DBFunction[I, R, E <: DBEngine[F], F[_]: Monad](functionNameOverride: Option[String] = None)
                                               (implicit val schema: DBSchema, val dBEngine: E) extends DBFunctionFabric {
 
   /* alternative constructors for different availability of input parameters */
-  def this(functionNameOverride: String)
-          (implicit schema: DBSchema, dBEngine: E) = {
-    this(Option(functionNameOverride))(schema, dBEngine)
-  }
 
-  def this(schema: DBSchema, functionNameOverride: String)
-          (implicit dBEngine: E) = {
-    this(Option(functionNameOverride))(schema, dBEngine)
-  }
-
-  /* only one constructor of a class can have default values for parameters*/
-  def this(schema: DBSchema)
-          (implicit dBEngine: E) = {
-    this(None)(schema, dBEngine)
-  }
-
-  def this(dBEngine: E, functionNameOverride: String)
-          (implicit schema: DBSchema)  = {
-    this(Option(functionNameOverride))(schema, dBEngine)
-  }
-
-  def this(dBEngine: E)
-          (implicit schema: DBSchema)  = {
-    this(None)(schema, dBEngine)
-  }
 
   /**
     * Function to create the DB function call specific to the provided [[DBEngine]]. Expected to be implemented by the
@@ -89,9 +67,9 @@ abstract class DBFunction[I, R, E <: DBEngine](functionNameOverride: Option[Stri
   override protected def fieldsToSelect: Seq[String] = super.fieldsToSelect //TODO should get the names from R #6
 
   /*these 3 functions has to be defined here and not in the ancestors, as there the query type is not compatible - path-dependent types*/
-  protected def multipleResults(values: I): Future[Seq[R]] = dBEngine.fetchAll(query(values))
-  protected def singleResult(values: I): Future[R] = dBEngine.fetchHead(query(values))
-  protected def optionalResult(values: I): Future[Option[R]] = dBEngine.fetchHeadOption(query(values))
+  protected def multipleResults(values: I): F[Seq[R]] = dBEngine.fetchAll(query(values))
+  protected def singleResult(values: I): F[R] = dBEngine.fetchHead(query(values))
+  protected def optionalResult(values: I): F[Option[R]] = dBEngine.fetchHeadOption(query(values))
 
 }
 
@@ -107,34 +85,9 @@ object DBFunction {
     * @tparam R                   - the type covering the returned fields from the database function
     * @tparam E                   - the type of the [[DBEngine]] engine
     */
-  abstract class DBMultipleResultFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
+  abstract class DBMultipleResultFunction[I, R, E <: DBEngine[F], F[_]: Monad](functionNameOverride: Option[String] = None)
                                                               (implicit schema: DBSchema, dBEngine: E)
-    extends DBFunction[I, R, E](functionNameOverride) {
-
-    def this(functionNameOverride: String)
-            (implicit schema: DBSchema, dBEngine: E) = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(schema: DBSchema, functionNameOverride: String)
-            (implicit dBEngine: E) = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(schema: DBSchema)
-            (implicit dBEngine: E) = {
-      this(None)(schema, dBEngine)
-    }
-
-    def this(dBEngine: E, functionNameOverride: String)
-            (implicit schema: DBSchema)  = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(dBEngine: E)
-            (implicit schema: DBSchema)  = {
-      this(None)(schema, dBEngine)
-    }
+    extends DBFunction[I, R, E, F](functionNameOverride) {
 
     /**
       * For easy and convenient execution of the DB function call
@@ -142,7 +95,7 @@ object DBFunction {
       * @return       - a sequence of values, each coming from a row returned from the DB function transformed to scala
       *               type `R`
       */
-    def apply(values: I): Future[Seq[R]] = multipleResults(values)
+    def apply(values: I): F[Seq[R]] = multipleResults(values)
   }
 
   /**
@@ -156,41 +109,16 @@ object DBFunction {
     * @tparam R                   - the type covering the returned fields from the database function
     * @tparam E                   - the type of the [[DBEngine]] engine
     */
-  abstract class DBSingleResultFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
+  abstract class DBSingleResultFunction[I, R, E <: DBEngine[F], F[_]: Monad](functionNameOverride: Option[String] = None)
                                                             (implicit schema: DBSchema, dBEngine: E)
-    extends DBFunction[I, R, E](functionNameOverride) {
-
-    def this(functionNameOverride: String)
-            (implicit schema: DBSchema, dBEngine: E) = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(schema: DBSchema, functionNameOverride: String)
-            (implicit dBEngine: E) = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(schema: DBSchema)
-            (implicit dBEngine: E) = {
-      this(None)(schema, dBEngine)
-    }
-
-    def this(dBEngine: E, functionNameOverride: String)
-            (implicit schema: DBSchema)  = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(dBEngine: E)
-            (implicit schema: DBSchema)  = {
-      this(None)(schema, dBEngine)
-    }
+    extends DBFunction[I, R, E, F](functionNameOverride) {
 
     /**
       * For easy and convenient execution of the DB function call
       * @param values - the values to pass over to the database function
       * @return       - the value returned from the DB function transformed to scala type `R`
       */
-    def apply(values: I): Future[R] = singleResult(values)
+    def apply(values: I): F[R] = singleResult(values)
   }
 
   /**
@@ -204,40 +132,15 @@ object DBFunction {
     * @tparam R                   - the type covering the returned fields from the database function
     * @tparam E                   - the type of the [[DBEngine]] engine
     */
-  abstract class DBOptionalResultFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
+  abstract class DBOptionalResultFunction[I, R, E <: DBEngine[F], F[_]: Monad](functionNameOverride: Option[String] = None)
                                                               (implicit schema: DBSchema, dBEngine: E)
-    extends DBFunction[I, R, E](functionNameOverride) {
-
-    def this(functionNameOverride: String)
-            (implicit schema: DBSchema, dBEngine: E) = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(schema: DBSchema, functionNameOverride: String)
-            (implicit dBEngine: E) = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(schema: DBSchema)
-            (implicit dBEngine: E) = {
-      this(None)(schema, dBEngine)
-    }
-
-    def this(dBEngine: E, functionNameOverride: String)
-            (implicit schema: DBSchema)  = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(dBEngine: E)
-            (implicit schema: DBSchema)  = {
-      this(None)(schema, dBEngine)
-    }
+    extends DBFunction[I, R, E, F](functionNameOverride) {
 
     /**
       * For easy and convenient execution of the DB function call
       * @param values - the values to pass over to the database function
       * @return       - the value returned from the DB function transformed to scala type `R` if a row is returned, otherwise `None`
       */
-    def apply(values: I): Future[Option[R]] = optionalResult(values)
+    def apply(values: I): F[Option[R]] = optionalResult(values)
   }
 }

@@ -22,7 +22,7 @@ ThisBuild / organization := "za.co.absa.fa-db"
 lazy val scala211 = "2.11.12"
 lazy val scala212 = "2.12.17"
 
-ThisBuild / scalaVersion := scala211
+ThisBuild / scalaVersion := scala212
 ThisBuild / crossScalaVersions := Seq(scala211, scala212)
 
 ThisBuild / versionScheme := Some("early-semver")
@@ -85,6 +85,21 @@ lazy val faDBSlick = (project in file("slick"))
   ).dependsOn(faDbCore)
   .settings(
     jacocoReportSettings := commonJacocoReportSettings.withTitle(s"fa-db:slick Jacoco Report - scala:${scalaVersion.value}"),
+    jacocoExcludes := commonJacocoExcludes
+  )
+
+lazy val faDBDoobie = (project in file("doobie"))
+  .configs(IntegrationTest)
+  .settings(
+    name := "doobie",
+    libraryDependencies ++= doobieDependencies(scalaVersion.value),
+    javacOptions ++= commonJavacOptions,
+    scalacOptions ++= commonScalacOptions,
+    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value, // printScalaVersion is run with compile
+    Defaults.itSettings,
+  ).dependsOn(faDbCore)
+  .settings(
+    jacocoReportSettings := commonJacocoReportSettings.withTitle(s"doobie:slick Jacoco Report - scala:${scalaVersion.value}"),
     jacocoExcludes := commonJacocoExcludes
   )
 

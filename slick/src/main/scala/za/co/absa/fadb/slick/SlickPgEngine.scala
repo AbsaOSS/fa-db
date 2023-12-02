@@ -28,7 +28,7 @@ import scala.language.higherKinds
   * [[DBEngine]] based on the Slick library in the Postgres flavor
   * @param db - the Slick database
   */
-class SlickPgEngine(val db: Database)(implicit val executor: ExecutionContext) extends DBEngine {
+class SlickPgEngine(val db: Database)(implicit val executor: ExecutionContext) extends DBEngine[Future] {
 
   /**
     * The type of Queries for Slick

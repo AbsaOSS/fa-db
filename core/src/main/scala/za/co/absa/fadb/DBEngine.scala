@@ -16,13 +16,15 @@
 
 package za.co.absa.fadb
 
-import scala.concurrent.{ExecutionContext, Future}
+import cats.Monad
+import cats.implicits.toFunctorOps
+
 import scala.language.higherKinds
 
 /**
   * A basis to represent a database executor
   */
-trait DBEngine {
+abstract class DBEngine[F[_]: Monad] {
 
   /**
     * A type representing the (SQL) query within the engine
@@ -30,15 +32,13 @@ trait DBEngine {
     */
   type QueryType[T] <: Query[T]
 
-  implicit val executor: ExecutionContext
-
   /**
     * The actual query executioner of the queries of the engine
     * @param query  - the query to execute
     * @tparam R     - return the of the query
     * @return       - sequence of the results of database query
     */
-  protected def run[R](query: QueryType[R]): Future[Seq[R]]
+  protected def run[R](query: QueryType[R]): F[Seq[R]]
 
   /**
     * Public method to execute when query is expected to return multiple results
@@ -46,7 +46,7 @@ trait DBEngine {
     * @tparam R     - return the of the query
     * @return       - sequence of the results of database query
     */
-  def fetchAll[R](query: QueryType[R]): Future[Seq[R]] = run(query)
+  def fetchAll[R](query: QueryType[R]): F[Seq[R]] = run(query)
 
   /**
     * Public method to execute when query is expected to return exactly one row
@@ -54,7 +54,7 @@ trait DBEngine {
     * @tparam R     - return the of the query
     * @return       - sequence of the results of database query
     */
-  def fetchHead[R](query: QueryType[R]): Future[R] = {
+  def fetchHead[R](query: QueryType[R]): F[R] = {
     run(query).map(_.head)
   }
 
@@ -65,7 +65,7 @@ trait DBEngine {
     * @return       - sequence of the results of database query
     */
 
-  def fetchHeadOption[R](query:  QueryType[R]): Future[Option[R]] = {
+  def fetchHeadOption[R](query:  QueryType[R]): F[Option[R]] = {
     run(query).map(_.headOption)
   }
 }
