@@ -5,5 +5,5 @@ import doobie.util.fragment.Fragment
 import za.co.absa.fadb.Query
 
 class DoobieQuery[R: Read](val fragment: Fragment)
-                          (implicit val readR: Read[R], val getR: Get[R])
+                          (implicit val readR: Read[R]) // , val getR: Get[R]
   extends Query[R]
