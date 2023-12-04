@@ -8,7 +8,6 @@ import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.doobie.Results.{FailedResult, ResultWithStatus, SuccessfulResult}
 import za.co.absa.fadb.status.FunctionStatus
 import za.co.absa.fadb.status.handling.StatusHandling
-import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
 
 import scala.util.{Failure, Success}
 

@@ -1,18 +1,16 @@
 package za.co.absa.fadb.doobie
 
-import cats.effect.IO
 import cats.effect.unsafe.implicits.global
+import doobie.Fragment
 import doobie.implicits.toSqlInterpolator
 import doobie.util.Read
-import doobie.util.log.{LogEvent, LogHandler}
-import doobie.{Fragment, Transactor}
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.doobie.DoobieFunction.DoobieSingleResultFunctionWithStatusSupport
 import za.co.absa.fadb.status.FunctionStatus
 import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
 
-class DoobieFunctionWithStatusSupportTest extends AnyFunSuite {
+class DoobieSingleResultFunctionWithStatusSupportTest extends AnyFunSuite with DoobieTest {
 
   case class CreateActorRequestBody(firstName: String, lastName: String)
 
@@ -21,26 +19,8 @@ class DoobieFunctionWithStatusSupportTest extends AnyFunSuite {
     with StandardStatusHandling {
 
     override def sql(values: CreateActorRequestBody)(implicit read: Read[Int]): Fragment =
-      sql"SELECT * FROM ${Fragment.const(functionName)}(${values.firstName}, ${values.lastName})"
+      sql"SELECT status, status_text, o_actor_id FROM ${Fragment.const(functionName)}(${values.firstName}, ${values.lastName})"
   }
-
-  import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits._
-  object Runs extends DBSchema
-
-  val printSqlLogHandler: LogHandler[IO] = new LogHandler[IO] {
-    def run(logEvent: LogEvent): IO[Unit] =
-      IO {
-        println(logEvent.sql)
-      }
-  }
-
-  private val transactor = Transactor.fromDriverManager[IO](
-    "org.postgresql.ds.PGSimpleDataSource",
-    "jdbc:postgresql://localhost:5432/movies",
-    "postgres",
-    "postgres",
-    Some(printSqlLogHandler)
-  )
 
   private val createActor = new CreateActor()(Runs, new DoobiePgEngine(transactor))
 
@@ -53,6 +33,4 @@ class DoobieFunctionWithStatusSupportTest extends AnyFunSuite {
         fail(failure.failure)
     }
   }
-
-
 }
