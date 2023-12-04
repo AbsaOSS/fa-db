@@ -35,9 +35,6 @@ import scala.language.higherKinds
 abstract class DBFunction[I, R, E <: DBEngine[F], F[_]: Monad](functionNameOverride: Option[String] = None)
                                               (implicit val schema: DBSchema, val dBEngine: E) extends DBFunctionFabric {
 
-  /* alternative constructors for different availability of input parameters */
-
-
   /**
     * Function to create the DB function call specific to the provided [[DBEngine]]. Expected to be implemented by the
     * DBEngine specific mix-in.
