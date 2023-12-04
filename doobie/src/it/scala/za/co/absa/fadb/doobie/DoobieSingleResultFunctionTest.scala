@@ -10,8 +10,6 @@ import za.co.absa.fadb.doobie.DoobieFunction.DoobieSingleResultFunction
 
 class DoobieSingleResultFunctionTest extends AnyFunSuite with DoobieTest {
 
-  case class CreateActorRequestBody(firstName: String, lastName: String)
-
   class CreateActor(implicit schema: DBSchema, dbEngine: DoobiePgEngine)
     extends DoobieSingleResultFunction[CreateActorRequestBody, Int] {
 
@@ -24,5 +22,4 @@ class DoobieSingleResultFunctionTest extends AnyFunSuite with DoobieTest {
   test("DoobieTest") {
     assert(createActor.apply(CreateActorRequestBody("Pavel", "Marek")).unsafeRunSync().isInstanceOf[Int])
   }
-
 }

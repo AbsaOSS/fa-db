@@ -10,8 +10,6 @@ import za.co.absa.fadb.doobie.DoobieFunction.DoobieOptionalResultFunction
 
 class DoobieOptionalResultFunctionTest extends AnyFunSuite with DoobieTest {
 
-  case class Actor(actorId: Int, firstName: String, lastName: String)
-
   class GetActorById(implicit schema: DBSchema, dbEngine: DoobiePgEngine)
     extends DoobieOptionalResultFunction[Int, Actor] {
 

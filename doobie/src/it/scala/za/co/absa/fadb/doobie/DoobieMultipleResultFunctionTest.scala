@@ -10,9 +10,6 @@ import za.co.absa.fadb.doobie.DoobieFunction.DoobieMultipleResultFunction
 
 class DoobieMultipleResultFunctionTest extends AnyFunSuite with DoobieTest {
 
-  case class Actor(actorId: Int, firstName: String, lastName: String)
-  case class GetActorsQueryParameters(firstName: Option[String], lastName: Option[String])
-
   class GetActors(implicit schema: DBSchema, dbEngine: DoobiePgEngine)
     extends DoobieMultipleResultFunction[GetActorsQueryParameters, Actor] {
 
@@ -27,5 +24,4 @@ class DoobieMultipleResultFunctionTest extends AnyFunSuite with DoobieTest {
     val results = getActors.apply(GetActorsQueryParameters(Some("Pavel"), Some("Marek"))).unsafeRunSync()
     assert(results.contains(expectedResultElem))
   }
-
 }

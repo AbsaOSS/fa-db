@@ -12,8 +12,6 @@ import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
 
 class DoobieSingleResultFunctionWithStatusSupportTest extends AnyFunSuite with DoobieTest {
 
-  case class CreateActorRequestBody(firstName: String, lastName: String)
-
   class CreateActor(implicit schema: DBSchema, dbEngine: DoobiePgEngine)
     extends DoobieSingleResultFunctionWithStatusSupport[CreateActorRequestBody, Int]
     with StandardStatusHandling {

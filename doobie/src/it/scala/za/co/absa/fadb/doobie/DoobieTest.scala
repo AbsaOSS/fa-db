@@ -6,8 +6,11 @@ import doobie.util.transactor.Transactor
 import za.co.absa.fadb.DBSchema
 
 trait DoobieTest {
-  import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits._
+  case class Actor(actorId: Int, firstName: String, lastName: String)
+  case class GetActorsQueryParameters(firstName: Option[String], lastName: Option[String])
+  case class CreateActorRequestBody(firstName: String, lastName: String)
 
+  import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits._
   object Runs extends DBSchema
 
   val printSqlLogHandler: LogHandler[IO] = new LogHandler[IO] {
