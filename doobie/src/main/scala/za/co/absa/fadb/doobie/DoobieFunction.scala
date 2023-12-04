@@ -7,6 +7,7 @@ import za.co.absa.fadb.DBFunction._
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.doobie.Results.{FailedResult, ResultWithStatus, SuccessfulResult}
 import za.co.absa.fadb.status.FunctionStatus
+import za.co.absa.fadb.status.handling.StatusHandling
 import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
 
 import scala.util.{Failure, Success}
@@ -47,7 +48,7 @@ private [doobie] trait DoobieFunction[I, R] {
  *  @tparam I the input type of the function
  *  @tparam R the result type of the function
  */
-private [doobie] trait DoobieFunctionWithStatusSupport[I, R] extends StandardStatusHandling {
+private [doobie] trait DoobieFunctionWithStatusSupport[I, R] extends StatusHandling {
 
   /**
    *  The `Read[R]` instance used to read the query result into `R`.
@@ -163,61 +164,7 @@ object DoobieFunction {
       }
     }
   }
-  //  ==Example==
-  //  {{{
-  //  CREATE OR REPLACE FUNCTION runs.create_actor(
-  //      IN  i_first_name           TEXT,
-  //      IN  i_last_name            TEXT,
-  //      OUT status                 INTEGER,
-  //      OUT status_text            TEXT,
-  //      OUT o_actor_id             INTEGER
-  //  ) RETURNS record AS
-  //  $$
-  //  BEGIN
-  //      INSERT INTO runs.actors(first_name, last_name)
-  //      VALUES (i_first_name, i_last_name)
-  //      RETURNING actor_id INTO o_actor_id;
-  //
-  //      status := 11;
-  //      status_text := 'Actor created';
-  //
-  //      RETURN;
-  //  END;
-  //  $$
-  //  LANGUAGE plpgsql;
-  //
-  //  case class CreateActorRequestBody(firstName: String, lastName: String)
-  //
-  //  class CreateActor(implicit schema: DBSchema, dbEngine: DoobiePgEngine)
-  //   extends DoobieFunction.DoobieSingleResultFunctionWithStatusSupport[CreateActorRequestBody, Int] {
-  //
-  //   override def sql(values: CreateActorRequestBody)(implicit read: Read[Int]): fragment.Fragment =
-  //     sql"SELECT * FROM create_actor(${values.firstName}, ${values.lastName})"
-  //  }
-  //
-  //  class DoobieTest extends AnyFunSuite {
-  //   import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits._
-  //   object Runs extends DBSchema
-  //
-  //   private val transactor = Transactor.fromDriverManager[IO](
-  //     "org.postgresql.ds.PGSimpleDataSource",
-  //     "jdbc:postgresql://localhost:5432/movies",
-  //     "postgres",
-  //     "postgres"
-  //   )
-  //
-  //   private val createActor = new CreateActor()(Runs, new DoobiePgEngine(transactor))
-  //
-  //   test("DoobieTest with status handling") {
-  //     val requestBody = CreateActorRequestBody("Pavel", "Marek")
-  //     createActor.applyWithStatus(requestBody).unsafeRunSync() match {
-  //       case Right(success) =>
-  //         assert(success.functionStatus == status.FunctionStatus(11, "Actor created"))
-  //       case Left(failure) =>
-  //         fail(failure.failure)
-  //     }
-  //   }
-  //  }
-  //  }}}
+
+  // for an example see DoobieFunctionWithStatusSupportTest
 
 }

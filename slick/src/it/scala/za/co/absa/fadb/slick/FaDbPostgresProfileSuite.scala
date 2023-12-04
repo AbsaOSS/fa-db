@@ -26,6 +26,7 @@ import org.scalatest.flatspec.AsyncFlatSpec
 
 import java.time.{Duration, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, ZonedDateTime}
 import java.util.UUID
+import scala.concurrent.Future
 
 class FaDbPostgresProfileSuite extends AsyncFlatSpec  {
 
@@ -53,7 +54,7 @@ class FaDbPostgresProfileSuite extends AsyncFlatSpec  {
                       )
 
       class TestFunction(implicit override val schema: DBSchema, override val dbEngine: SlickPgEngine)
-        extends DBSingleResultFunction[InputOutput, InputOutput, SlickPgEngine]
+        extends DBSingleResultFunction[InputOutput, InputOutput, SlickPgEngine, Future]
           with SlickFunction[InputOutput, InputOutput] {
 
         override protected def sql(values: InputOutput): SQLActionBuilder = {
@@ -136,7 +137,7 @@ class FaDbPostgresProfileSuite extends AsyncFlatSpec  {
                             )
 
       class TestFunction(implicit override val schema: DBSchema, override val dbEngine: SlickPgEngine)
-        extends DBSingleResultFunction[InputOutput, InputOutput, SlickPgEngine]
+        extends DBSingleResultFunction[InputOutput, InputOutput, SlickPgEngine, Future]
           with SlickFunction[InputOutput, InputOutput] {
 
         override protected def sql(values: InputOutput): SQLActionBuilder = {
