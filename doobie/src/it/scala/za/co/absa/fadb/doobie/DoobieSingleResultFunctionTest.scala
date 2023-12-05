@@ -16,6 +16,7 @@
 
 package za.co.absa.fadb.doobie
 
+import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import doobie.implicits.toSqlInterpolator
 import doobie.util.Read
@@ -26,8 +27,8 @@ import za.co.absa.fadb.doobie.DoobieFunction.DoobieSingleResultFunction
 
 class DoobieSingleResultFunctionTest extends AnyFunSuite with DoobieTest {
 
-  class CreateActor(implicit schema: DBSchema, dbEngine: DoobiePgEngine)
-    extends DoobieSingleResultFunction[CreateActorRequestBody, Int] {
+  class CreateActor(implicit schema: DBSchema, dbEngine: DoobiePgEngine[IO])
+    extends DoobieSingleResultFunction[CreateActorRequestBody, Int, IO] {
 
     override def sql(values: CreateActorRequestBody)(implicit read: Read[Int]): Fragment =
       sql"SELECT o_actor_id FROM ${Fragment.const(functionName)}(${values.firstName}, ${values.lastName})"

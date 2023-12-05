@@ -16,6 +16,7 @@
 
 package za.co.absa.fadb.doobie
 
+import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import doobie.Fragment
 import doobie.implicits.toSqlInterpolator
@@ -28,8 +29,8 @@ import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
 
 class DoobieSingleResultFunctionWithStatusSupportTest extends AnyFunSuite with DoobieTest {
 
-  class CreateActor(implicit schema: DBSchema, dbEngine: DoobiePgEngine)
-    extends DoobieSingleResultFunctionWithStatusSupport[CreateActorRequestBody, Int]
+  class CreateActor(implicit schema: DBSchema, dbEngine: DoobiePgEngine[IO])
+    extends DoobieSingleResultFunctionWithStatusSupport[CreateActorRequestBody, Int, IO]
     with StandardStatusHandling {
 
     override def sql(values: CreateActorRequestBody)(implicit read: Read[Int]): Fragment =
