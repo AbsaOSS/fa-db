@@ -21,7 +21,7 @@ class DoobieOptionalResultFunctionTest extends AnyFunSuite with DoobieTest {
 
   test("DoobieTest") {
     val expectedResult = Some(Actor(49, "Pavel", "Marek"))
-    val result = createActor.apply(49).unsafeRunSync()
+    val result = createActor(49).unsafeRunSync()
     assert(expectedResult == result)
   }
 

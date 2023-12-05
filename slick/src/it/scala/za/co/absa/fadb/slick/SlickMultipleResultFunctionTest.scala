@@ -29,7 +29,7 @@ class SlickMultipleResultFunctionTest extends AnyFunSuite with SlickTest {
 
   test("SlickTest") {
     val expectedResultElem = Actor(49, "Pavel", "Marek")
-    val results = getActors.apply(GetActorsQueryParameters(Some("Pavel"), Some("Marek")))
+    val results = getActors(GetActorsQueryParameters(Some("Pavel"), Some("Marek")))
     assert(Await.result(results, 5.seconds).contains(expectedResultElem))
   }
 }

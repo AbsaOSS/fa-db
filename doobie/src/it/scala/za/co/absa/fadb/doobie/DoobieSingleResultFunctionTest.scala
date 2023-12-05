@@ -20,6 +20,6 @@ class DoobieSingleResultFunctionTest extends AnyFunSuite with DoobieTest {
   private val createActor = new CreateActor()(Runs, new DoobiePgEngine(transactor))
 
   test("DoobieTest") {
-    assert(createActor.apply(CreateActorRequestBody("Pavel", "Marek")).unsafeRunSync().isInstanceOf[Int])
+    assert(createActor(CreateActorRequestBody("Pavel", "Marek")).unsafeRunSync().isInstanceOf[Int])
   }
 }

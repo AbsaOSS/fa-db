@@ -30,7 +30,7 @@ class SlickOptionalResultFunctionTest extends AnyFunSuite with SlickTest {
 
   test("SlickTest") {
     val expectedResultElem = Some(Actor(49, "Pavel", "Marek"))
-    val results = getActorById.apply(49)
+    val results = getActorById(49)
     assert(Await.result(results, 5.seconds) == expectedResultElem)
   }
 }
