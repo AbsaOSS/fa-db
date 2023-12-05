@@ -25,10 +25,14 @@ import za.co.absa.fadb.DBEngine
 import scala.language.higherKinds
 
 /**
- *  `DoobiePgEngine` is a class that extends `DBEngine` with `IO` as the effect type.
- *  It uses Doobie's `Transactor[IO]` to execute SQL queries.
+ *  `DoobiePgEngine` is a class that extends `DBEngine` with `F` as the effect type.
+ *  It uses Doobie's `Transactor[F]` to execute SQL queries.
+ *
+ *  `Async` is needed because Doobie requires it for non-blocking database operations.
+ *  `Monad` is needed because it provides an interface for chaining operations together.
  *
  *  @param transactor the Doobie transactor for executing SQL queries
+ *  @tparam F the effect type, which must have an `Async` and a `Monad` instance
  */
 class DoobiePgEngine[F[_]: Async: Monad](val transactor: Transactor[F]) extends DBEngine[F] {
 
@@ -36,21 +40,21 @@ class DoobiePgEngine[F[_]: Async: Monad](val transactor: Transactor[F]) extends 
   type QueryType[T] = DoobieQuery[T]
 
   /**
-   *  Executes a Doobie query and returns the result as an `IO[Seq[R]]`.
+   *  Executes a Doobie query and returns the result as an `F[Seq[R]]`.
    *
    *  @param query the Doobie query to execute
    *  @param readR the `Read[R]` instance used to read the query result into `R`
-   *  @return the query result as an `IO[Seq[R]]`
+   *  @return the query result as an `F[Seq[R]]`
    */
   private def executeQuery[R](query: QueryType[R])(implicit readR: Read[R]): F[Seq[R]] = {
     query.fragment.query[R].to[Seq].transact(transactor)
   }
 
   /**
-   *  Runs a Doobie query and returns the result as an `IO[Seq[R]]`.
+   *  Runs a Doobie query and returns the result as an `F[Seq[R]]`.
    *
    *  @param query the Doobie query to run
-   *  @return the query result as an `IO[Seq[R]]`
+   *  @return the query result as an `F[Seq[R]]`
    */
   override def run[R](query: QueryType[R]): F[Seq[R]] =
     executeQuery(query)(query.readR)

@@ -28,7 +28,7 @@ import za.co.absa.fadb.doobie.DoobieFunction.DoobieMultipleResultFunction
 class DoobieMultipleResultFunctionTest extends AnyFunSuite with DoobieTest {
 
   class GetActors(implicit schema: DBSchema, dbEngine: DoobiePgEngine[IO])
-    extends DoobieMultipleResultFunction[GetActorsQueryParameters, Actor, IO] {
+      extends DoobieMultipleResultFunction[GetActorsQueryParameters, Actor, IO] {
 
     override def sql(values: GetActorsQueryParameters)(implicit read: Read[Actor]): Fragment =
       sql"SELECT actor_id, first_name, last_name FROM ${Fragment.const(functionName)}(${values.firstName}, ${values.lastName})"

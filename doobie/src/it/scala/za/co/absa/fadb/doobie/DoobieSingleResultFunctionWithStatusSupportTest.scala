@@ -30,8 +30,8 @@ import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
 class DoobieSingleResultFunctionWithStatusSupportTest extends AnyFunSuite with DoobieTest {
 
   class CreateActor(implicit schema: DBSchema, dbEngine: DoobiePgEngine[IO])
-    extends DoobieSingleResultFunctionWithStatusSupport[CreateActorRequestBody, Int, IO]
-    with StandardStatusHandling {
+      extends DoobieSingleResultFunctionWithStatusSupport[CreateActorRequestBody, Int, IO]
+      with StandardStatusHandling {
 
     override def sql(values: CreateActorRequestBody)(implicit read: Read[Int]): Fragment =
       sql"SELECT status, status_text, o_actor_id FROM ${Fragment.const(functionName)}(${values.firstName}, ${values.lastName})"

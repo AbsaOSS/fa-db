@@ -1,4 +1,5 @@
-CREATE OR REPLACE FUNCTION runs.get_actors(
+CREATE
+OR REPLACE FUNCTION runs.get_actors(
     i_first_name             TEXT,
     i_last_name              TEXT
 ) RETURNS TABLE (
@@ -8,7 +9,7 @@ CREATE OR REPLACE FUNCTION runs.get_actors(
                 ) AS
 $$
 BEGIN
-    RETURN QUERY SELECT A.actor_id, A.first_name, A.last_name
+RETURN QUERY SELECT A.actor_id, A.first_name, A.last_name
                  FROM runs.actors A
                  WHERE
                      (i_first_name IS NULL OR A.first_name = i_first_name)
