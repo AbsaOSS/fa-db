@@ -22,6 +22,8 @@ import za.co.absa.fadb.DBEngine
 import scala.concurrent.{ExecutionContext, Future}
 import slick.jdbc.PostgresProfile.api._
 
+import cats.implicits._
+
 import scala.language.higherKinds
 
 /**

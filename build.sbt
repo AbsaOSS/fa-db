@@ -97,6 +97,9 @@ lazy val faDBDoobie = (project in file("doobie"))
     scalacOptions ++= commonScalacOptions,
     (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value, // printScalaVersion is run with compile
     Defaults.itSettings,
+    compile / skip := !scalaVersion.value.startsWith("2.12"), // skip if not Scala 2.12 (does not work, but publishM2 does)
+    crossScalaVersions := Seq(scala212),
+    publishM2 := (if (scalaVersion.value.startsWith("2.12")) publishM2.value else ()) // publish only for Scala 2.12
   ).dependsOn(faDbCore)
   .settings(
     jacocoReportSettings := commonJacocoReportSettings.withTitle(s"doobie:slick Jacoco Report - scala:${scalaVersion.value}"),
