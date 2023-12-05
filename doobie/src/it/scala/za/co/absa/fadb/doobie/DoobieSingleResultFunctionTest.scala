@@ -27,14 +27,14 @@ import za.co.absa.fadb.doobie.DoobieFunction.DoobieSingleResultFunction
 
 class DoobieSingleResultFunctionTest extends AnyFunSuite with DoobieTest {
 
-  class CreateActor(implicit schema: DBSchema, dbEngine: DoobiePgEngine[IO])
+  class CreateActor(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
       extends DoobieSingleResultFunction[CreateActorRequestBody, Int, IO] {
 
     override def sql(values: CreateActorRequestBody)(implicit read: Read[Int]): Fragment =
       sql"SELECT o_actor_id FROM ${Fragment.const(functionName)}(${values.firstName}, ${values.lastName})"
   }
 
-  private val createActor = new CreateActor()(Runs, new DoobiePgEngine(transactor))
+  private val createActor = new CreateActor()(Runs, new DoobieEngine(transactor))
 
   test("DoobieTest") {
     assert(createActor(CreateActorRequestBody("Pavel", "Marek")).unsafeRunSync().isInstanceOf[Int])

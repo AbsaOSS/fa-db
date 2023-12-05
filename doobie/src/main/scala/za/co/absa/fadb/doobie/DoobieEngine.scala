@@ -28,12 +28,11 @@ import scala.language.higherKinds
  *  It uses Doobie's `Transactor[F]` to execute SQL queries.
  *
  *  `Async` is needed because Doobie requires it for non-blocking database operations.
- *  `Monad` is needed because it provides an interface for chaining operations together.
  *
  *  @param transactor the Doobie transactor for executing SQL queries
  *  @tparam F the effect type, which must have an `Async` and a `Monad` instance
  */
-class DoobiePgEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[F] {
+class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[F] {
 
   /** The type of Doobie queries that produce `T` */
   type QueryType[T] = DoobieQuery[T]

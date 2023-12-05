@@ -27,14 +27,14 @@ import za.co.absa.fadb.doobie.DoobieFunction.DoobieOptionalResultFunction
 
 class DoobieOptionalResultFunctionTest extends AnyFunSuite with DoobieTest {
 
-  class GetActorById(implicit schema: DBSchema, dbEngine: DoobiePgEngine[IO])
+  class GetActorById(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
       extends DoobieOptionalResultFunction[Int, Actor, IO] {
 
     override def sql(values: Int)(implicit read: Read[Actor]): Fragment =
       sql"SELECT actor_id, first_name, last_name FROM ${Fragment.const(functionName)}($values)"
   }
 
-  private val createActor = new GetActorById()(Runs, new DoobiePgEngine(transactor))
+  private val createActor = new GetActorById()(Runs, new DoobieEngine(transactor))
 
   test("DoobieTest") {
     val expectedResult = Some(Actor(49, "Pavel", "Marek"))

@@ -29,7 +29,7 @@ import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
 
 class DoobieSingleResultFunctionWithStatusSupportTest extends AnyFunSuite with DoobieTest {
 
-  class CreateActor(implicit schema: DBSchema, dbEngine: DoobiePgEngine[IO])
+  class CreateActor(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
       extends DoobieSingleResultFunctionWithStatusSupport[CreateActorRequestBody, Int, IO]
       with StandardStatusHandling {
 
@@ -37,7 +37,7 @@ class DoobieSingleResultFunctionWithStatusSupportTest extends AnyFunSuite with D
       sql"SELECT status, status_text, o_actor_id FROM ${Fragment.const(functionName)}(${values.firstName}, ${values.lastName})"
   }
 
-  private val createActor = new CreateActor()(Runs, new DoobiePgEngine(transactor))
+  private val createActor = new CreateActor()(Runs, new DoobieEngine(transactor))
 
   test("DoobieTest with status handling") {
     val requestBody = CreateActorRequestBody("Pavel", "Marek")

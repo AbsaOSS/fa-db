@@ -113,9 +113,9 @@ object DoobieFunction {
    */
   abstract class DoobieSingleResultFunction[I, R, F[_]: Async: Monad](functionNameOverride: Option[String] = None)(
     implicit override val schema: DBSchema,
-    val dbEngine: DoobiePgEngine[F],
+    val dbEngine: DoobieEngine[F],
     val readR: Read[R]
-  ) extends DBSingleResultFunction[I, R, DoobiePgEngine[F], F](functionNameOverride)
+  ) extends DBSingleResultFunction[I, R, DoobieEngine[F], F](functionNameOverride)
     with DoobieFunction[I, R]
 
   /**
@@ -130,9 +130,9 @@ object DoobieFunction {
    */
   abstract class DoobieMultipleResultFunction[I, R, F[_]: Async: Monad](functionNameOverride: Option[String] = None)(
     implicit override val schema: DBSchema,
-    val dbEngine: DoobiePgEngine[F],
+    val dbEngine: DoobieEngine[F],
     val readR: Read[R]
-  ) extends DBMultipleResultFunction[I, R, DoobiePgEngine[F], F](functionNameOverride)
+  ) extends DBMultipleResultFunction[I, R, DoobieEngine[F], F](functionNameOverride)
       with DoobieFunction[I, R]
 
   /**
@@ -147,9 +147,9 @@ object DoobieFunction {
    */
   abstract class DoobieOptionalResultFunction[I, R, F[_]: Async: Monad](functionNameOverride: Option[String] = None)(
     implicit override val schema: DBSchema,
-    val dbEngine: DoobiePgEngine[F],
+    val dbEngine: DoobieEngine[F],
     val readR: Read[R]
-  ) extends DBOptionalResultFunction[I, R, DoobiePgEngine[F], F](functionNameOverride)
+  ) extends DBOptionalResultFunction[I, R, DoobieEngine[F], F](functionNameOverride)
       with DoobieFunction[I, R]
 
   /**
@@ -166,10 +166,10 @@ object DoobieFunction {
   abstract class DoobieSingleResultFunctionWithStatusSupport[I, R, F[_]: Async: Monad](
     functionNameOverride: Option[String] = None
   )(implicit override val schema: DBSchema,
-    val dbEngine: DoobiePgEngine[F],
+    val dbEngine: DoobieEngine[F],
     val readR: Read[R],
     val readSelectWithStatus: Read[(Int, String, R)]
-  ) extends DBSingleResultFunction[I, (Int, String, R), DoobiePgEngine[F], F](functionNameOverride)
+  ) extends DBSingleResultFunction[I, (Int, String, R), DoobieEngine[F], F](functionNameOverride)
       with DoobieFunctionWithStatusSupport[I, R] {
 
     /**
