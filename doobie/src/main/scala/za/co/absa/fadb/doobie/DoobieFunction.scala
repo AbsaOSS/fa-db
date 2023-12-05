@@ -116,7 +116,7 @@ object DoobieFunction {
     val dbEngine: DoobiePgEngine[F],
     val readR: Read[R]
   ) extends DBSingleResultFunction[I, R, DoobiePgEngine[F], F](functionNameOverride)
-      with DoobieFunction[I, R] {}
+    with DoobieFunction[I, R]
 
   /**
  *  `DoobieMultipleResultFunction` is an abstract class that extends `DBMultipleResultFunction` with `DoobiePgEngine` as the engine type.
@@ -133,7 +133,7 @@ object DoobieFunction {
     val dbEngine: DoobiePgEngine[F],
     val readR: Read[R]
   ) extends DBMultipleResultFunction[I, R, DoobiePgEngine[F], F](functionNameOverride)
-      with DoobieFunction[I, R] {}
+      with DoobieFunction[I, R]
 
   /**
  *  `DoobieOptionalResultFunction` is an abstract class that extends `DBOptionalResultFunction` with `DoobiePgEngine` as the engine type.
@@ -150,7 +150,7 @@ object DoobieFunction {
     val dbEngine: DoobiePgEngine[F],
     val readR: Read[R]
   ) extends DBOptionalResultFunction[I, R, DoobiePgEngine[F], F](functionNameOverride)
-      with DoobieFunction[I, R] {}
+      with DoobieFunction[I, R]
 
   /**
    *  `DoobieSingleResultFunctionWithStatusSupport` is an abstract class that extends `DBSingleResultFunction` with `DoobiePgEngine` as the engine type.
