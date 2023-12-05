@@ -35,6 +35,12 @@ import scala.language.higherKinds
 abstract class DBFunction[I, R, E <: DBEngine[F], F[_]: Monad](functionNameOverride: Option[String] = None)
                                               (implicit val schema: DBSchema, val dBEngine: E) extends DBFunctionFabric {
 
+  // A constructor that takes only the mandatory parameters and uses default values for the optional ones
+  def this()(implicit schema: DBSchema, dBEngine: E) = this(None)
+
+  // A constructor that allows specifying the function name as a string, but not as an option
+  def this(functionName: String)(implicit schema: DBSchema, dBEngine: E) = this(Some(functionName))
+
   /**
     * Function to create the DB function call specific to the provided [[DBEngine]]. Expected to be implemented by the
     * DBEngine specific mix-in.
@@ -86,6 +92,12 @@ object DBFunction {
                                                               (implicit schema: DBSchema, dBEngine: E)
     extends DBFunction[I, R, E, F](functionNameOverride) {
 
+    // A constructor that takes only the mandatory parameters and uses default values for the optional ones
+    def this()(implicit schema: DBSchema, dBEngine: E) = this(None)
+
+    // A constructor that allows specifying the function name as a string, but not as an option
+    def this(functionName: String)(implicit schema: DBSchema, dBEngine: E) = this(Some(functionName))
+
     /**
       * For easy and convenient execution of the DB function call
       * @param values - the values to pass over to the database function
@@ -110,6 +122,12 @@ object DBFunction {
                                                             (implicit schema: DBSchema, dBEngine: E)
     extends DBFunction[I, R, E, F](functionNameOverride) {
 
+    // A constructor that takes only the mandatory parameters and uses default values for the optional ones
+    def this()(implicit schema: DBSchema, dBEngine: E) = this(None)
+
+    // A constructor that allows specifying the function name as a string, but not as an option
+    def this(functionName: String)(implicit schema: DBSchema, dBEngine: E) = this(Some(functionName))
+
     /**
       * For easy and convenient execution of the DB function call
       * @param values - the values to pass over to the database function
@@ -132,6 +150,12 @@ object DBFunction {
   abstract class DBOptionalResultFunction[I, R, E <: DBEngine[F], F[_]: Monad](functionNameOverride: Option[String] = None)
                                                               (implicit schema: DBSchema, dBEngine: E)
     extends DBFunction[I, R, E, F](functionNameOverride) {
+
+    // A constructor that takes only the mandatory parameters and uses default values for the optional ones
+    def this()(implicit schema: DBSchema, dBEngine: E) = this(None)
+
+    // A constructor that allows specifying the function name as a string, but not as an option
+    def this(functionName: String)(implicit schema: DBSchema, dBEngine: E) = this(Some(functionName))
 
     /**
       * For easy and convenient execution of the DB function call
