@@ -16,7 +16,6 @@
 
 package za.co.absa.fadb.doobie
 
-import cats.Monad
 import cats.effect.Async
 import doobie._
 import doobie.implicits._
@@ -34,7 +33,7 @@ import scala.language.higherKinds
  *  @param transactor the Doobie transactor for executing SQL queries
  *  @tparam F the effect type, which must have an `Async` and a `Monad` instance
  */
-class DoobiePgEngine[F[_]: Async: Monad](val transactor: Transactor[F]) extends DBEngine[F] {
+class DoobiePgEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[F] {
 
   /** The type of Doobie queries that produce `T` */
   type QueryType[T] = DoobieQuery[T]
