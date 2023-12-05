@@ -16,7 +16,6 @@
 
 package za.co.absa.fadb.slick
 
-import cats.implicits._
 import org.scalatest.funsuite.AnyFunSuite
 import slick.jdbc.SQLActionBuilder
 import za.co.absa.fadb.DBFunction.DBMultipleResultFunction

@@ -16,8 +16,6 @@
 
 package za.co.absa.fadb.slick
 
-import cats.implicits._
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import org.scalatest.funsuite.AnyFunSuite
 import slick.jdbc.SQLActionBuilder

@@ -17,7 +17,6 @@
 package za.co.absa.fadb.doobie
 
 import cats.Monad
-import cats.effect.IO
 import cats.effect.kernel.Async
 import cats.implicits.toFlatMapOps
 import doobie.util.Read
