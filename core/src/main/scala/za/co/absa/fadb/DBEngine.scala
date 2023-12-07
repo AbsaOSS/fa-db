@@ -32,7 +32,6 @@ abstract class DBEngine[F[_]: Monad] {
     * @tparam T - the return type of the query
     */
   type QueryType[T] <: Query[T]
-//  type QueryWithStatusType[A, B, R] <: QueryWithStatus[A, B, R]
   type QueryWithStatusType[R] <: QueryWithStatus[_, _, R]
 
   /**
@@ -43,8 +42,13 @@ abstract class DBEngine[F[_]: Monad] {
     */
   protected def run[R](query: QueryType[R]): F[Seq[R]]
 
-//  def fetchHeadWithStatusHandling[A, B, R](query: QueryWithStatusType[A, B, R]): F[Either[StatusException, R]]
-  def fetchHeadWithStatusHandling[R](query: QueryWithStatusType[R]): F[Either[StatusException, R]]
+  /**
+    * The actual query executioner of the queries of the engine
+    * @param query  - the query to execute
+    * @tparam R     - return the of the query
+    * @return       - sequence of the results of database query
+    */
+  def fetchHeadWithStatus[R](query: QueryWithStatusType[R]): F[Either[StatusException, R]]
 
   /**
     * Public method to execute when query is expected to return multiple results

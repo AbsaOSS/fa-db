@@ -29,7 +29,7 @@ import za.co.absa.fadb.status.StatusException
 import scala.language.higherKinds
 
 /**
- *  `DoobiePgEngine` is a class that extends `DBEngine` with `F` as the effect type.
+ *  `DoobieEngine` is a class that extends `DBEngine` with `F` as the effect type.
  *  It uses Doobie's `Transactor[F]` to execute SQL queries.
  *
  *  `Async` is needed because Doobie requires it for non-blocking database operations.
@@ -41,7 +41,6 @@ class DoobieEngine[F[_]: Async: Monad](val transactor: Transactor[F]) extends DB
 
   /** The type of Doobie queries that produce `T` */
   type QueryType[R] = DoobieQuery[R]
-//  type QueryWithStatusType[A, B, R] = DoobieQueryWithStatus[R]
   type QueryWithStatusType[R] = DoobieQueryWithStatus[R]
 
   /**
@@ -55,7 +54,6 @@ class DoobieEngine[F[_]: Async: Monad](val transactor: Transactor[F]) extends DB
     query.fragment.query[R].to[Seq].transact(transactor)
   }
 
-//  private def executeQueryWithStatusHandling[A, B, R](query: DoobieQueryWithStatus[R])(implicit readStatusWithDataR: Read[StatusWithData[R]]): F[Either[StatusException, R]] = {
   private def executeQueryWithStatusHandling[R](query: QueryWithStatusType[R])(implicit readStatusWithDataR: Read[StatusWithData[R]]): F[Either[StatusException, R]] = {
     query.fragment.query[StatusWithData[R]].unique.transact(transactor).map(query.getResultOrException)
   }
@@ -69,8 +67,7 @@ class DoobieEngine[F[_]: Async: Monad](val transactor: Transactor[F]) extends DB
   override def run[R](query: QueryType[R]): F[Seq[R]] =
     executeQuery(query)(query.readR)
 
-//  override def fetchHeadWithStatusHandling[A, B, R](query: DoobieQueryWithStatus[R]): F[Either[StatusException, R]] = { // refactor in terms of run
-  override def fetchHeadWithStatusHandling[R](query: QueryWithStatusType[R]): F[Either[StatusException, R]] = { // refactor in terms of run
+  override def fetchHeadWithStatus[R](query: QueryWithStatusType[R]): F[Either[StatusException, R]] = {
     executeQueryWithStatusHandling(query)(query.readStatusWithDataR)
   }
 }

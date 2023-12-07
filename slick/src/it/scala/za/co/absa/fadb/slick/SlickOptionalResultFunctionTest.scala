@@ -16,22 +16,20 @@
 
 package za.co.absa.fadb.slick
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import org.scalatest.funsuite.AnyFunSuite
 import slick.jdbc.SQLActionBuilder
-import za.co.absa.fadb.DBFunction.DBOptionalResultFunction
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
+import za.co.absa.fadb.slick.SlickFunction.SlickOptionalResultFunction
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 
 class SlickOptionalResultFunctionTest extends AnyFunSuite with SlickTest {
 
   class GetActorById(implicit override val schema: DBSchema, val dbEngine: SlickPgEngine)
-    extends DBOptionalResultFunction[Int, Actor, SlickPgEngine, Future]
-      with SlickFunction[Int, Actor]
-      with ActorSlickConverter {
+    extends SlickOptionalResultFunction[Int, Actor] with ActorSlickConverter {
 
     override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("actor_id", "first_name", "last_name")
 

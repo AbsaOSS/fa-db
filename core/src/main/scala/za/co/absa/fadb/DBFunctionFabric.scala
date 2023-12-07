@@ -28,7 +28,7 @@ abstract class DBFunctionFabric(functionNameOverride: Option[String])(implicit v
     * List of fields to select from the DB function.
     * @return - list of fields to select
     */
-  protected def fieldsToSelect: Seq[String] = Seq.empty
+  def fieldsToSelect: Seq[String] = Seq.empty
 
   /**
    * Name of the function, based on the class name, unless it is overridden in the constructor
@@ -42,5 +42,5 @@ abstract class DBFunctionFabric(functionNameOverride: Option[String])(implicit v
     }
   }
 
-  def namingConvention: NamingConvention = schema.namingConvention
+//  def namingConvention: NamingConvention = schema.namingConvention
 }

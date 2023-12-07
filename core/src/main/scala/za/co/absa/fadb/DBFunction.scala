@@ -17,7 +17,6 @@
 package za.co.absa.fadb
 
 import cats.Monad
-import za.co.absa.fadb.naming.NamingConvention
 import za.co.absa.fadb.status.StatusException
 
 import scala.language.higherKinds
@@ -57,8 +56,8 @@ abstract class DBFunction[I, R, E <: DBEngine[F], F[_]: Monad](functionNameOverr
   protected def optionalResult(values: I): F[Option[R]] = dBEngine.fetchHeadOption(query(values))
 }
 
-abstract class DBFunctionWithStatusHandling[I, R, E <: DBEngine[F], F[_]: Monad](functionNameOverride: Option[String] = None)
-                                                              (implicit override val schema: DBSchema, val dBEngine: E)
+abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]: Monad](functionNameOverride: Option[String] = None)
+                                                                        (implicit override val schema: DBSchema, val dBEngine: E)
   extends DBFunctionFabric(functionNameOverride) {
 
   // A constructor that takes only the mandatory parameters and uses default values for the optional ones
@@ -75,9 +74,7 @@ abstract class DBFunctionWithStatusHandling[I, R, E <: DBEngine[F], F[_]: Monad]
    */
   protected def query(values: I): dBEngine.QueryWithStatusType[R]
 
-  protected def singleResultWithStatusHandling(values: I): F[Either[StatusException, R]] = {
-    dBEngine.fetchHeadWithStatusHandling(query(values))
-  }
+  def apply(values: I): F[Either[StatusException, R]] = dBEngine.fetchHeadWithStatus(query(values))
 }
 
 object DBFunction {
@@ -168,23 +165,4 @@ object DBFunction {
       */
     def apply(values: I): F[Option[R]] = optionalResult(values)
   }
-
-//  abstract class DBSingleResultWithStatusHandlingFunction[I, R, E <: DBEngine[F], F[_] : Monad](functionNameOverride: Option[String] = None)
-//                                                                             (implicit schema: DBSchema, dBEngine: E)
-//    extends DBFunctionWithStatusHandling[I, R, E, F](functionNameOverride) {
-//
-//    // A constructor that takes only the mandatory parameters and uses default values for the optional ones
-//    def this()(implicit schema: DBSchema, dBEngine: E) = this(None)
-//
-//    // A constructor that allows specifying the function name as a string, but not as an option
-//    def this(functionName: String)(implicit schema: DBSchema, dBEngine: E) = this(Some(functionName))
-//
-//    /**
-//     * For easy and convenient execution of the DB function call
-//     *
-//     * @param values - the values to pass over to the database function
-//     * @return - the value returned from the DB function transformed to scala type `R`
-//     */
-//    def apply(values: I): F[Either[StatusException, R]] = singleResultWithStatusHandling(values)
-//  }
 }

@@ -17,6 +17,7 @@
 package za.co.absa.fadb.slick
 
 import slick.jdbc.{GetResult, PositionedResult, SQLActionBuilder}
+import za.co.absa.fadb.status.handling.StandardQueryStatusHandling
 import za.co.absa.fadb.status.{FunctionStatus, StatusException}
 import za.co.absa.fadb.{FunctionStatusWithData, Query, QueryWithStatus}
 
@@ -30,8 +31,8 @@ import za.co.absa.fadb.{FunctionStatusWithData, Query, QueryWithStatus}
 class SlickQuery[R](val sql: SQLActionBuilder, val getResult: GetResult[R]) extends Query[R]
 
 // QueryStatusHandling has to be mixed-in for the checkStatus method implementation
-abstract class SlickQueryWithStatus[R](val sql: SQLActionBuilder, val getResult: GetResult[R])
-  extends QueryWithStatus[PositionedResult, PositionedResult, R] {
+class SlickQueryWithStatus[R](val sql: SQLActionBuilder, val getResult: GetResult[R])
+  extends QueryWithStatus[PositionedResult, PositionedResult, R] with StandardQueryStatusHandling {
 
   override def processStatus(initialResult: PositionedResult): FunctionStatusWithData[PositionedResult] = {
     val status: Int = initialResult.<<

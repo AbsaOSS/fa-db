@@ -48,7 +48,7 @@ trait StatusHandling extends DBFunctionFabric {
     * A mix-in to add the status fields into the SELECT statement
     * @return a sequence of fields to use in SELECT
     */
-  override protected def fieldsToSelect: Seq[String] = {
+  override def fieldsToSelect: Seq[String] = {
     Seq(
       namingConvention.stringPerConvention(statusField),
       namingConvention.stringPerConvention(statusTextField)

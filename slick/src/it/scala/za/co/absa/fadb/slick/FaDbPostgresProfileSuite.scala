@@ -23,6 +23,7 @@ import za.co.absa.fadb.DBFunction.DBSingleResultFunction
 import za.co.absa.fadb.DBSchema
 import com.github.tminglei.slickpg.{InetString, LTree, MacAddrString, Range}
 import org.scalatest.flatspec.AsyncFlatSpec
+import za.co.absa.fadb.slick.SlickFunction.SlickSingleResultFunction
 
 import java.time.{Duration, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, ZonedDateTime}
 import java.util.UUID
@@ -32,8 +33,6 @@ class FaDbPostgresProfileSuite extends AsyncFlatSpec  {
 
   private val database = Database.forConfig("postgrestestdb")
   private val testDBEngine: SlickPgEngine = new SlickPgEngine(database)
-
-
 
   behavior of "FaDbPostgresProfile"
     it should "be able to pass through and extract extended Postgres types" in {
@@ -53,9 +52,8 @@ class FaDbPostgresProfileSuite extends AsyncFlatSpec  {
                       macaddr1:   MacAddrString       //macaddr
                       )
 
-      class TestFunction(implicit override val schema: DBSchema, override val dbEngine: SlickPgEngine)
-        extends DBSingleResultFunction[InputOutput, InputOutput, SlickPgEngine, Future]
-          with SlickFunction[InputOutput, InputOutput] {
+      class TestFunction(implicit override val schema: DBSchema,  val dbEngine: SlickPgEngine)
+        extends SlickSingleResultFunction[InputOutput, InputOutput] {
 
         override protected def sql(values: InputOutput): SQLActionBuilder = {
           sql"""SELECT #$selectEntry
@@ -136,9 +134,8 @@ class FaDbPostgresProfileSuite extends AsyncFlatSpec  {
                               macaddr1:   Option[MacAddrString]          //macaddr
                             )
 
-      class TestFunction(implicit override val schema: DBSchema, override val dbEngine: SlickPgEngine)
-        extends DBSingleResultFunction[InputOutput, InputOutput, SlickPgEngine, Future]
-          with SlickFunction[InputOutput, InputOutput] {
+      class TestFunction(implicit override val schema: DBSchema,  val dbEngine: SlickPgEngine)
+        extends SlickSingleResultFunction[InputOutput, InputOutput] {
 
         override protected def sql(values: InputOutput): SQLActionBuilder = {
           sql"""SELECT #$selectEntry
@@ -178,7 +175,6 @@ class FaDbPostgresProfileSuite extends AsyncFlatSpec  {
 
         val testFunction = new TestFunction
       }
-
 
       val inputOutput = InputOutput(
         None,

@@ -44,7 +44,3 @@ class DoobieQueryWithStatus[R](val fragment: Fragment)(implicit val readStatusWi
    override def toStatusExceptionOrData(statusWithData: FunctionStatusWithData[R]): Either[StatusException, R] =
      checkStatus(statusWithData)
 }
-
-//class DoobieQueryWithStandardStatusHandling[R: Read](override val fragment: Fragment)(implicit override val readStatusWithDataR: Read[StatusWithData[R]])
-////  extends DoobieQueryWithStatus[A, B, R](fragment)(readStatusWithDataR) with StandardQueryStatusHandling
-//  extends DoobieQueryWithStatus[R](fragment)(readStatusWithDataR) with StandardQueryStatusHandling

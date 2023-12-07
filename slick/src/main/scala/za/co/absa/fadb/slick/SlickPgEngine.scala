@@ -54,7 +54,7 @@ class SlickPgEngine(val db: Database)(implicit val executor: ExecutionContext) e
   }
 
 //  override def fetchHeadWithStatusHandling[_, _, R](query: SlickQueryWithStatus[R]): Future[Either[StatusException, R]] = {
-  override def fetchHeadWithStatusHandling[R](query: QueryWithStatusType[R]): Future[Either[StatusException, R]] = {
+  override def fetchHeadWithStatus[R](query: QueryWithStatusType[R]): Future[Either[StatusException, R]] = {
     implicit val getPositionedResult: GetResult[PositionedResult] = GetResult(r => r)
     db.run(query.sql.as[PositionedResult]).map { results =>
       query.getResultOrException(results.head)

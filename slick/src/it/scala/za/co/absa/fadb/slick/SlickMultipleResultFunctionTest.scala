@@ -21,6 +21,7 @@ import slick.jdbc.SQLActionBuilder
 import za.co.absa.fadb.DBFunction.DBMultipleResultFunction
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
+import za.co.absa.fadb.slick.SlickFunction.SlickMultipleResultFunction
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
@@ -29,9 +30,7 @@ import scala.concurrent.{Await, Future}
 class SlickMultipleResultFunctionTest extends AnyFunSuite with SlickTest {
 
   class GetActors(implicit override val schema: DBSchema, val dbEngine: SlickPgEngine)
-    extends DBMultipleResultFunction[GetActorsQueryParameters, Actor, SlickPgEngine, Future]
-      with SlickFunction[GetActorsQueryParameters, Actor]
-      with ActorSlickConverter {
+    extends SlickMultipleResultFunction[GetActorsQueryParameters, Actor] with ActorSlickConverter {
 
     override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("actor_id", "first_name", "last_name")
 
