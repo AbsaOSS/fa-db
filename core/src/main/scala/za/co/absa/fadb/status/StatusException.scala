@@ -16,60 +16,11 @@
 
 package za.co.absa.fadb.status
 
-import za.co.absa.fadb.exceptions.DBFailException
+sealed abstract class StatusException(val status: FunctionStatus) extends Exception(status.statusText)
 
-/**
-  * Exception caused by status signaling a failure in DB function execution
-  * @param status     - represent the status information returned from the function call
-  */
-class StatusException(val status:FunctionStatus) extends DBFailException(status.statusText) {
-
-  override def equals(obj: Any): Boolean = {
-    obj match {
-      case other: StatusException => (other.status == status)  && (getClass == other.getClass)
-      case _ => false
-    }
-  }
-}
-
-object StatusException {
-
-  def apply(status: FunctionStatus): StatusException = new StatusException(status)
-  def apply(status: Int, statusText: String): StatusException = new StatusException(FunctionStatus(status, statusText))
-
-  class ServerMisconfigurationException(status:FunctionStatus) extends StatusException(status)
-
-  class DataConflictException(status:FunctionStatus) extends StatusException(status)
-
-  class DataNotFoundException(status:FunctionStatus) extends StatusException(status)
-
-  class ErrorInDataException(status:FunctionStatus) extends StatusException(status)
-
-  class OtherStatusException(status:FunctionStatus) extends StatusException(status)
-
-  object ServerMisconfigurationException {
-    def apply(status: FunctionStatus): ServerMisconfigurationException = new ServerMisconfigurationException(status)
-    def apply(status: Int, statusText: String): ServerMisconfigurationException = new ServerMisconfigurationException(FunctionStatus(status, statusText))
-  }
-
-  object DataConflictException {
-    def apply(status: FunctionStatus): DataConflictException = new DataConflictException(status)
-    def apply(status: Int, statusText: String): DataConflictException = new DataConflictException(FunctionStatus(status, statusText))
-  }
-
-  object DataNotFoundException {
-    def apply(status: FunctionStatus): DataNotFoundException = new DataNotFoundException(status)
-    def apply(status: Int, statusText: String): DataNotFoundException = new DataNotFoundException(FunctionStatus(status, statusText))
-  }
-
-  object ErrorInDataException {
-    def apply(status: FunctionStatus): ErrorInDataException = new ErrorInDataException(status)
-    def apply(status: Int, statusText: String): ErrorInDataException = new ErrorInDataException(FunctionStatus(status, statusText))
-  }
-
-  object OtherStatusException {
-    def apply(status: FunctionStatus): OtherStatusException = new OtherStatusException(status)
-    def apply(status: Int, statusText: String): OtherStatusException = new OtherStatusException(FunctionStatus(status, statusText))
-  }
-
-}
+final case class ServerMisconfigurationException(override val status: FunctionStatus) extends StatusException(status)
+final case class DataConflictException(override val status: FunctionStatus) extends StatusException(status)
+final case class DataNotFoundException(override val status: FunctionStatus) extends StatusException(status)
+final case class ErrorInDataException(override val status: FunctionStatus) extends StatusException(status)
+final case class OtherStatusException(override val status: FunctionStatus) extends StatusException(status)
+final case class StatusOutOfRangeException(override val status: FunctionStatus) extends StatusException(status)

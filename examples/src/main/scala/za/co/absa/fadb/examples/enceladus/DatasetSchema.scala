@@ -27,7 +27,6 @@ import scala.concurrent.Future
 import DatasetSchema._
 import cats.implicits._
 import za.co.absa.fadb.DBFunction.{DBMultipleResultFunction, DBSingleResultFunction}
-import za.co.absa.fadb.status.handling.implementations.UserDefinedStatusHandling
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

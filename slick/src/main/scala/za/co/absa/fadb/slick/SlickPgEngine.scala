@@ -21,29 +21,31 @@ import za.co.absa.fadb.DBEngine
 
 import scala.concurrent.{ExecutionContext, Future}
 import slick.jdbc.PostgresProfile.api._
-
 import cats.implicits._
+import za.co.absa.fadb.status.StatusException
 
 import scala.language.higherKinds
+import slick.jdbc.{GetResult, PositionedResult}
 
 /**
-  * [[DBEngine]] based on the Slick library in the Postgres flavor
-  * @param db - the Slick database
-  */
+ * [[DBEngine]] based on the Slick library in the Postgres flavor
+ * @param db - the Slick database
+ */
 class SlickPgEngine(val db: Database)(implicit val executor: ExecutionContext) extends DBEngine[Future] {
 
   /**
-    * The type of Queries for Slick
-    * @tparam T - the return type of the query
-    */
-  type QueryType[T] = SlickQuery[T]
+   * The type of Queries for Slick
+   * @tparam T - the return type of the query
+   */
+  type QueryType[R] = SlickQuery[R]
+  type QueryWithStatusType[R] = SlickQueryWithStatus[R]
 
   /**
-    * Execution using Slick
-    * @param query  - the Slick query to execute
-    * @tparam R     - return the of the query
-    * @return       - sequence of the results of database query
-    */
+   * Execution using Slick
+   * @param query  - the Slick query to execute
+   * @tparam R     - return the of the query
+   * @return       - sequence of the results of database query
+   */
   override protected def run[R](query: QueryType[R]): Future[Seq[R]] = {
     // It can be expected that a GetResult will be passed into the run function as converter.
     // Unfortunately it has to be recreated to be used by Slick
@@ -51,4 +53,11 @@ class SlickPgEngine(val db: Database)(implicit val executor: ExecutionContext) e
     db.run(slickAction)
   }
 
+//  override def fetchHeadWithStatusHandling[_, _, R](query: SlickQueryWithStatus[R]): Future[Either[StatusException, R]] = {
+  override def fetchHeadWithStatusHandling[R](query: QueryWithStatusType[R]): Future[Either[StatusException, R]] = {
+    implicit val getPositionedResult: GetResult[PositionedResult] = GetResult(r => r)
+    db.run(query.sql.as[PositionedResult]).map { results =>
+      query.getResultOrException(results.head)
+    }
+  }
 }

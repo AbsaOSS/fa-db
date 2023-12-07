@@ -18,7 +18,11 @@ package za.co.absa.fadb.doobie
 
 import doobie.util.Read
 import doobie.util.fragment.Fragment
-import za.co.absa.fadb.Query
+import za.co.absa.fadb.status.handling.StandardQueryStatusHandling
+import za.co.absa.fadb.status.{FunctionStatus, StatusException}
+import za.co.absa.fadb.{FunctionStatusWithData, Query, QueryWithStatus}
+
+import scala.language.higherKinds
 
 /**
  *  `DoobieQuery` is a class that extends `Query` with `R` as the result type.
@@ -28,3 +32,19 @@ import za.co.absa.fadb.Query
  *  @param readR the `Read[R]` instance used to read the query result into `R`
  */
 class DoobieQuery[R: Read](val fragment: Fragment)(implicit val readR: Read[R]) extends Query[R]
+
+// QueryStatusHandling has to be mixed-in for the checkStatus method implementation
+class DoobieQueryWithStatus[R](val fragment: Fragment)(implicit val readStatusWithDataR: Read[StatusWithData[R]])
+  extends QueryWithStatus[StatusWithData[R], R, R] with StandardQueryStatusHandling {
+//  extends QueryWithStatus[A, B, R] {
+
+   override def processStatus(initialResult: StatusWithData[R]): FunctionStatusWithData[R] =
+     FunctionStatusWithData(FunctionStatus(initialResult.status, initialResult.status_text), initialResult.data)
+
+   override def toStatusExceptionOrData(statusWithData: FunctionStatusWithData[R]): Either[StatusException, R] =
+     checkStatus(statusWithData)
+}
+
+//class DoobieQueryWithStandardStatusHandling[R: Read](override val fragment: Fragment)(implicit override val readStatusWithDataR: Read[StatusWithData[R]])
+////  extends DoobieQueryWithStatus[A, B, R](fragment)(readStatusWithDataR) with StandardQueryStatusHandling
+//  extends DoobieQueryWithStatus[R](fragment)(readStatusWithDataR) with StandardQueryStatusHandling

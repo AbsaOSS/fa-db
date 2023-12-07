@@ -16,10 +16,15 @@
 
 package za.co.absa.fadb.doobie
 
+import cats.Monad
 import cats.effect.Async
+import cats.implicits.toFlatMapOps
+import cats.implicits._
 import doobie._
 import doobie.implicits._
+import doobie.util.Read
 import za.co.absa.fadb.DBEngine
+import za.co.absa.fadb.status.StatusException
 
 import scala.language.higherKinds
 
@@ -32,10 +37,12 @@ import scala.language.higherKinds
  *  @param transactor the Doobie transactor for executing SQL queries
  *  @tparam F the effect type, which must have an `Async` and a `Monad` instance
  */
-class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[F] {
+class DoobieEngine[F[_]: Async: Monad](val transactor: Transactor[F]) extends DBEngine[F] {
 
   /** The type of Doobie queries that produce `T` */
-  type QueryType[T] = DoobieQuery[T]
+  type QueryType[R] = DoobieQuery[R]
+//  type QueryWithStatusType[A, B, R] = DoobieQueryWithStatus[R]
+  type QueryWithStatusType[R] = DoobieQueryWithStatus[R]
 
   /**
    *  Executes a Doobie query and returns the result as an `F[Seq[R]]`.
@@ -48,6 +55,11 @@ class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[
     query.fragment.query[R].to[Seq].transact(transactor)
   }
 
+//  private def executeQueryWithStatusHandling[A, B, R](query: DoobieQueryWithStatus[R])(implicit readStatusWithDataR: Read[StatusWithData[R]]): F[Either[StatusException, R]] = {
+  private def executeQueryWithStatusHandling[R](query: QueryWithStatusType[R])(implicit readStatusWithDataR: Read[StatusWithData[R]]): F[Either[StatusException, R]] = {
+    query.fragment.query[StatusWithData[R]].unique.transact(transactor).map(query.getResultOrException)
+  }
+
   /**
    *  Runs a Doobie query and returns the result as an `F[Seq[R]]`.
    *
@@ -56,4 +68,9 @@ class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[
    */
   override def run[R](query: QueryType[R]): F[Seq[R]] =
     executeQuery(query)(query.readR)
+
+//  override def fetchHeadWithStatusHandling[A, B, R](query: DoobieQueryWithStatus[R]): F[Either[StatusException, R]] = { // refactor in terms of run
+  override def fetchHeadWithStatusHandling[R](query: QueryWithStatusType[R]): F[Either[StatusException, R]] = { // refactor in terms of run
+    executeQueryWithStatusHandling(query)(query.readStatusWithDataR)
+  }
 }
