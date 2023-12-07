@@ -31,5 +31,6 @@ class SlickSingleResultFunctionWithStatusTest extends AnyFunSuite with SlickTest
     val requestBody = CreateActorRequestBody("Pavel", "Marek")
     val result = createActor(requestBody)
     assert(Await.result(result, 5.seconds).isRight)
+    println(result)
   }
 }

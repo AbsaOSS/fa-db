@@ -31,4 +31,5 @@ trait QueryWithStatus[A, B, R] extends QueryStatusHandling {
   def processStatus(initialResult: A): FunctionStatusWithData[B]
   def toStatusExceptionOrData(statusWithData: FunctionStatusWithData[B]): Either[StatusException, R]
   def getResultOrException(initialResult: A): Either[StatusException, R] = toStatusExceptionOrData(processStatus(initialResult))
+//  def getResultOrException(initialResult: Vector[A]): Either[StatusException, R] = initialResult.map(getResultOrException).head
 }

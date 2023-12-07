@@ -75,6 +75,8 @@ abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]: Monad](functio
   protected def query(values: I): dBEngine.QueryWithStatusType[R]
 
   def apply(values: I): F[Either[StatusException, R]] = dBEngine.fetchHeadWithStatus(query(values))
+
+  override def fieldsToSelect: Seq[String] = Seq("status", "status_text") ++ super.fieldsToSelect
 }
 
 object DBFunction {

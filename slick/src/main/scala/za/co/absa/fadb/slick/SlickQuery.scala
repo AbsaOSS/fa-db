@@ -46,4 +46,8 @@ class SlickQueryWithStatus[R](val sql: SQLActionBuilder, val getResult: GetResul
       case Right(value) => Right(getResult(value))
     }
   }
+
+  def getStatusExceptionOrData: GetResult[Either[StatusException, R]] = {
+    GetResult(pr => processStatus(pr)).andThen(fs => toStatusExceptionOrData(fs))
+  }
 }
