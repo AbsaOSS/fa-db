@@ -53,7 +53,7 @@ class DoobieEngine[F[_]: Async: Monad](val transactor: Transactor[F]) extends DB
     query.fragment.query[R].to[Seq].transact(transactor)
   }
 
-  private def executeQueryWithStatusHandling[R](
+  private def executeQueryWithStatus[R](
     query: QueryWithStatusType[R]
   )(implicit readStatusWithDataR: Read[StatusWithData[R]]): F[Either[StatusException, R]] = {
     query.fragment.query[StatusWithData[R]].unique.transact(transactor).map(query.getResultOrException)
@@ -68,7 +68,7 @@ class DoobieEngine[F[_]: Async: Monad](val transactor: Transactor[F]) extends DB
   override def run[R](query: QueryType[R]): F[Seq[R]] =
     executeQuery(query)(query.readR)
 
-  override def fetchHeadWithStatus[R](query: QueryWithStatusType[R]): F[Either[StatusException, R]] = {
-    executeQueryWithStatusHandling(query)(query.readStatusWithDataR)
+  override def runWithStatus[R](query: QueryWithStatusType[R]): F[Either[StatusException, R]] = {
+    executeQueryWithStatus(query)(query.readStatusWithDataR)
   }
 }

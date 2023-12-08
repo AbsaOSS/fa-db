@@ -51,7 +51,7 @@ class SlickPgEngine(val db: Database)(implicit val executor: ExecutionContext) e
     db.run(slickAction)
   }
 
-  override def fetchHeadWithStatus[R](query: QueryWithStatusType[R]): Future[Either[StatusException, R]] = {
+  override def runWithStatus[R](query: QueryWithStatusType[R]): Future[Either[StatusException, R]] = {
     val slickAction = query.sql.as[Either[StatusException, R]](query.getStatusExceptionOrData).head
     db.run(slickAction)
   }

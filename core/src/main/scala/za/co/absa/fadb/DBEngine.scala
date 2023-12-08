@@ -43,12 +43,12 @@ abstract class DBEngine[F[_]: Monad] {
   protected def run[R](query: QueryType[R]): F[Seq[R]]
 
   /**
-   *  The actual query executioner of the queries of the engine
+   *  The actual query executioner of the queries of the engine with status
    *  @param query  - the query to execute
    *  @tparam R     - return the of the query
    *  @return       - sequence of the results of database query
    */
-  def fetchHeadWithStatus[R](query: QueryWithStatusType[R]): F[Either[StatusException, R]]
+  def runWithStatus[R](query: QueryWithStatusType[R]): F[Either[StatusException, R]]
 
   /**
    *  Public method to execute when query is expected to return multiple results
@@ -56,7 +56,9 @@ abstract class DBEngine[F[_]: Monad] {
    *  @tparam R     - return the of the query
    *  @return       - sequence of the results of database query
    */
-  def fetchAll[R](query: QueryType[R]): F[Seq[R]] = run(query)
+  def fetchAll[R](query: QueryType[R]): F[Seq[R]] = {
+    run(query)
+  }
 
   /**
    *  Public method to execute when query is expected to return exactly one row
