@@ -46,3 +46,5 @@ dist
 test-output
 build.log
 .bsp
+/.bloop/
+/.metals/

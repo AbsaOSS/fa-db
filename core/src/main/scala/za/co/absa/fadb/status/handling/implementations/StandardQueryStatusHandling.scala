@@ -1,8 +1,7 @@
 package za.co.absa.fadb.status.handling.implementations
 
 import za.co.absa.fadb.FunctionStatusWithData
-import za.co.absa.fadb.exceptions.{DataConflictException, DataNotFoundException, ErrorInDataException, OtherStatusException, ServerMisconfigurationException, StatusException, StatusOutOfRangeException}
-import za.co.absa.fadb.status._
+import za.co.absa.fadb.exceptions._
 import za.co.absa.fadb.status.handling.QueryStatusHandling
 
 trait StandardQueryStatusHandling extends QueryStatusHandling {
