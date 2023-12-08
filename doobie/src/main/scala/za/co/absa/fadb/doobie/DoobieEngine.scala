@@ -53,6 +53,13 @@ class DoobieEngine[F[_]: Async: Monad](val transactor: Transactor[F]) extends DB
     query.fragment.query[R].to[Seq].transact(transactor)
   }
 
+  /**
+   *  Executes a Doobie query and returns the result as an `F[Either[StatusException, R]]`.
+   *
+   *  @param query the Doobie query to execute
+   *  @param readStatusWithDataR the `Read[StatusWithData[R]]` instance used to read the query result into `StatusWithData[R]`
+   *  @return the query result as an `F[Either[StatusException, R]]`
+   */
   private def executeQueryWithStatus[R](
     query: QueryWithStatusType[R]
   )(implicit readStatusWithDataR: Read[StatusWithData[R]]): F[Either[StatusException, R]] = {
@@ -68,6 +75,12 @@ class DoobieEngine[F[_]: Async: Monad](val transactor: Transactor[F]) extends DB
   override def run[R](query: QueryType[R]): F[Seq[R]] =
     executeQuery(query)(query.readR)
 
+  /**
+   *  Runs a Doobie query and returns the result as an `F[Either[StatusException, R]]`.
+   *
+   *  @param query the Doobie query to run
+   *  @return the query result as an `F[Either[StatusException, R]]`
+   */
   override def runWithStatus[R](query: QueryWithStatusType[R]): F[Either[StatusException, R]] = {
     executeQueryWithStatus(query)(query.readStatusWithDataR)
   }

@@ -31,14 +31,32 @@ import za.co.absa.fadb.{FunctionStatusWithData, Query, QueryWithStatus}
  */
 class DoobieQuery[R: Read](val fragment: Fragment)(implicit val readR: Read[R]) extends Query[R]
 
+/**
+ *  `DoobieQueryWithStatus` is a class that extends `QueryWithStatus` with `R` as the result type.
+ *  It uses Doobie's `Fragment` to represent SQL queries.
+ *
+ *  @param fragment the Doobie fragment representing the SQL query
+ *  @param checkStatus the function to check the status of the query
+ *  @param readStatusWithDataR the `Read[StatusWithData[R]]` instance used to read the query result into `StatusWithData[R]`
+ */
 class DoobieQueryWithStatus[R](
   val fragment: Fragment,
   checkStatus: FunctionStatusWithData[R] => Either[StatusException, R]
 )(implicit val readStatusWithDataR: Read[StatusWithData[R]]) extends QueryWithStatus[StatusWithData[R], R, R] {
 
+  /*
+   * Processes the status of the query and returns the status with data
+   * @param initialResult - the initial result of the query
+   * @return the status with data
+   */
   override def processStatus(initialResult: StatusWithData[R]): FunctionStatusWithData[R] =
     FunctionStatusWithData(FunctionStatus(initialResult.status, initialResult.status_text), initialResult.data)
 
+  /*
+   * Converts the status with data to either a status exception or the data
+   * @param statusWithData - the status with data
+   * @return either a status exception or the data
+   */
   override def toStatusExceptionOrData(statusWithData: FunctionStatusWithData[R]): Either[StatusException, R] =
     checkStatus(statusWithData)
 }
