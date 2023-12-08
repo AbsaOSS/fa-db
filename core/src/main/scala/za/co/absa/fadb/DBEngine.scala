@@ -23,15 +23,17 @@ import za.co.absa.fadb.exceptions.StatusException
 import scala.language.higherKinds
 
 /**
- *  A basis to represent a database executor
+ * `DBEngine` is an abstract class that represents a database engine.
+ * It provides methods to execute queries and fetch results from a database.
+ * @tparam F - The type of the context in which the database queries are executed.
  */
 abstract class DBEngine[F[_]: Monad] {
 
   /**
    *  A type representing the (SQL) query within the engine
-   *  @tparam T - the return type of the query
+   *  @tparam R - the return type of the query
    */
-  type QueryType[T] <: Query[T]
+  type QueryType[R] <: Query[R]
   type QueryWithStatusType[R] <: QueryWithStatus[_, _, R]
 
   /**
@@ -76,7 +78,6 @@ abstract class DBEngine[F[_]: Monad] {
    *  @tparam R     - return the of the query
    *  @return       - sequence of the results of database query
    */
-
   def fetchHeadOption[R](query: QueryType[R]): F[Option[R]] = {
     run(query).map(_.headOption)
   }

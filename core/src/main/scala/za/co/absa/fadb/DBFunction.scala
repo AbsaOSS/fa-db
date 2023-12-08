@@ -136,13 +136,6 @@ object DBFunction {
 /**
  * `DBMultipleResultFunction` is an abstract class that represents a database function returning multiple results.
  * It extends the [[DBFunction]] class and overrides the apply method to return a sequence of results.
- * @param functionNameOverride - Optional parameter to override the class name if it does not match the database function name.
- * @param schema - The schema the function belongs to.
- * @param dBEngine - The database engine that is supposed to execute the function (presumably contains connection to the database).
- * @tparam I - The type covering the input fields of the database function.
- * @tparam R - The type covering the returned fields from the database function.
- * @tparam E - The type of the [[DBEngine]] engine.
- * @tparam F - The type of the context in which the database function is executed.
  */
   abstract class DBMultipleResultFunction[I, R, E <: DBEngine[F], F[_]: Monad](
     functionNameOverride: Option[String] = None
@@ -167,13 +160,6 @@ object DBFunction {
 /**
  * `DBSingleResultFunction` is an abstract class that represents a database function returning a single result.
  * It extends the [[DBFunction]] class and overrides the apply method to return a single result.
- * @param functionNameOverride - Optional parameter to override the class name if it does not match the database function name.
- * @param schema - The schema the function belongs to.
- * @param dBEngine - The database engine that is supposed to execute the function (presumably contains connection to the database).
- * @tparam I - The type covering the input fields of the database function.
- * @tparam R - The type covering the returned fields from the database function.
- * @tparam E - The type of the [[DBEngine]] engine.
- * @tparam F - The type of the context in which the database function is executed.
  */
   abstract class DBSingleResultFunction[I, R, E <: DBEngine[F], F[_]: Monad](
     functionNameOverride: Option[String] = None
@@ -197,13 +183,6 @@ object DBFunction {
 /**
  * `DBOptionalResultFunction` is an abstract class that represents a database function returning an optional result.
  * It extends the [[DBFunction]] class and overrides the apply method to return an optional result.
- * @param functionNameOverride - Optional parameter to override the class name if it does not match the database function name.
- * @param schema - The schema the function belongs to.
- * @param dBEngine - The database engine that is supposed to execute the function (presumably contains connection to the database).
- * @tparam I - The type covering the input fields of the database function.
- * @tparam R - The type covering the returned fields from the database function.
- * @tparam E - The type of the [[DBEngine]] engine.
- * @tparam F - The type of the context in which the database function is executed.
  */
   abstract class DBOptionalResultFunction[I, R, E <: DBEngine[F], F[_]: Monad](
     functionNameOverride: Option[String] = None
