@@ -27,7 +27,7 @@ class SnakeCaseNaming(lettersCase: LettersCase) extends NamingConvention {
   private def stripIfFirstChar(s: String, ch: Char): String = {
     if (s == "") {
       s
-    } else if (s(0) == ch){
+    } else if (s(0) == ch) {
       s.substring(1)
     } else {
       s
@@ -35,9 +35,7 @@ class SnakeCaseNaming(lettersCase: LettersCase) extends NamingConvention {
   }
 
   override def stringPerConvention(original: String): String = {
-    lettersCase.convert(
-    stripIfFirstChar(
-    camelCaseToSnakeCase(original), '_'))
+    lettersCase.convert(stripIfFirstChar(camelCaseToSnakeCase(original), '_'))
   }
 }
 

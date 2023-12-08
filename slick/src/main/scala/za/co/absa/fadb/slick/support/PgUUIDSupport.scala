@@ -31,11 +31,11 @@ trait PgUUIDSupport extends PgCommonJdbcTypes { driver: PostgresProfile =>
     // register types to let `ExModelBuilder` find them
     driver match {
       case profile: ExPostgresProfile => profile.bindPgTypeToScala("uuid", classTag[UUID])
-      case _ =>
+      case _                          =>
     }
   }
 
-  trait UUIDPlainImplicits extends UUIDCodeGenSupport{
+  trait UUIDPlainImplicits extends UUIDCodeGenSupport {
     import utils.PlainSQLUtils._
 
     implicit class PgPositionedResult(val r: PositionedResult) {
@@ -44,12 +44,16 @@ trait PgUUIDSupport extends PgCommonJdbcTypes { driver: PostgresProfile =>
       def nextUUIDOption: Option[UUID] = r.nextObjectOption().map(_.asInstanceOf[UUID])
     }
 
-    implicit object SetUUID extends SetParameter[UUID] { def apply(v: UUID, pp: PositionedParameters): Unit = { pp.setObject(v, JDBCType.BINARY.getVendorTypeNumber) } }
+    implicit object SetUUID extends SetParameter[UUID] {
+      def apply(v: UUID, pp: PositionedParameters): Unit = { pp.setObject(v, JDBCType.BINARY.getVendorTypeNumber) }
+    }
 
     implicit val getUUID: GetResult[UUID] = mkGetResult(_.nextUUID)
     implicit val getUUIDOption: GetResult[Option[UUID]] = mkGetResult(_.nextUUIDOption)
-    implicit val setUUID: SetParameter[UUID] = new SetParameter[UUID] { def apply(v: UUID, pp: PositionedParameters): Unit = { pp.setObject(v, JDBCType.BINARY.getVendorTypeNumber) } }
-    implicit val setUUIDOption: SetParameter[Option[UUID]] =  new SetParameter[Option[UUID]] {
+    implicit val setUUID: SetParameter[UUID] = new SetParameter[UUID] {
+      def apply(v: UUID, pp: PositionedParameters): Unit = { pp.setObject(v, JDBCType.BINARY.getVendorTypeNumber) }
+    }
+    implicit val setUUIDOption: SetParameter[Option[UUID]] = new SetParameter[Option[UUID]] {
       def apply(v: Option[UUID], pp: PositionedParameters): Unit = {
         v.map(
           pp.setObject(_, JDBCType.BINARY.getVendorTypeNumber)

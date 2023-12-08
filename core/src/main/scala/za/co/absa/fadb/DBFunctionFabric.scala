@@ -16,22 +16,20 @@
 
 package za.co.absa.fadb
 
-import za.co.absa.fadb.naming.NamingConvention
-
 /**
-  * This trait serves the purpose of introducing functions that are common to all DB Function objects and mix-in traits
-  * that offer certain implementations. This trait should help with the inheritance of all of these
-  */
+ *  This trait serves the purpose of introducing functions that are common to all DB Function objects and mix-in traits
+ *  that offer certain implementations. This trait should help with the inheritance of all of these
+ */
 abstract class DBFunctionFabric(functionNameOverride: Option[String])(implicit val schema: DBSchema) {
 
-   /**
-    * List of fields to select from the DB function.
-    * @return - list of fields to select
-    */
+  /**
+   *  List of fields to select from the DB function.
+   *  @return - list of fields to select
+   */
   def fieldsToSelect: Seq[String] = Seq.empty
 
   /**
-   * Name of the function, based on the class name, unless it is overridden in the constructor
+   *  Name of the function, based on the class name, unless it is overridden in the constructor
    */
   val functionName: String = {
     val fn = functionNameOverride.getOrElse(schema.objectNameFromClassName(getClass))
@@ -42,5 +40,4 @@ abstract class DBFunctionFabric(functionNameOverride: Option[String])(implicit v
     }
   }
 
-//  def namingConvention: NamingConvention = schema.namingConvention
 }

@@ -20,39 +20,38 @@ import com.github.tminglei.slickpg._
 import za.co.absa.fadb.slick.support.PgUUIDSupport
 
 /**
-  * DB profile recommended to use with SlickPgEngine to offer support for all extended Postgres types.
-  * JSON is not included, as they are multiple JSON implementations. Choose the one of your liking and extend
-  * `FaDbPostgresProfile` with it. More on [SlickPG](https://github.com/tminglei/slick-pg/tree/master) page.
-  */
-trait FaDbPostgresProfile extends ExPostgresProfile
-  with PgArraySupport
-  with PgDate2Support
-  with PgNetSupport
-  with PgRangeSupport
-  with PgLTreeSupport
-  with PgHStoreSupport
-  with PgSearchSupport
-  with PgUUIDSupport
-  {
+ *  DB profile recommended to use with SlickPgEngine to offer support for all extended Postgres types.
+ *  JSON is not included, as they are multiple JSON implementations. Choose the one of your liking and extend
+ *  `FaDbPostgresProfile` with it. More on [SlickPG](https://github.com/tminglei/slick-pg/tree/master) page.
+ */
+trait FaDbPostgresProfile
+    extends ExPostgresProfile
+    with PgArraySupport
+    with PgDate2Support
+    with PgNetSupport
+    with PgRangeSupport
+    with PgLTreeSupport
+    with PgHStoreSupport
+    with PgSearchSupport
+    with PgUUIDSupport {
 
-    trait API extends super.API
+  trait API
+      extends super.API
       with ArrayImplicits
       with Date2DateTimeImplicitsDuration
       with NetImplicits
       with RangeImplicits
       with LTreeImplicits
       with HStoreImplicits
-
       with SimpleArrayPlainImplicits
       with Date2DateTimePlainImplicits
       with SimpleNetPlainImplicits
       with SimpleRangePlainImplicits
       with SimpleLTreePlainImplicits
       with SimpleHStorePlainImplicits
-
       with UUIDPlainImplicits
 
-    override val api: API = new API {}
-  }
+  override val api: API = new API {}
+}
 
 object FaDbPostgresProfile extends FaDbPostgresProfile

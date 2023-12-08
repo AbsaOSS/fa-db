@@ -24,11 +24,13 @@ import doobie.util.Read
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.doobie.DoobieFunction.DoobieSingleResultFunctionWithStatus
+import za.co.absa.fadb.status.handling.implementations.StandardQueryStatusHandling
 
 class DoobieSingleResultFunctionWithStatusTest extends AnyFunSuite with DoobieTest {
 
   class CreateActor(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
-      extends DoobieSingleResultFunctionWithStatus[CreateActorRequestBody, Int, IO] {
+      extends DoobieSingleResultFunctionWithStatus[CreateActorRequestBody, Int, IO]
+      with StandardQueryStatusHandling {
 
     override def sql(values: CreateActorRequestBody)(implicit read: Read[StatusWithData[Int]]): Fragment = {
       sql"SELECT status, status_text, o_actor_id FROM ${Fragment.const(functionName)}(${values.firstName}, ${values.lastName})"
@@ -41,5 +43,6 @@ class DoobieSingleResultFunctionWithStatusTest extends AnyFunSuite with DoobieTe
     val requestBody = CreateActorRequestBody("Pavel", "Marek")
     val result = createActor(requestBody).unsafeRunSync()
     assert(result.isRight)
+    println(result)
   }
 }

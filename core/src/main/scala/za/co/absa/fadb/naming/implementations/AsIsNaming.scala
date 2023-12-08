@@ -19,7 +19,7 @@ package za.co.absa.fadb.naming.implementations
 import za.co.absa.fadb.naming.{LettersCase, NamingConvention}
 import LettersCase.AsIs
 
-class AsIsNaming(lettersCase: LettersCase) extends NamingConvention{
+class AsIsNaming(lettersCase: LettersCase) extends NamingConvention {
   override def stringPerConvention(original: String): String = {
     lettersCase.convert(original)
   }

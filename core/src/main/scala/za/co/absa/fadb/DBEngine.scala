@@ -18,65 +18,64 @@ package za.co.absa.fadb
 
 import cats.Monad
 import cats.implicits.toFunctorOps
-import za.co.absa.fadb.status.StatusException
+import za.co.absa.fadb.exceptions.StatusException
 
 import scala.language.higherKinds
 
 /**
-  * A basis to represent a database executor
-  */
+ *  A basis to represent a database executor
+ */
 abstract class DBEngine[F[_]: Monad] {
 
   /**
-    * A type representing the (SQL) query within the engine
-    * @tparam T - the return type of the query
-    */
+   *  A type representing the (SQL) query within the engine
+   *  @tparam T - the return type of the query
+   */
   type QueryType[T] <: Query[T]
   type QueryWithStatusType[R] <: QueryWithStatus[_, _, R]
 
   /**
-    * The actual query executioner of the queries of the engine
-    * @param query  - the query to execute
-    * @tparam R     - return the of the query
-    * @return       - sequence of the results of database query
-    */
+   *  The actual query executioner of the queries of the engine
+   *  @param query  - the query to execute
+   *  @tparam R     - return the of the query
+   *  @return       - sequence of the results of database query
+   */
   protected def run[R](query: QueryType[R]): F[Seq[R]]
 
   /**
-    * The actual query executioner of the queries of the engine
-    * @param query  - the query to execute
-    * @tparam R     - return the of the query
-    * @return       - sequence of the results of database query
-    */
+   *  The actual query executioner of the queries of the engine
+   *  @param query  - the query to execute
+   *  @tparam R     - return the of the query
+   *  @return       - sequence of the results of database query
+   */
   def fetchHeadWithStatus[R](query: QueryWithStatusType[R]): F[Either[StatusException, R]]
 
   /**
-    * Public method to execute when query is expected to return multiple results
-    * @param query  - the query to execute
-    * @tparam R     - return the of the query
-    * @return       - sequence of the results of database query
-    */
+   *  Public method to execute when query is expected to return multiple results
+   *  @param query  - the query to execute
+   *  @tparam R     - return the of the query
+   *  @return       - sequence of the results of database query
+   */
   def fetchAll[R](query: QueryType[R]): F[Seq[R]] = run(query)
 
   /**
-    * Public method to execute when query is expected to return exactly one row
-    * @param query  - the query to execute
-    * @tparam R     - return the of the query
-    * @return       - sequence of the results of database query
-    */
+   *  Public method to execute when query is expected to return exactly one row
+   *  @param query  - the query to execute
+   *  @tparam R     - return the of the query
+   *  @return       - sequence of the results of database query
+   */
   def fetchHead[R](query: QueryType[R]): F[R] = {
     run(query).map(_.head)
   }
 
   /**
-    * Public method to execute when query is expected to return one or no results
-    * @param query  - the query to execute
-    * @tparam R     - return the of the query
-    * @return       - sequence of the results of database query
-    */
+   *  Public method to execute when query is expected to return one or no results
+   *  @param query  - the query to execute
+   *  @tparam R     - return the of the query
+   *  @return       - sequence of the results of database query
+   */
 
   def fetchHeadOption[R](query: QueryType[R]): F[Option[R]] = {
     run(query).map(_.headOption)
   }
 }
-

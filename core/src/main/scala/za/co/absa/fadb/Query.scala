@@ -16,20 +16,19 @@
 
 package za.co.absa.fadb
 
-import za.co.absa.fadb.status.StatusException
-import za.co.absa.fadb.status.handling.QueryStatusHandling
+import za.co.absa.fadb.exceptions.StatusException
 
 /**
-  * The basis for all query types of [[DBEngine]] implementations
+ *  The basis for all query types of [[DBEngine]] implementations
  *
- * @tparam R - the return type of the query
-  */
+ *  @tparam R - the return type of the query
+ */
 trait Query[R]
 
-
-trait QueryWithStatus[A, B, R] extends QueryStatusHandling {
+trait QueryWithStatus[A, B, R] {
   def processStatus(initialResult: A): FunctionStatusWithData[B]
   def toStatusExceptionOrData(statusWithData: FunctionStatusWithData[B]): Either[StatusException, R]
-  def getResultOrException(initialResult: A): Either[StatusException, R] = toStatusExceptionOrData(processStatus(initialResult))
-//  def getResultOrException(initialResult: Vector[A]): Either[StatusException, R] = initialResult.map(getResultOrException).head
+  def getResultOrException(initialResult: A): Either[StatusException, R] = toStatusExceptionOrData(
+    processStatus(initialResult)
+  )
 }

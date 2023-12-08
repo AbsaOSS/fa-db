@@ -17,7 +17,7 @@
 //package za.co.absa.fadb.status
 //
 //import org.scalatest.funsuite.AnyFunSuite
-//import za.co.absa.fadb.status.StatusException._
+//import za.co.absa.fadb.exceptions.StatusException._
 //
 //class StatusExceptionSuite extends AnyFunSuite {
 //  test("Test equals - when they are the same") {

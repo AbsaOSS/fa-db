@@ -29,7 +29,8 @@ import scala.concurrent.duration.DurationInt
 class SlickOptionalResultFunctionTest extends AnyFunSuite with SlickTest {
 
   class GetActorById(implicit override val schema: DBSchema, val dbEngine: SlickPgEngine)
-    extends SlickOptionalResultFunction[Int, Actor] with ActorSlickConverter {
+      extends SlickOptionalResultFunction[Int, Actor]
+      with ActorSlickConverter {
 
     override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("actor_id", "first_name", "last_name")
 

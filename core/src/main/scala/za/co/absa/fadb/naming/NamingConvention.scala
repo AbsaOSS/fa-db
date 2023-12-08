@@ -21,7 +21,7 @@ trait NamingConvention {
     val className = c.getSimpleName
     val cleanClassName = className.lastIndexOf('$') match {
       case -1 => className
-      case x => className.substring(0, x)
+      case x  => className.substring(0, x)
     }
     stringPerConvention(cleanClassName)
   }

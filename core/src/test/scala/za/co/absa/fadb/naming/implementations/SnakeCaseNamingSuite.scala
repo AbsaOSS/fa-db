@@ -8,7 +8,6 @@ class SnakeCaseNamingSuite extends AnyWordSpec with Matchers {
   private class ThisIsATestClass
   private val testInstance = new ThisIsATestClass()
 
-
   "stringPerConvention" should {
     "handle empty string" in {
       val nm = new SnakeCaseNaming(AsIs)

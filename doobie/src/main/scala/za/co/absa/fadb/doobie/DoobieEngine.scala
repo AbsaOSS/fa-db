@@ -18,13 +18,12 @@ package za.co.absa.fadb.doobie
 
 import cats.Monad
 import cats.effect.Async
-import cats.implicits.toFlatMapOps
 import cats.implicits._
 import doobie._
 import doobie.implicits._
 import doobie.util.Read
 import za.co.absa.fadb.DBEngine
-import za.co.absa.fadb.status.StatusException
+import za.co.absa.fadb.exceptions.StatusException
 
 import scala.language.higherKinds
 
@@ -54,7 +53,9 @@ class DoobieEngine[F[_]: Async: Monad](val transactor: Transactor[F]) extends DB
     query.fragment.query[R].to[Seq].transact(transactor)
   }
 
-  private def executeQueryWithStatusHandling[R](query: QueryWithStatusType[R])(implicit readStatusWithDataR: Read[StatusWithData[R]]): F[Either[StatusException, R]] = {
+  private def executeQueryWithStatusHandling[R](
+    query: QueryWithStatusType[R]
+  )(implicit readStatusWithDataR: Read[StatusWithData[R]]): F[Either[StatusException, R]] = {
     query.fragment.query[StatusWithData[R]].unique.transact(transactor).map(query.getResultOrException)
   }
 

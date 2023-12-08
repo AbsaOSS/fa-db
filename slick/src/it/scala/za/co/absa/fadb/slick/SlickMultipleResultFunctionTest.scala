@@ -30,7 +30,8 @@ import scala.concurrent.{Await, Future}
 class SlickMultipleResultFunctionTest extends AnyFunSuite with SlickTest {
 
   class GetActors(implicit override val schema: DBSchema, val dbEngine: SlickPgEngine)
-    extends SlickMultipleResultFunction[GetActorsQueryParameters, Actor] with ActorSlickConverter {
+      extends SlickMultipleResultFunction[GetActorsQueryParameters, Actor]
+      with ActorSlickConverter {
 
     override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("actor_id", "first_name", "last_name")
 

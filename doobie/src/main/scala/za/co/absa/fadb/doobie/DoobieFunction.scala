@@ -21,14 +21,15 @@ import cats.effect.kernel.Async
 import doobie.util.Read
 import doobie.util.fragment.Fragment
 import za.co.absa.fadb.DBFunction._
-import za.co.absa.fadb.{DBFunctionWithStatus, DBSchema}
+import za.co.absa.fadb.exceptions.StatusException
+import za.co.absa.fadb.{DBFunctionWithStatus, DBSchema, FunctionStatusWithData}
 
 import scala.language.higherKinds
 
 trait DoobieFunctionBase[R] {
 
   /**
-   * The `Read[R]` instance used to read the query result into `R`.
+   *  The `Read[R]` instance used to read the query result into `R`.
    */
   implicit val readR: Read[R]
 }
@@ -40,6 +41,7 @@ trait DoobieFunctionBase[R] {
  *  @tparam R the result type of the function
  */
 private[doobie] trait DoobieFunction[I, R] extends DoobieFunctionBase[R] {
+
   /**
    *  Generates a Doobie `Fragment` representing the SQL query for the function.
    *
@@ -57,8 +59,9 @@ private[doobie] trait DoobieFunction[I, R] extends DoobieFunctionBase[R] {
   protected def query(values: I): DoobieQuery[R] = new DoobieQuery[R](sql(values))
 }
 
-
 private[doobie] trait DoobieFunctionWithStatus[I, R] extends DoobieFunctionBase[R] {
+
+  def checkStatus[A](statusWithData: FunctionStatusWithData[A]): Either[StatusException, A]
 
   /**
    *  The `Read[StatusWithData[R]]` instance used to read the query result with status into `StatusWithData[R]`.
@@ -81,7 +84,7 @@ private[doobie] trait DoobieFunctionWithStatus[I, R] extends DoobieFunctionBase[
    *  @param values the input values for the function
    *  @return the `DoobieQueryWithStatus[R]` representing the SQL query
    */
-  protected def query(values: I): DoobieQueryWithStatus[R] = new DoobieQueryWithStatus[R](sql(values))
+  protected def query(values: I): DoobieQueryWithStatus[R] = new DoobieQueryWithStatus[R](sql(values), checkStatus)
 }
 
 /**
@@ -103,8 +106,8 @@ object DoobieFunction {
    */
   abstract class DoobieSingleResultFunctionWithStatus[I, R, F[_]: Async: Monad](
     functionNameOverride: Option[String] = None
-  )(
-    implicit override val schema: DBSchema,
+  )(implicit
+    override val schema: DBSchema,
     val dbEngine: DoobieEngine[F],
     val readR: Read[R],
     val readSelectWithStatus: Read[StatusWithData[R]]
@@ -122,7 +125,8 @@ object DoobieFunction {
    *  @tparam F the effect type, which must have an `Async` and a `Monad` instance
    */
   abstract class DoobieSingleResultFunction[I, R, F[_]: Async: Monad](functionNameOverride: Option[String] = None)(
-    implicit override val schema: DBSchema,
+    implicit
+    override val schema: DBSchema,
     val dbEngine: DoobieEngine[F],
     val readR: Read[R]
   ) extends DBSingleResultFunction[I, R, DoobieEngine[F], F](functionNameOverride)
@@ -139,7 +143,8 @@ object DoobieFunction {
    *  @tparam F the effect type, which must have an `Async` and a `Monad` instance
    */
   abstract class DoobieMultipleResultFunction[I, R, F[_]: Async: Monad](functionNameOverride: Option[String] = None)(
-    implicit override val schema: DBSchema,
+    implicit
+    override val schema: DBSchema,
     val dbEngine: DoobieEngine[F],
     val readR: Read[R]
   ) extends DBMultipleResultFunction[I, R, DoobieEngine[F], F](functionNameOverride)
@@ -156,7 +161,8 @@ object DoobieFunction {
    *  @tparam F the effect type, which must have an `Async` and a `Monad` instance
    */
   abstract class DoobieOptionalResultFunction[I, R, F[_]: Async: Monad](functionNameOverride: Option[String] = None)(
-    implicit override val schema: DBSchema,
+    implicit
+    override val schema: DBSchema,
     val dbEngine: DoobieEngine[F],
     val readR: Read[R]
   ) extends DBOptionalResultFunction[I, R, DoobieEngine[F], F](functionNameOverride)
