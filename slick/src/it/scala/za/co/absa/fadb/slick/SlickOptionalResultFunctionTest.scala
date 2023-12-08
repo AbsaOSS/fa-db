@@ -16,17 +16,16 @@
 
 package za.co.absa.fadb.slick
 
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuite
 import slick.jdbc.SQLActionBuilder
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
 import za.co.absa.fadb.slick.SlickFunction.SlickOptionalResultFunction
 
-import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.DurationInt
 
-class SlickOptionalResultFunctionTest extends AnyFunSuite with SlickTest {
+class SlickOptionalResultFunctionTest extends AnyFunSuite with SlickTest with ScalaFutures {
 
   class GetActorById(implicit override val schema: DBSchema, val dbEngine: SlickPgEngine)
       extends SlickOptionalResultFunction[Int, Actor]
@@ -44,6 +43,6 @@ class SlickOptionalResultFunctionTest extends AnyFunSuite with SlickTest {
   test("SlickTest") {
     val expectedResultElem = Some(Actor(49, "Pavel", "Marek"))
     val results = getActorById(49)
-    assert(Await.result(results, 5.seconds) == expectedResultElem)
+    assert(results.futureValue == expectedResultElem)
   }
 }

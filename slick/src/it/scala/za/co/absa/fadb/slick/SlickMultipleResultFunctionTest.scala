@@ -16,18 +16,16 @@
 
 package za.co.absa.fadb.slick
 
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuite
 import slick.jdbc.SQLActionBuilder
-import za.co.absa.fadb.DBFunction.DBMultipleResultFunction
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
 import za.co.absa.fadb.slick.SlickFunction.SlickMultipleResultFunction
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, Future}
 
-class SlickMultipleResultFunctionTest extends AnyFunSuite with SlickTest {
+class SlickMultipleResultFunctionTest extends AnyFunSuite with SlickTest with ScalaFutures {
 
   class GetActors(implicit override val schema: DBSchema, val dbEngine: SlickPgEngine)
       extends SlickMultipleResultFunction[GetActorsQueryParameters, Actor]
@@ -45,6 +43,6 @@ class SlickMultipleResultFunctionTest extends AnyFunSuite with SlickTest {
   test("SlickTest") {
     val expectedResultElem = Actor(49, "Pavel", "Marek")
     val results = getActors(GetActorsQueryParameters(Some("Pavel"), Some("Marek")))
-    assert(Await.result(results, 5.seconds).contains(expectedResultElem))
+    assert(results.futureValue.contains(expectedResultElem))
   }
 }

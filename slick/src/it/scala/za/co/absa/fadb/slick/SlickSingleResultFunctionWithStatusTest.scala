@@ -1,17 +1,16 @@
 package za.co.absa.fadb.slick
 
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuite
 import slick.jdbc.{GetResult, SQLActionBuilder}
 import za.co.absa.fadb.DBSchema
-import za.co.absa.fadb.slick.SlickFunction.SlickSingleResultFunctionWithStatus
 import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
+import za.co.absa.fadb.slick.SlickFunction.SlickSingleResultFunctionWithStatus
 import za.co.absa.fadb.status.handling.implementations.StandardQueryStatusHandling
 
-import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.DurationInt
 
-class SlickSingleResultFunctionWithStatusTest extends AnyFunSuite with SlickTest {
+class SlickSingleResultFunctionWithStatusTest extends AnyFunSuite with SlickTest with ScalaFutures {
   class CreateActor(implicit schema: DBSchema, dbEngine: SlickPgEngine)
       extends SlickSingleResultFunctionWithStatus[CreateActorRequestBody, Int]
       with StandardQueryStatusHandling {
@@ -28,8 +27,7 @@ class SlickSingleResultFunctionWithStatusTest extends AnyFunSuite with SlickTest
 
   test("SlickTest with status handling") {
     val requestBody = CreateActorRequestBody("Pavel", "Marek")
-    val result = createActor(requestBody)
-    assert(Await.result(result, 5.seconds).isRight)
-    println(result)
+    val result = createActor(requestBody).futureValue
+    assert(result.isRight)
   }
 }
