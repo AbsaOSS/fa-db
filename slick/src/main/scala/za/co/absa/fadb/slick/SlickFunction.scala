@@ -25,6 +25,12 @@ import za.co.absa.fadb.{DBFunctionWithStatus, DBSchema, FunctionStatusWithData}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+/**
+ *  Base class for Slick DB functions.
+ *
+ *  @tparam I the input type of the function
+ *  @tparam R the result type of the function
+ */
 private[slick] trait SlickFunctionBase[I, R] {
 
   /**
@@ -80,38 +86,51 @@ private[slick] trait SlickFunction[I, R] extends SlickFunctionBase[I, R] {
 
 private[slick] trait SlickFunctionWithStatus[I, R] extends SlickFunctionBase[I, R] {
 
-  def checkStatus[A](statusWithData: FunctionStatusWithData[A]): Either[StatusException, A]
-
   /**
-   *  Generates a `SlickQueryWithStatus[R]` representing the SQL query for the function with status support.
+   * Generates a `SlickQueryWithStatus[R]` representing the SQL query for the function with status support.
    *
-   *  @param status - the status to check
-   *  @return       - Success or failure the status means
+   * @param status - the status to check
+   * @return - Success or failure the status means
    */
   protected def query(values: I): SlickQueryWithStatus[R] =
     new SlickQueryWithStatus[R](sql(values), slickConverter, checkStatus)
+
+  // Expected to be mixed in by an implementation of StatusHandling
+  def checkStatus[A](statusWithData: FunctionStatusWithData[A]): Either[StatusException, A]
 }
 
 object SlickFunction {
 
+  /**
+   *  Class for Slick DB functions with status support.
+   */
   abstract class SlickSingleResultFunctionWithStatus[I, R](functionNameOverride: Option[String] = None)(implicit
     override val schema: DBSchema,
     DBEngine: SlickPgEngine
   ) extends DBFunctionWithStatus[I, R, SlickPgEngine, Future](functionNameOverride)
       with SlickFunctionWithStatus[I, R]
 
+  /**
+   *  Class for Slick DB functions with single result.
+   */
   abstract class SlickSingleResultFunction[I, R](functionNameOverride: Option[String] = None)(implicit
     override val schema: DBSchema,
     DBEngine: SlickPgEngine
   ) extends DBSingleResultFunction[I, R, SlickPgEngine, Future](functionNameOverride)
       with SlickFunction[I, R]
 
+  /**
+   *  Class for Slick DB functions with multiple results.
+   */
   abstract class SlickMultipleResultFunction[I, R](functionNameOverride: Option[String] = None)(implicit
     override val schema: DBSchema,
     DBEngine: SlickPgEngine
   ) extends DBMultipleResultFunction[I, R, SlickPgEngine, Future](functionNameOverride)
       with SlickFunction[I, R]
 
+  /**
+   *  Class for Slick DB functions with optional result.
+   */
   abstract class SlickOptionalResultFunction[I, R](functionNameOverride: Option[String] = None)(implicit
     override val schema: DBSchema,
     DBEngine: SlickPgEngine
