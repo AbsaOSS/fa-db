@@ -4,7 +4,18 @@ import za.co.absa.fadb.FunctionStatusWithData
 import za.co.absa.fadb.exceptions._
 import za.co.absa.fadb.status.handling.QueryStatusHandling
 
+/**
+ * `StandardQueryStatusHandling` is a trait that extends the [[QueryStatusHandling]] interface.
+ * It provides a standard implementation for checking the status of a function invocation.
+ */
 trait StandardQueryStatusHandling extends QueryStatusHandling {
+
+  /**
+   * Checks the status of a function invocation.
+   * @param statusWithData - The status of the function invocation with the data returned by the function.
+   * @tparam A - The type of the data returned by the function.
+   * @return Either the data returned by the function or an exception.
+   */
   override def checkStatus[A](statusWithData: FunctionStatusWithData[A]): Either[StatusException, A] = {
     val functionStatus = statusWithData.functionStatus
     functionStatus.statusCode / 10 match {
