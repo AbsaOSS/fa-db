@@ -29,24 +29,25 @@ trait Query[R]
  *  @tparam R - the return type of the query
  */
 trait QueryWithStatus[A, B, R] {
+
   /**
-   * Processes the status of the query and returns the status with data
-   * @param initialResult - the initial result of the query
-   * @return the status with data
+   *  Processes the status of the query and returns the status with data
+   *  @param initialResult - the initial result of the query
+   *  @return the status with data
    */
   def processStatus(initialResult: A): FunctionStatusWithData[B]
 
   /**
-   * Converts the status with data to either a status exception or the data
-   * @param statusWithData - the status with data
-   * @return either a status exception or the data
+   *  Converts the status with data to either a status exception or the data
+   *  @param statusWithData - the status with data
+   *  @return either a status exception or the data
    */
   def toStatusExceptionOrData(statusWithData: FunctionStatusWithData[B]): Either[StatusException, R]
 
   /**
-   * Returns the result of the query or a status exception
-   * @param initialResult - the initial result of the query
-   * @return the result of the query or a status exception
+   *  Returns the result of the query or a status exception
+   *  @param initialResult - the initial result of the query
+   *  @return the result of the query or a status exception
    */
   def getResultOrException(initialResult: A): Either[StatusException, R] = toStatusExceptionOrData(
     processStatus(initialResult)

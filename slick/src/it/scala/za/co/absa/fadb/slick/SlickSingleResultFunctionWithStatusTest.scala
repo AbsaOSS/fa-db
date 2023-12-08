@@ -6,14 +6,14 @@ import slick.jdbc.{GetResult, SQLActionBuilder}
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
 import za.co.absa.fadb.slick.SlickFunction.SlickSingleResultFunctionWithStatus
-import za.co.absa.fadb.status.handling.implementations.StandardQueryStatusHandling
+import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SlickSingleResultFunctionWithStatusTest extends AnyFunSuite with SlickTest with ScalaFutures {
   class CreateActor(implicit schema: DBSchema, dbEngine: SlickPgEngine)
       extends SlickSingleResultFunctionWithStatus[CreateActorRequestBody, Int]
-      with StandardQueryStatusHandling {
+      with StandardStatusHandling {
 
     override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("o_actor_id")
 

@@ -17,16 +17,16 @@
 package za.co.absa.fadb.naming
 
 /**
- * `NamingConvention` is a base trait that defines the interface for different naming conventions.
- * It provides methods to convert a class name according to given naming convention.
+ *  `NamingConvention` is a base trait that defines the interface for different naming conventions.
+ *  It provides methods to convert a class name according to given naming convention.
  */
 trait NamingConvention {
 
   /**
-   * Converts the class name according to the specific naming convention.
-   * @param c - The class.
-   * @return The class name converted to string according to the specific naming convention.
-   */  
+   *  Converts the class name according to the specific naming convention.
+   *  @param c - The class.
+   *  @return The class name converted to string according to the specific naming convention.
+   */
   def fromClassNamePerConvention(c: Class[_]): String = {
     val className = c.getSimpleName
     val cleanClassName = className.lastIndexOf('$') match {
@@ -37,18 +37,18 @@ trait NamingConvention {
   }
 
   /**
-   * Converts the class name according to the specific naming convention.
-   * @param instance - The instance of the class.
-   * @return The class name converted to string according to the specific naming convention.
-   */ 
+   *  Converts the class name according to the specific naming convention.
+   *  @param instance - The instance of the class.
+   *  @return The class name converted to string according to the specific naming convention.
+   */
   def fromClassNamePerConvention(instance: AnyRef): String = {
     fromClassNamePerConvention(instance.getClass)
   }
 
   /**
-   * Converts the original string according to the specific naming convention.
-   * @param original - The original string.
-   * @return The original string converted according to the specific naming convention.
+   *  Converts the original string according to the specific naming convention.
+   *  @param original - The original string.
+   *  @return The original string converted according to the specific naming convention.
    */
   def stringPerConvention(original: String): String
 }

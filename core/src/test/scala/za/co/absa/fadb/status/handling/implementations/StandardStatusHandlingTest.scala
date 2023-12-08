@@ -6,9 +6,9 @@ import za.co.absa.fadb.FunctionStatusWithData
 import za.co.absa.fadb.exceptions._
 import za.co.absa.fadb.status.FunctionStatus
 
-class StandardQueryStatusHandlingTest extends AnyFunSuiteLike {
+class StandardStatusHandlingTest extends AnyFunSuiteLike {
 
-  private val standardQueryStatusHandling = new StandardQueryStatusHandling {}
+  private val standardQueryStatusHandling = new StandardStatusHandling {}
 
   test("checkStatus should return Right when status code is in the range 10-19") {
     for (statusCode <- 10 to 19) {

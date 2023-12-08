@@ -20,16 +20,16 @@ import za.co.absa.fadb.naming.{LettersCase, NamingConvention}
 import LettersCase.AsIs
 
 /**
- * `AsIsNaming` provides a naming convention that leaves strings as they are.
- * It implements the [[NamingConvention]] trait.
- * @param lettersCase - The case of the letters in the string.
+ *  `AsIsNaming` provides a naming convention that leaves strings as they are.
+ *  It implements the [[NamingConvention]] trait.
+ *  @param lettersCase - The case of the letters in the string.
  */
 class AsIsNaming(lettersCase: LettersCase) extends NamingConvention {
 
   /**
-   * Returns the original string converted to the specified letter case.
-   * @param original - The original string.
-   * @return The original string converted to the specified letter case.
+   *  Returns the original string converted to the specified letter case.
+   *  @param original - The original string.
+   *  @return The original string converted to the specified letter case.
    */
   override def stringPerConvention(original: String): String = {
     lettersCase.convert(original)
@@ -37,12 +37,13 @@ class AsIsNaming(lettersCase: LettersCase) extends NamingConvention {
 }
 
 /**
- * `AsIsNaming.Implicits` provides an implicit [[NamingConvention]] instance that leaves strings as they are.
+ *  `AsIsNaming.Implicits` provides an implicit [[NamingConvention]] instance that leaves strings as they are.
  */
 object AsIsNaming {
   object Implicits {
+
     /**
-     * An implicit [[NamingConvention]] instance that leaves strings as they are.
+     *  An implicit [[NamingConvention]] instance that leaves strings as they are.
      */
     implicit val namingConvention: NamingConvention = new AsIsNaming(AsIs)
   }

@@ -20,9 +20,9 @@ import za.co.absa.fadb.naming.{LettersCase, NamingConvention}
 import LettersCase.LowerCase
 
 /**
- * `SnakeCaseNaming` provides a naming convention that converts camel case strings to snake case.
- * It implements the [[NamingConvention]] trait.
- * @param lettersCase - The case of the letters in the string.
+ *  `SnakeCaseNaming` provides a naming convention that converts camel case strings to snake case.
+ *  It implements the [[NamingConvention]] trait.
+ *  @param lettersCase - The case of the letters in the string.
  */
 class SnakeCaseNaming(lettersCase: LettersCase) extends NamingConvention {
 
@@ -41,9 +41,9 @@ class SnakeCaseNaming(lettersCase: LettersCase) extends NamingConvention {
   }
 
   /**
-   * Converts the original string to snake case and the specified letter case.
-   * @param original - The original string.
-   * @return The original string converted to snake case and the specified letter case.
+   *  Converts the original string to snake case and the specified letter case.
+   *  @param original - The original string.
+   *  @return The original string converted to snake case and the specified letter case.
    */
   override def stringPerConvention(original: String): String = {
     lettersCase.convert(stripIfFirstChar(camelCaseToSnakeCase(original), '_'))
@@ -51,12 +51,13 @@ class SnakeCaseNaming(lettersCase: LettersCase) extends NamingConvention {
 }
 
 /**
- * `SnakeCaseNaming.Implicits` provides an implicit [[NamingConvention]] instance that converts camel case strings to snake case.
+ *  `SnakeCaseNaming.Implicits` provides an implicit [[NamingConvention]] instance that converts camel case strings to snake case.
  */
 object SnakeCaseNaming {
   object Implicits {
+
     /**
-     * An implicit [[NamingConvention]] instance that converts camel case strings to snake case.
+     *  An implicit [[NamingConvention]] instance that converts camel case strings to snake case.
      */
     implicit val namingConvention: NamingConvention = new SnakeCaseNaming(LowerCase)
   }

@@ -18,6 +18,5 @@ package za.co.absa.fadb.exceptions
 
 /**
  *  Exception thrown when a naming convention is not found for a given string
- *  @param message - the message to display
  */
 case class NamingException(message: String) extends Exception(message)

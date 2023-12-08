@@ -16,19 +16,17 @@
 
 package za.co.absa.fadb.examples.enceladus
 
-import za.co.absa.fadb.DBSchema
-import za.co.absa.fadb.slick.{SlickFunction, SlickFunctionWithStatusSupport, SlickPgEngine}
-import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits.namingConvention
-import slick.jdbc.{GetResult, SQLActionBuilder}
 import slick.jdbc.PostgresProfile.api._
+import slick.jdbc.{GetResult, SQLActionBuilder}
+import za.co.absa.fadb.DBSchema
+import za.co.absa.fadb.examples.enceladus.DatasetSchema._
+import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits.namingConvention
+import za.co.absa.fadb.slick.SlickFunction.{SlickMultipleResultFunction, SlickSingleResultFunctionWithStatus}
+import za.co.absa.fadb.slick.SlickPgEngine
+import za.co.absa.fadb.status.handling.implementations.UserDefinedStatusHandling
 
 import java.sql.Timestamp
 import scala.concurrent.Future
-import DatasetSchema._
-import cats.implicits._
-import za.co.absa.fadb.DBFunction.{DBMultipleResultFunction, DBSingleResultFunction}
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 /* The Schema doesn't need the dBEngine directly, but it seems cleaner this way to hand it over to schema's functions */
 class DatasetSchema(implicit engine: SlickPgEngine) extends DBSchema {
@@ -63,9 +61,8 @@ object DatasetSchema {
 
  case class SchemaHeader(entityName: String, entityLatestVersion: Int)
 
- final class AddSchema(implicit override val schema: DBSchema, override val dbEngine: SlickPgEngine)
-   extends DBSingleResultFunction[SchemaInput, Long, SlickPgEngine, Future]
-   with SlickFunctionWithStatusSupport[SchemaInput, Long]
+ final class AddSchema(implicit override val schema: DBSchema,  val dbEngine: SlickPgEngine)
+   extends SlickSingleResultFunctionWithStatus[SchemaInput, Long]
    with UserDefinedStatusHandling {
 
    override protected def sql(values: SchemaInput): SQLActionBuilder = {
@@ -78,12 +75,10 @@ object DatasetSchema {
    override protected def slickConverter: GetResult[Long] = GetResult.GetLong
 
    override def OKStatuses: Set[Integer] = Set(201)
-
  }
 
- final class GetSchema(implicit override val schema: DBSchema, override val dbEngine: SlickPgEngine)
-   extends DBSingleResultFunction[(String, Option[Int]), Schema, SlickPgEngine, Future]
-   with SlickFunctionWithStatusSupport[(String, Option[Int]), Schema]
+ final class GetSchema(implicit override val schema: DBSchema, val dbEngine: SlickPgEngine)
+   extends SlickSingleResultFunctionWithStatus[(String, Option[Int]), Schema]
    with UserDefinedStatusHandling {
 
    /* This is an example of how to deal with overloaded DB functions - see different input type: Long vs what's in the class type: (String, Option[Int]) */
@@ -108,9 +103,8 @@ object DatasetSchema {
    override val OKStatuses: Set[Integer] = Set(200)
  }
 
- final class List(implicit override val schema: DBSchema, override val dbEngine: SlickPgEngine)
-   extends DBMultipleResultFunction[Boolean, SchemaHeader, SlickPgEngine, Future]()
-   with SlickFunction[Boolean, SchemaHeader] {
+ final class List(implicit override val schema: DBSchema,  val dbEngine: SlickPgEngine)
+   extends SlickMultipleResultFunction[Boolean, SchemaHeader] {
 
    override def apply(values: Boolean = false): Future[Seq[SchemaHeader]] = super.apply(values)
 

@@ -106,8 +106,7 @@ object DoobieFunction {
    */
   abstract class DoobieSingleResultFunctionWithStatus[I, R, F[_]: Async: Monad](
     functionNameOverride: Option[String] = None
-  )(implicit
-    override val schema: DBSchema,
+  )(implicit override val schema: DBSchema,
     val dbEngine: DoobieEngine[F],
     val readR: Read[R],
     val readSelectWithStatus: Read[StatusWithData[R]]
@@ -125,8 +124,7 @@ object DoobieFunction {
    *  @tparam F the effect type, which must have an `Async` and a `Monad` instance
    */
   abstract class DoobieSingleResultFunction[I, R, F[_]: Async: Monad](functionNameOverride: Option[String] = None)(
-    implicit
-    override val schema: DBSchema,
+    implicit override val schema: DBSchema,
     val dbEngine: DoobieEngine[F],
     val readR: Read[R]
   ) extends DBSingleResultFunction[I, R, DoobieEngine[F], F](functionNameOverride)
@@ -135,16 +133,9 @@ object DoobieFunction {
   /**
    *  `DoobieMultipleResultFunction` is an abstract class that extends `DBMultipleResultFunction` with `DoobiePgEngine` as the engine type.
    *  It represents a database function that returns multiple results.
-   *
-   *  @param functionNameOverride the optional override for the function name
-   *  @param schema the database schema
-   *  @param dbEngine the `DoobieEngine` instance used to execute SQL queries
-   *  @param readR the `Read[R]` instance used to read the query result into `R`
-   *  @tparam F the effect type, which must have an `Async` and a `Monad` instance
    */
   abstract class DoobieMultipleResultFunction[I, R, F[_]: Async: Monad](functionNameOverride: Option[String] = None)(
-    implicit
-    override val schema: DBSchema,
+    implicit override val schema: DBSchema,
     val dbEngine: DoobieEngine[F],
     val readR: Read[R]
   ) extends DBMultipleResultFunction[I, R, DoobieEngine[F], F](functionNameOverride)
@@ -153,16 +144,9 @@ object DoobieFunction {
   /**
    *  `DoobieOptionalResultFunction` is an abstract class that extends `DBOptionalResultFunction` with `DoobiePgEngine` as the engine type.
    *  It represents a database function that returns an optional result.
-   *
-   *  @param functionNameOverride the optional override for the function name
-   *  @param schema the database schema
-   *  @param dbEngine the `DoobieEngine` instance used to execute SQL queries
-   *  @param readR the `Read[R]` instance used to read the query result into `R`
-   *  @tparam F the effect type, which must have an `Async` and a `Monad` instance
    */
   abstract class DoobieOptionalResultFunction[I, R, F[_]: Async: Monad](functionNameOverride: Option[String] = None)(
-    implicit
-    override val schema: DBSchema,
+    implicit override val schema: DBSchema,
     val dbEngine: DoobieEngine[F],
     val readR: Read[R]
   ) extends DBOptionalResultFunction[I, R, DoobieEngine[F], F](functionNameOverride)

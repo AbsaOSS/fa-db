@@ -23,9 +23,9 @@ import za.co.absa.fadb.exceptions.StatusException
 import scala.language.higherKinds
 
 /**
- * `DBEngine` is an abstract class that represents a database engine.
- * It provides methods to execute queries and fetch results from a database.
- * @tparam F - The type of the context in which the database queries are executed.
+ *  `DBEngine` is an abstract class that represents a database engine.
+ *  It provides methods to execute queries and fetch results from a database.
+ *  @tparam F - The type of the context in which the database queries are executed.
  */
 abstract class DBEngine[F[_]: Monad] {
 
