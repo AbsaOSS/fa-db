@@ -32,7 +32,6 @@ import scala.concurrent.Future
  *  @tparam R the result type of the function
  */
 private[slick] trait SlickFunctionBase[I, R] {
-
   /**
    *  The `GetResult[R]` instance used to read the query result into `R`.
    */
@@ -47,34 +46,9 @@ private[slick] trait SlickFunctionBase[I, R] {
   protected def sql(values: I): SQLActionBuilder
 
   def fieldsToSelect: Seq[String]
-
-  /**
-   *  Alias to use within the SQL query
-   */
-  protected val alias = "FNC"
-
-  /**
-   *  Helper function to use in the actual DB function class
-   *
-   *  @return the SELECT part of the function call SQL query
-   */
-  protected def selectEntry: String = {
-    val fieldsSeq = fieldsToSelect
-    if (fieldsSeq.isEmpty) {
-      "*"
-    } else {
-      val aliasToUse = if (alias.isEmpty) {
-        ""
-      } else {
-        s"$alias."
-      }
-      fieldsToSelect.map(aliasToUse + _).mkString(",")
-    }
-  }
 }
 
 private[slick] trait SlickFunction[I, R] extends SlickFunctionBase[I, R] {
-
   /**
    *  Generates a `SlickQuery[R]` representing the SQL query for the function.
    *
@@ -85,7 +59,6 @@ private[slick] trait SlickFunction[I, R] extends SlickFunctionBase[I, R] {
 }
 
 private[slick] trait SlickFunctionWithStatus[I, R] extends SlickFunctionBase[I, R] {
-
   /**
    * Generates a `SlickQueryWithStatus[R]` representing the SQL query for the function with status support.
    *
@@ -100,7 +73,6 @@ private[slick] trait SlickFunctionWithStatus[I, R] extends SlickFunctionBase[I, 
 }
 
 object SlickFunction {
-
   /**
    *  Class for Slick DB functions with status support.
    */

@@ -30,8 +30,13 @@ class DoobieSingleResultFunctionTest extends AnyFunSuite with DoobieTest {
   class CreateActor(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
       extends DoobieSingleResultFunction[CreateActorRequestBody, Int, IO] {
 
+    // do not remove the example below
+    // override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("o_actor_id")
+
     override def sql(values: CreateActorRequestBody)(implicit read: Read[Int]): Fragment =
       sql"SELECT o_actor_id FROM ${Fragment.const(functionName)}(${values.firstName}, ${values.lastName})"
+      // do not remove the example below, it has to be used with the override def fieldsToSelect
+      // sql"SELECT ${Fragment.const(selectEntry)} FROM ${Fragment.const(functionName)}(${values.firstName}, ${values.lastName}) ${Fragment.const(alias)}"
   }
 
   private val createActor = new CreateActor()(Runs, new DoobieEngine(transactor))

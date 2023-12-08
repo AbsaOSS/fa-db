@@ -21,15 +21,13 @@ package za.co.absa.fadb
  *  that offer certain implementations. This trait should help with the inheritance of all of these
  */
 abstract class DBFunctionFabric(functionNameOverride: Option[String])(implicit val schema: DBSchema) {
-
   /**
-   *  List of fields to select from the DB function.
-   *  @return - list of fields to select
+   * Alias of the function, based on the class name
    */
-  def fieldsToSelect: Seq[String] = Seq.empty
+  protected val alias = "FNC"
 
   /**
-   *  Name of the function, based on the class name, unless it is overridden in the constructor
+   * Name of the function, based on the class name, unless it is overridden in the constructor
    */
   val functionName: String = {
     val fn = functionNameOverride.getOrElse(schema.objectNameFromClassName(getClass))
@@ -40,4 +38,26 @@ abstract class DBFunctionFabric(functionNameOverride: Option[String])(implicit v
     }
   }
 
+  /**
+   *  List of fields to select from the DB function.
+   *  @return - list of fields to select
+   */
+  def fieldsToSelect: Seq[String] = Seq.empty
+
+  /*
+    *  Generates a list of select columns for the function
+   */
+  protected def selectEntry: String = {
+    val fieldsSeq = fieldsToSelect
+    if (fieldsSeq.isEmpty) {
+      "*"
+    } else {
+      val aliasToUse = if (alias.isEmpty) {
+        ""
+      } else {
+        s"$alias."
+      }
+      fieldsToSelect.map(aliasToUse + _).mkString(",")
+    }
+  }
 }

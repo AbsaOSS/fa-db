@@ -27,7 +27,6 @@ import za.co.absa.fadb.{DBFunctionWithStatus, DBSchema, FunctionStatusWithData}
 import scala.language.higherKinds
 
 trait DoobieFunctionBase[R] {
-
   /**
    *  The `Read[R]` instance used to read the query result into `R`.
    */
@@ -41,7 +40,6 @@ trait DoobieFunctionBase[R] {
  *  @tparam R the result type of the function
  */
 private[doobie] trait DoobieFunction[I, R] extends DoobieFunctionBase[R] {
-
   /**
    *  Generates a Doobie `Fragment` representing the SQL query for the function.
    *
@@ -60,9 +58,6 @@ private[doobie] trait DoobieFunction[I, R] extends DoobieFunctionBase[R] {
 }
 
 private[doobie] trait DoobieFunctionWithStatus[I, R] extends DoobieFunctionBase[R] {
-
-  def checkStatus[A](statusWithData: FunctionStatusWithData[A]): Either[StatusException, A]
-
   /**
    *  The `Read[StatusWithData[R]]` instance used to read the query result with status into `StatusWithData[R]`.
    */
@@ -85,6 +80,9 @@ private[doobie] trait DoobieFunctionWithStatus[I, R] extends DoobieFunctionBase[
    *  @return the `DoobieQueryWithStatus[R]` representing the SQL query
    */
   protected def query(values: I): DoobieQueryWithStatus[R] = new DoobieQueryWithStatus[R](sql(values), checkStatus)
+
+  // This is to be mixed in by an implementation of StatusHandling
+  def checkStatus[A](statusWithData: FunctionStatusWithData[A]): Either[StatusException, A]
 }
 
 /**
@@ -92,7 +90,6 @@ private[doobie] trait DoobieFunctionWithStatus[I, R] extends DoobieFunctionBase[
  *  These classes use Doobie's `Fragment` to represent SQL queries and `DoobieEngine` to execute them.
  */
 object DoobieFunction {
-
   /**
    *  `DoobieSingleResultFunctionWithStatus` is an abstract class that extends `DBSingleResultFunctionWithStatus` with `DoobiePgEngine` as the engine type.
    *  It represents a database function that returns a single result with status.
