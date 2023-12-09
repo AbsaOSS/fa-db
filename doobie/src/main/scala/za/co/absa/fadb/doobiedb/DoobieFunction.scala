@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.doobie
+package za.co.absa.fadb.doobiedb
 
 import cats.Monad
 import cats.effect.kernel.Async
@@ -39,7 +39,7 @@ trait DoobieFunctionBase[R] {
  *  @tparam I the input type of the function
  *  @tparam R the result type of the function
  */
-private[doobie] trait DoobieFunction[I, R] extends DoobieFunctionBase[R] {
+private[doobiedb] trait DoobieFunction[I, R] extends DoobieFunctionBase[R] {
   /**
    *  Generates a Doobie `Fragment` representing the SQL query for the function.
    *
@@ -57,7 +57,7 @@ private[doobie] trait DoobieFunction[I, R] extends DoobieFunctionBase[R] {
   protected def query(values: I): DoobieQuery[R] = new DoobieQuery[R](sql(values))
 }
 
-private[doobie] trait DoobieFunctionWithStatus[I, R] extends DoobieFunctionBase[R] {
+private[doobiedb] trait DoobieFunctionWithStatus[I, R] extends DoobieFunctionBase[R] {
   /**
    *  The `Read[StatusWithData[R]]` instance used to read the query result with status into `StatusWithData[R]`.
    */

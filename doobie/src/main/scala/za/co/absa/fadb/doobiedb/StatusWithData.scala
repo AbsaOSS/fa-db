@@ -1,4 +1,4 @@
-package za.co.absa.fadb.doobie
+package za.co.absa.fadb.doobiedb
 
 /**
  *  Represents a function status with data.

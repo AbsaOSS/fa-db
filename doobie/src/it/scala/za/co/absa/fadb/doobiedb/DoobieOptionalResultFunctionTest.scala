@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.doobie
+package za.co.absa.fadb.doobiedb
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
@@ -23,22 +23,23 @@ import doobie.util.Read
 import doobie.util.fragment.Fragment
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
-import za.co.absa.fadb.doobie.DoobieFunction.DoobieMultipleResultFunction
+import za.co.absa.fadb.doobiedb.DoobieFunction.DoobieOptionalResultFunction
 
-class DoobieMultipleResultFunctionTest extends AnyFunSuite with DoobieTest {
+class DoobieOptionalResultFunctionTest extends AnyFunSuite with DoobieTest {
 
-  class GetActors(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
-      extends DoobieMultipleResultFunction[GetActorsQueryParameters, Actor, IO] {
+  class GetActorById(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
+      extends DoobieOptionalResultFunction[Int, Actor, IO] {
 
-    override def sql(values: GetActorsQueryParameters)(implicit read: Read[Actor]): Fragment =
-      sql"SELECT actor_id, first_name, last_name FROM ${Fragment.const(functionName)}(${values.firstName}, ${values.lastName})"
+    override def sql(values: Int)(implicit read: Read[Actor]): Fragment =
+      sql"SELECT actor_id, first_name, last_name FROM ${Fragment.const(functionName)}($values)"
   }
 
-  private val getActors = new GetActors()(Runs, new DoobieEngine(transactor))
+  private val createActor = new GetActorById()(Runs, new DoobieEngine(transactor))
 
   test("DoobieTest") {
-    val expectedResultElem = Actor(49, "Pavel", "Marek")
-    val results = getActors(GetActorsQueryParameters(Some("Pavel"), Some("Marek"))).unsafeRunSync()
-    assert(results.contains(expectedResultElem))
+    val expectedResult = Some(Actor(49, "Pavel", "Marek"))
+    val result = createActor(49).unsafeRunSync()
+    assert(expectedResult == result)
   }
+
 }

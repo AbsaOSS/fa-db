@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.doobie
+package za.co.absa.fadb.doobiedb
 
 import doobie.util.Read
 import doobie.util.fragment.Fragment

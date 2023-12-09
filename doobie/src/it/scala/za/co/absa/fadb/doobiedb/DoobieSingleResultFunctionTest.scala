@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.doobie
+package za.co.absa.fadb.doobiedb
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
@@ -23,7 +23,7 @@ import doobie.util.Read
 import doobie.util.fragment.Fragment
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
-import za.co.absa.fadb.doobie.DoobieFunction.DoobieSingleResultFunction
+import za.co.absa.fadb.doobiedb.DoobieFunction.DoobieSingleResultFunction
 
 class DoobieSingleResultFunctionTest extends AnyFunSuite with DoobieTest {
 

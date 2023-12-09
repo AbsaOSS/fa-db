@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.doobie
+package za.co.absa.fadb.doobiedb
 
 import cats.effect.IO
 import doobie.util.log.{LogEvent, LogHandler}
@@ -37,7 +37,8 @@ trait DoobieTest {
   }
 
   protected val transactor = Transactor.fromDriverManager[IO](
-    "org.postgresql.ds.PGSimpleDataSource",
+//    "org.postgresql.ds.PGSimpleDataSource",
+    "org.postgresql.Driver",
     "jdbc:postgresql://localhost:5432/movies",
     "postgres",
     "postgres",
