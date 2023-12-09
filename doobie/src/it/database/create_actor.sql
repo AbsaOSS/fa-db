@@ -29,10 +29,8 @@ INSERT INTO runs.actors(first_name, last_name)
 VALUES (i_first_name, i_last_name) RETURNING actor_id
 INTO o_actor_id;
 
-status
-:= 11;
-    status_text
-:= 'Actor created';
+    status:= 11;
+    status_text:= 'Actor created';
 
     RETURN;
 END;
