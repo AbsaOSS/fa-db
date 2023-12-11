@@ -43,12 +43,22 @@ class SlickQueryWithStatus[R](
   checkStatus: FunctionStatusWithData[PositionedResult] => Either[StatusException, PositionedResult]
 ) extends QueryWithStatus[PositionedResult, PositionedResult, R] {
 
+  /*
+   * Processes the status of the query and returns the status with data
+   * @param initialResult - the initial result of the query
+   * @return the status with data
+   */
   override def processStatus(initialResult: PositionedResult): FunctionStatusWithData[PositionedResult] = {
     val status: Int = initialResult.<<
     val statusText: String = initialResult.<<
     FunctionStatusWithData(FunctionStatus(status, statusText), initialResult)
   }
 
+  /*
+   * Converts the status with data to either a status exception or the data
+   * @param statusWithData - the status with data
+   * @return either a status exception or the data
+   */
   override def toStatusExceptionOrData(
     statusWithData: FunctionStatusWithData[PositionedResult]
   ): Either[StatusException, R] = {
@@ -58,6 +68,11 @@ class SlickQueryWithStatus[R](
     }
   }
 
+  /*
+   * Combines the processing of the status and the conversion of the status with data to either a status exception or the data
+   * @return the GetResult, that combines the processing of the status and the conversion of the status with data
+   * to either a status exception or the data
+   */
   def getStatusExceptionOrData: GetResult[Either[StatusException, R]] = {
     GetResult(pr => processStatus(pr)).andThen(fs => toStatusExceptionOrData(fs))
   }

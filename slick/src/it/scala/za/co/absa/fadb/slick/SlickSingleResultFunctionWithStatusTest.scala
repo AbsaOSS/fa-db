@@ -25,7 +25,7 @@ class SlickSingleResultFunctionWithStatusTest extends AnyFunSuite with SlickTest
 
   private val createActor = new CreateActor()(Runs, new SlickPgEngine(db))
 
-  test("SlickTest with status handling") {
+  test("Creating actor with status handling") {
     val requestBody = CreateActorRequestBody("Pavel", "Marek")
     val result = createActor(requestBody).futureValue
     assert(result.isRight)

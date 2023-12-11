@@ -1,11 +1,3 @@
-CREATE TYPE my_enum AS ENUM ('enum1', 'enum2', 'enum3');
-
-CREATE EXTENSION IF NOT EXISTS "ltree";
-CREATE EXTENSION IF NOT EXISTS "hstore";
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
-drop table runs.other_types cascade;
-
 CREATE TABLE runs.other_types (
   id INT PRIMARY KEY,
   ltree_col LTREE,
@@ -32,7 +24,7 @@ INSERT INTO runs.other_types VALUES (
   ARRAY[1,2,3]
 );
 
-CREATE OR REPLACE FUNCTION runs.read_other_types(p_id INT) 
+CREATE OR REPLACE FUNCTION runs.read_other_types(p_id INT)
 RETURNS TABLE(
   id INT,
   ltree_col LTREE,
@@ -63,7 +55,8 @@ CREATE OR REPLACE FUNCTION runs.insert_other_types(
   p_array_col INT[]
 ) RETURNS TABLE(
   status INT,
-  status_text TEXT
+  status_text TEXT,
+  o_id INT
 ) AS $$
 BEGIN
   BEGIN
@@ -81,6 +74,7 @@ BEGIN
     );
     status := 11;
     status_text := 'ok';
+    o_id := p_id;
   EXCEPTION WHEN unique_violation THEN
     status := 31;
     status_text := 'data conflict';

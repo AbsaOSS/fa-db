@@ -36,7 +36,7 @@ class DoobieMultipleResultFunctionTest extends AnyFunSuite with DoobieTest {
 
   private val getActors = new GetActors()(Runs, new DoobieEngine(transactor))
 
-  test("DoobieTest") {
+  test("Retrieving actor from database") {
     val expectedResultElem = Actor(49, "Pavel", "Marek")
     val results = getActors(GetActorsQueryParameters(Some("Pavel"), Some("Marek"))).unsafeRunSync()
     assert(results.contains(expectedResultElem))

@@ -18,8 +18,7 @@
  *
  * This will return the actor with ID 1, if he/she exists.
  */
-CREATE
-OR REPLACE FUNCTION runs.get_actor_by_id(
+CREATE OR REPLACE FUNCTION runs.get_actor_by_id(
     i_actor_id              INTEGER
 ) RETURNS TABLE (
     actor_id                INTEGER,

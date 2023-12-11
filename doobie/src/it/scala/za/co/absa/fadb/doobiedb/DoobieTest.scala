@@ -37,7 +37,6 @@ trait DoobieTest {
   }
 
   protected val transactor = Transactor.fromDriverManager[IO](
-//    "org.postgresql.ds.PGSimpleDataSource",
     "org.postgresql.Driver",
     "jdbc:postgresql://localhost:5432/movies",
     "postgres",

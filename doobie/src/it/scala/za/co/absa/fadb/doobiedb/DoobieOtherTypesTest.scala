@@ -7,7 +7,10 @@ import doobie.util.Read
 import doobie.util.fragment.Fragment
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
-import za.co.absa.fadb.doobiedb.DoobieFunction.DoobieSingleResultFunction
+import za.co.absa.fadb.doobiedb.DoobieFunction.{DoobieSingleResultFunction, DoobieSingleResultFunctionWithStatus}
+import za.co.absa.fadb.exceptions.DataConflictException
+import za.co.absa.fadb.status.FunctionStatus
+import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
 
 import java.net.InetAddress
 import java.util.UUID
@@ -38,11 +41,72 @@ class DoobieOtherTypesTest extends AnyFunSuite with DoobieTest {
       sql"SELECT * FROM ${Fragment.const(functionName)}($values)"
   }
 
-  private val readOtherTypes = new ReadOtherTypes()(Runs, new DoobieEngine(transactor))
+  class InsertOtherTypes(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
+    extends DoobieSingleResultFunctionWithStatus[OtherTypesData, Option[Int], IO] with StandardStatusHandling {
 
-  test("DoobieTest") {
+    override def sql(values: OtherTypesData)(implicit read: Read[StatusWithData[Option[Int]]]): Fragment =
+      sql"""
+           SELECT * FROM ${Fragment.const(functionName)}(
+             ${values.id},
+             ${values.ltreeCol}::ltree,
+             ${values.inetCol}::inet,
+             ${values.macaddrCol}::macaddr,
+             ${values.hstoreCol}::hstore,
+             ${values.cidrCol}::cidr,
+             ${values.jsonCol}::json,
+             ${values.jsonbCol}::jsonb,
+             ${values.uuidCol}::uuid,
+             ${values.arrayCol}::integer[]
+           )
+         """
+  }
+
+  private val readOtherTypes = new ReadOtherTypes()(Runs, new DoobieEngine(transactor))
+  private val insertOtherTypes = new InsertOtherTypes()(Runs, new DoobieEngine(transactor))
+
+  test("Reading other common data types from database") {
+    val expectedData = OtherTypesData(
+      id = 1,
+      ltreeCol = "Top.Science.Astronomy",
+      inetCol = InetAddress.getByName("192.168.1.1"),
+      macaddrCol = "08:00:2b:01:02:03",
+      hstoreCol = Map("key" -> "value"),
+      cidrCol = "192.168.1.0/24",
+      jsonCol = """{"key": "value"}""",
+      jsonbCol = """{"key": "value"}""",
+      uuidCol = UUID.fromString("b574cb0f-4790-4798-9b3f-824c7fab69dc"),
+      arrayCol = Array(1, 2, 3)
+    )
+
     val result = readOtherTypes(1).unsafeRunSync()
-    println(result)
+
+    assert(result.id == expectedData.id)
+    assert(result.ltreeCol == expectedData.ltreeCol)
+    assert(result.inetCol == expectedData.inetCol)
+    assert(result.macaddrCol == expectedData.macaddrCol)
+    assert(result.hstoreCol == expectedData.hstoreCol)
+    assert(result.cidrCol == expectedData.cidrCol)
+    assert(result.jsonCol == expectedData.jsonCol)
+    assert(result.jsonbCol == expectedData.jsonbCol)
+    assert(result.uuidCol == expectedData.uuidCol)
+    assert(result.arrayCol sameElements expectedData.arrayCol)
+  }
+
+  test("Writing other common data types to database") {
+    val data = OtherTypesData(
+      id = 3,
+      ltreeCol = "Top.Science.Astronomy",
+      inetCol = InetAddress.getByName("192.168.1.1"),
+      macaddrCol = "08:00:2b:01:02:03",
+      hstoreCol = Map("key" -> "value"),
+      cidrCol = "192.168.1/24",
+      jsonCol = """{"key": "value"}""",
+      jsonbCol = """{"key": "value"}""",
+      uuidCol = UUID.randomUUID(),
+      arrayCol = Array(1, 2, 3)
+    )
+    val result = insertOtherTypes(data).unsafeRunSync()
+    assert(result == Left(DataConflictException(FunctionStatus(31, "data conflict"))))
   }
 
 }

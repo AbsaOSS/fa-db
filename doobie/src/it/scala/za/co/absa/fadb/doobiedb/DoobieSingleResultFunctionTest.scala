@@ -41,7 +41,7 @@ class DoobieSingleResultFunctionTest extends AnyFunSuite with DoobieTest {
 
   private val createActor = new CreateActor()(Runs, new DoobieEngine(transactor))
 
-  test("DoobieTest") {
+  test("Inserting an actor into database") {
     assert(createActor(CreateActorRequestBody("Pavel", "Marek")).unsafeRunSync().isInstanceOf[Int])
   }
 }

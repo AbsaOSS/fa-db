@@ -15,8 +15,7 @@
 -- Example:
 -- SELECT * FROM runs.create_actor('John', 'Doe');
 
-CREATE
-OR REPLACE FUNCTION runs.create_actor(
+CREATE OR REPLACE FUNCTION runs.create_actor(
     IN  i_first_name           TEXT,
     IN  i_last_name            TEXT,
     OUT status                 INTEGER,
@@ -25,9 +24,9 @@ OR REPLACE FUNCTION runs.create_actor(
 ) RETURNS record AS
 $$
 BEGIN
-INSERT INTO runs.actors(first_name, last_name)
-VALUES (i_first_name, i_last_name) RETURNING actor_id
-INTO o_actor_id;
+    INSERT INTO runs.actors(first_name, last_name)
+    VALUES (i_first_name, i_last_name) RETURNING actor_id
+    INTO o_actor_id;
 
     status:= 11;
     status_text:= 'Actor created';

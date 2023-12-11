@@ -17,7 +17,7 @@ class DatesTimesTest extends AnyFunSuite with DoobieTest {
   import doobie.implicits.javasql._
 
   // this import is needed for the implicit Meta[java.time.ZonedDateTime]
-  import za.co.absa.fadb.doobiedb.implicits.zonedDateTimeMeta
+  import za.co.absa.fadb.doobiedb.postgres.implicits.zonedDateTimeMeta
 
   case class DatesTimes(
                                offsetDateTime: java.time.OffsetDateTime,
@@ -43,13 +43,26 @@ class DatesTimesTest extends AnyFunSuite with DoobieTest {
       extends DoobieSingleResultFunctionWithStatus[DatesTimes, Int, IO] with StandardStatusHandling {
 
     override def sql(values: DatesTimes)(implicit read: Read[StatusWithData[Int]]): Fragment =
-      sql"SELECT * FROM ${Fragment.const(functionName)}(${values.offsetDateTime}, ${values.instant}, ${values.zonedDateTime}, ${values.localDateTime}, ${values.localDate}, ${values.localTime}, ${values.sqlDate}, ${values.sqlTime}, ${values.sqlTimestamp}, ${values.utilDate})"
+      sql"""
+           SELECT * FROM ${Fragment.const(functionName)}(
+            ${values.offsetDateTime},
+            ${values.instant},
+            ${values.zonedDateTime},
+            ${values.localDateTime},
+            ${values.localDate},
+            ${values.localTime},
+            ${values.sqlDate},
+            ${values.sqlTime},
+            ${values.sqlTimestamp},
+            ${values.utilDate}
+           )
+        """
   }
 
   private val getAllDateTimeTypes = new GetAllDateTimeTypes()(Runs, new DoobieEngine(transactor))
   private val insertDatesTimes = new InsertDatesTimes()(Runs, new DoobieEngine(transactor))
 
-  test("DoobieTest READ") {
+  test("Reading different date/time types from the database") {
     val offsetDateTime = java.time.OffsetDateTime.parse("2004-10-19T08:23:54Z")
     val instant = java.time.Instant.parse("2004-10-19T08:23:54Z")
     val zonedDateTime = java.time.ZonedDateTime.parse("2004-10-19T10:23:54+02:00[Europe/Prague]")
@@ -77,7 +90,7 @@ class DatesTimesTest extends AnyFunSuite with DoobieTest {
     assert(expectedDatesTimes == result)
   }
 
-  test("DoobieTest WRITE") {
+  test("Writing different date/time types to the database") {
     val offsetDateTime = java.time.OffsetDateTime.parse("2004-10-19T08:23:54Z")
     val instant = java.time.Instant.parse("2004-10-19T08:23:54Z")
     val zonedDateTime = java.time.ZonedDateTime.parse("2004-10-19T10:23:54+02:00[Europe/Prague]")

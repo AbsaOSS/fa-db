@@ -46,54 +46,42 @@ class DoobieSingleResultFunctionWithStatusTest extends AnyFunSuite with DoobieTe
       sql"SELECT * FROM ${Fragment.const(functionName)}(${values})"
   }
 
+  class ErrorIfNotOneWithStatus(functionNameOverride: String)(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
+    extends DoobieSingleResultFunctionWithStatus[Int, Option[Int], IO](Some(functionNameOverride))
+      with StandardStatusHandling {
+
+    override def sql(values: Int)(implicit read: Read[StatusWithData[Option[Int]]]): Fragment =
+      sql"SELECT * FROM ${Fragment.const(functionName)}(${values})"
+  }
+
   private val createActor = new CreateActor()(Runs, new DoobieEngine(transactor))
   private val errorIfNotOne = new ErrorIfNotOne()(Runs, new DoobieEngine(transactor))
 
-  test("DoobieTest with status handling") {
+  test("Creating actor within a function with status handling") {
     val requestBody = CreateActorRequestBody("Pavel", "Marek")
     val result = createActor(requestBody).unsafeRunSync()
     assert(result.isRight)
-    println(result)
   }
 
-  test("error if not one with status handling") {
+  test("Successful function call with status handling") {
     val result = errorIfNotOne(1).unsafeRunSync()
     assert(result.isRight)
-    println(result)
   }
 
-  test("error if not one with status handling - error") {
-    // throws null exception
+  test("Unsuccessful function call with status handling. Asserting on error when Int not wrapped in Option") {
     // SQL `NULL` read at column 3 (JDBC type Integer) but mapping is to a non-Option type; use Option here. Note that JDBC column indexing is 1-based.
     assertThrows[NonNullableColumnRead](errorIfNotOne(2).unsafeRunSync())
   }
 
-  test("error if not one with status handling - error - null wrapped in option") {
-    class ErrorIfNotOne(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
-      extends DoobieSingleResultFunctionWithStatus[Int, Option[Int], IO]
-        with StandardStatusHandling {
+  test("Unsuccessful function call with status handling. Asserting on error when Int wrapped in Option") {
+    val errorIfNotOne = new ErrorIfNotOneWithStatus("error_if_not_one")(Runs, new DoobieEngine(transactor))
 
-      override def sql(values: Int)(implicit read: Read[StatusWithData[Option[Int]]]): Fragment =
-        sql"SELECT * FROM ${Fragment.const(functionName)}(${values})"
-    }
-
-    val errorIfNotOne = new ErrorIfNotOne()(Runs, new DoobieEngine(transactor))
-
-    // does not throw because null is wrapped in option
     val result = errorIfNotOne(2).unsafeRunSync()
     assert(result.isLeft)
   }
 
-  test("error if not one with status handling - success - null wrapped in option") {
-    class ErrorIfNotOne(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
-      extends DoobieSingleResultFunctionWithStatus[Int, Option[Int], IO]
-        with StandardStatusHandling {
-
-      override def sql(values: Int)(implicit read: Read[StatusWithData[Option[Int]]]): Fragment =
-        sql"SELECT * FROM ${Fragment.const(functionName)}(${values})"
-    }
-
-    val errorIfNotOne = new ErrorIfNotOne()(Runs, new DoobieEngine(transactor))
+  test("Successful function call with status handling. Asserting on success when Int wrapped in Option") {
+    val errorIfNotOne = new ErrorIfNotOneWithStatus("error_if_not_one")(Runs, new DoobieEngine(transactor))
 
     val result = errorIfNotOne(1).unsafeRunSync()
     result match {
