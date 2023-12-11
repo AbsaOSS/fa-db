@@ -47,7 +47,7 @@ abstract class DBFunctionFabric(functionNameOverride: Option[String])(implicit v
   /*
     *  Generates a list of select columns for the function
    */
-  protected def selectEntry: String = {
+  def selectEntry: String = {
     val fieldsSeq = fieldsToSelect
     if (fieldsSeq.isEmpty) {
       "*"
