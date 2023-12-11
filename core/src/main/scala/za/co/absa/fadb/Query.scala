@@ -26,7 +26,9 @@ trait Query[R]
 
 /**
  *  The basis for all query types of [[DBEngine]] implementations with status
- *  @tparam R - the return type of the query
+ *  @tparam A - the initial result type of the query
+ *  @tparam B - the intermediate result type of the query
+ *  @tparam R - the final return type of the query
  */
 trait QueryWithStatus[A, B, R] {
 

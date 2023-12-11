@@ -19,8 +19,8 @@ import sbt._
 object Dependencies {
 
   private def commonDependencies(scalaVersion: String): Seq[ModuleID] = Seq(
-    "org.typelevel" %% "cats-core" % "2.9.0", // 2.0.0 latest for Scala 2.11, 2.9.0 used by Doobie
-    "org.typelevel" %% "cats-effect" % "3.5.0", // 2.0.0 latest for Scala 2.11, 2.9.0 used by Doobie
+    "org.typelevel" %% "cats-core" % "2.9.0",
+    "org.typelevel" %% "cats-effect" % "3.5.0",
     "org.scalatest"      %% "scalatest" % "3.1.0"           % "test,it",
     "org.scalatest"      %% "scalatest-flatspec" % "3.2.0"  % "test,it",
     "org.scalatestplus"  %% "mockito-1-10" % "3.1.0.0"      % "test,it"
