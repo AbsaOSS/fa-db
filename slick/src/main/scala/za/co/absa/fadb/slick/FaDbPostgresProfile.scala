@@ -35,7 +35,7 @@ trait FaDbPostgresProfile
     with PgSearchSupport
     with PgUUIDSupport {
 
-  trait API
+  trait FaDbAPI
       extends super.API
       with ArrayImplicits
       with Date2DateTimeImplicitsDuration
@@ -51,7 +51,7 @@ trait FaDbPostgresProfile
       with SimpleHStorePlainImplicits
       with UUIDPlainImplicits
 
-  override val api: API = new API {}
+  override val api: FaDbAPI = new FaDbAPI {}
 }
 
 object FaDbPostgresProfile extends FaDbPostgresProfile

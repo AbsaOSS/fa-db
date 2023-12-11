@@ -19,11 +19,11 @@ import com.github.sbt.jacoco.report.JacocoReportSettings
 
 ThisBuild / organization := "za.co.absa.fa-db"
 
-lazy val scala211 = "2.11.12"
 lazy val scala212 = "2.12.17"
+lazy val scala213 = "2.13.11"
 
-ThisBuild / scalaVersion := scala212
-ThisBuild / crossScalaVersions := Seq(scala211, scala212)
+ThisBuild / scalaVersion := scala213
+ThisBuild / crossScalaVersions := Seq(scala212, scala213)
 
 ThisBuild / versionScheme := Some("early-semver")
 
@@ -95,11 +95,7 @@ lazy val faDBDoobie = (project in file("doobie"))
     libraryDependencies ++= doobieDependencies(scalaVersion.value),
     javacOptions ++= commonJavacOptions,
     scalacOptions ++= commonScalacOptions,
-    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value, // printScalaVersion is run with compile
     Defaults.itSettings,
-    compile / skip := !scalaVersion.value.startsWith("2.12"), // skip if not Scala 2.12 (does not work, but publishM2 does)
-    crossScalaVersions := Seq(scala212),
-    publishM2 := (if (scalaVersion.value.startsWith("2.12")) publishM2.value else ()) // publish only for Scala 2.12
   ).dependsOn(faDbCore)
   .settings(
     jacocoReportSettings := commonJacocoReportSettings.withTitle(s"doobie:slick Jacoco Report - scala:${scalaVersion.value}"),
