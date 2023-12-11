@@ -29,12 +29,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - scala: 2.11.12
-            scalaShort: "2.11"
-            overall: 0.0
-            changed: 80.0
           - scala: 2.12.17
             scalaShort: "2.12"
+            overall: 0.0
+            changed: 80.0
+          - scala: 2.13.11
+            scalaShort: "2.13"
             overall: 0.0
             changed: 80.0
     name: Build and test
@@ -62,12 +62,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - scala: 2.11.12
-            scalaShort: "2.11"
-            overall: 0.0
-            changed: 80.0
           - scala: 2.12.17
             scalaShort: "2.12"
+            overall: 0.0
+            changed: 80.0
+          - scala: 2.13.11
+            scalaShort: "2.13"
             overall: 0.0
             changed: 80.0
     name: JaCoCo Code Coverage ${{matrix.scala}}
