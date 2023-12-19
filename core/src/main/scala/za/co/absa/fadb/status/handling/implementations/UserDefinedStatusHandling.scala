@@ -1,5 +1,3 @@
-package za.co.absa.fadb.status.handling.implementations
-
 /*
  * Copyright 2022 ABSA Group Limited
  *
@@ -15,6 +13,8 @@ package za.co.absa.fadb.status.handling.implementations
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package za.co.absa.fadb.status.handling.implementations
 
 import za.co.absa.fadb.FunctionStatusWithData
 import za.co.absa.fadb.exceptions.{OtherStatusException, StatusException}

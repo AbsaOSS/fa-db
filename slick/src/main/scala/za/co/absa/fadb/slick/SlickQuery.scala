@@ -24,8 +24,8 @@ import za.co.absa.fadb.{FunctionStatusWithData, Query, QueryWithStatus}
 /**
  *  SQL query representation for Slick
  *  @param sql        - the SQL query in Slick format
- *  @param getResult  - the converting function, that converts the [[slick.jdbc.PositionedResult slick.PositionedResult]] (the result of Slick
- *                   execution) into the desire `R` type
+ *  @param getResult  - function that converts the [[slick.jdbc.PositionedResult slick.PositionedResult]]
+ *                    (the result of Slick execution) into the desired `R` type
  *  @tparam R         - the return type of the query
  */
 class SlickQuery[R](val sql: SQLActionBuilder, val getResult: GetResult[R]) extends Query[R]
@@ -33,8 +33,8 @@ class SlickQuery[R](val sql: SQLActionBuilder, val getResult: GetResult[R]) exte
 /**
  *  SQL query representation for Slick with status
  *  @param sql        - the SQL query in Slick format
- *  @param getResult  - the converting function, that converts the [[slick.jdbc.PositionedResult slick.PositionedResult]] (the result of Slick
- *                   execution) into the desire `R` type
+ *  @param getResult  - function that converts the [[slick.jdbc.PositionedResult slick.PositionedResult]]
+ *                    (the result of Slick execution) into the desired `R` type
  *  @tparam R         - the return type of the query
  */
 class SlickQueryWithStatus[R](
@@ -43,7 +43,7 @@ class SlickQueryWithStatus[R](
   checkStatus: FunctionStatusWithData[PositionedResult] => Either[StatusException, PositionedResult]
 ) extends QueryWithStatus[PositionedResult, PositionedResult, R] {
 
-  /*
+  /**
    * Processes the status of the query and returns the status with data
    * @param initialResult - the initial result of the query
    * @return the status with data
@@ -54,7 +54,7 @@ class SlickQueryWithStatus[R](
     FunctionStatusWithData(FunctionStatus(status, statusText), initialResult)
   }
 
-  /*
+  /**
    * Converts the status with data to either a status exception or the data
    * @param statusWithData - the status with data
    * @return either a status exception or the data
@@ -68,7 +68,7 @@ class SlickQueryWithStatus[R](
     }
   }
 
-  /*
+  /**
    * Combines the processing of the status and the conversion of the status with data to either a status exception or the data
    * @return the GetResult, that combines the processing of the status and the conversion of the status with data
    * to either a status exception or the data

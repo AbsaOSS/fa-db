@@ -17,7 +17,7 @@
 package za.co.absa.fadb.status.handling.implementations
 
 import org.scalatest.funsuite.AnyFunSuiteLike
-import org.scalatest.matchers.should.Matchers.{a, convertToAnyShouldWrapper}
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import za.co.absa.fadb.FunctionStatusWithData
 import za.co.absa.fadb.exceptions._
 import za.co.absa.fadb.status.FunctionStatus

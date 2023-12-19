@@ -63,6 +63,8 @@ class DoobieEngine[F[_]: Async: Monad](val transactor: Transactor[F]) extends DB
   private def executeQueryWithStatus[R](
     query: QueryWithStatusType[R]
   )(implicit readStatusWithDataR: Read[StatusWithData[R]]): F[Either[StatusException, R]] = {
+    // .unique returns a single value, raising an exception if there is not exactly one row returned
+    // https://tpolecat.github.io/doobie/docs/04-Selecting.html
     query.fragment.query[StatusWithData[R]].unique.transact(transactor).map(query.getResultOrException)
   }
 

@@ -16,15 +16,13 @@
 
 package za.co.absa.fadb.slick
 
+import cats.implicits._
+import slick.jdbc.PostgresProfile.api._
 import za.co.absa.fadb.DBEngine
+import za.co.absa.fadb.exceptions.StatusException
 
 import scala.concurrent.{ExecutionContext, Future}
-import slick.jdbc.PostgresProfile.api._
-import cats.implicits._
-
 import scala.language.higherKinds
-import slick.jdbc.{GetResult, PositionedResult}
-import za.co.absa.fadb.exceptions.StatusException
 
 /**
  *  [[DBEngine]] based on the Slick library in the Postgres flavor
@@ -35,7 +33,7 @@ class SlickPgEngine(val db: Database)(implicit val executor: ExecutionContext) e
 
   /**
    *  The type of Queries for Slick
-   *  @tparam T - the return type of the query
+   *  @tparam R - the return type of the query
    */
   type QueryType[R] = SlickQuery[R]
   type QueryWithStatusType[R] = SlickQueryWithStatus[R]

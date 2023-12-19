@@ -51,7 +51,7 @@ class DoobieQueryWithStatus[R](
    * @return the status with data
    */
   override def processStatus(initialResult: StatusWithData[R]): FunctionStatusWithData[R] =
-    FunctionStatusWithData(FunctionStatus(initialResult.status, initialResult.status_text), initialResult.data)
+    FunctionStatusWithData(FunctionStatus(initialResult.status, initialResult.statusText), initialResult.data)
 
   /*
    * Converts the status with data to either a status exception or the data

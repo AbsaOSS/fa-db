@@ -79,7 +79,6 @@ abstract class DBFunction[I, R, E <: DBEngine[F], F[_]: Monad](functionNameOverr
  *  @param functionNameOverride - Optional parameter to override the class name if it does not match the database function name.
  *  @param schema - The schema the function belongs to.
  *  @param dBEngine - The database engine that is supposed to execute the function (contains connection to the database).
- *  @param queryStatusHandling - The [[QueryStatusHandling]] instance that handles the status of the function invocation.
  *  @tparam I - The type covering the input fields of the database function.
  *  @tparam R - The type covering the returned fields from the database function.
  *  @tparam E - The type of the [[DBEngine]] engine.
