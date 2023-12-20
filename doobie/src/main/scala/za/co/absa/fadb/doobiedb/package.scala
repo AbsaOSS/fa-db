@@ -16,8 +16,8 @@
 
 package za.co.absa.fadb
 
-import doobie.util.meta.Meta
 import doobie.implicits.javasql._
+import doobie.util.meta.Meta
 
 import java.sql.Timestamp
 import java.time.ZoneId

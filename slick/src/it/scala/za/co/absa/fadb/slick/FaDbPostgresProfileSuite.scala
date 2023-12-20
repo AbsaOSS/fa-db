@@ -166,9 +166,9 @@ class FaDbPostgresProfileSuite extends AsyncFlatSpec {
           r.<<,
           r.<<,
           r.<<,
-          r.nextHStoreOption,
+          r.nextHStoreOption(),
           r.<<,
-          r.nextMacAddrOption
+          r.nextMacAddrOption()
         )
       }
     }
