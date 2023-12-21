@@ -65,6 +65,22 @@ object TransactorProvider {
 }
 ```
 
+Transactor can then be provided as a dependency to other ZLayers.
+
+```scala
+class PostgresDatabaseProvider(val dbEngine: DoobieEngine[Task])
+
+object PostgresDatabaseProvider {
+  val layer: RLayer[Transactor[Task], PostgresDatabaseProvider] = ZLayer {
+    for {
+      // access the transactor from the environment
+      transactor <- ZIO.service[Transactor[Task]]
+      doobieEngine <- ZIO.succeed(new DoobieEngine[Task](transactor))
+    } yield new PostgresDatabaseProvider(doobieEngine)
+  }
+}
+```
+
 Provide default Scope for your application.
 
 ```scala
