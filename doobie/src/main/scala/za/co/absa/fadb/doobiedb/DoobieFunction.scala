@@ -101,7 +101,7 @@ object DoobieFunction {
    *  @param readSelectWithStatus the `Read[StatusWithData[R]]` instance used to read the query result with status into `StatusWithData[R]`
    *  @tparam F the effect type, which must have an `Async` and a `Monad` instance
    */
-  abstract class DoobieSingleResultFunctionWithStatus[I, R, F[_]: Async: Monad](
+  abstract class DoobieSingleResultFunctionWithStatus[I, R, F[_]: Async](
     functionNameOverride: Option[String] = None
   )(implicit override val schema: DBSchema,
     val dbEngine: DoobieEngine[F],
@@ -120,7 +120,7 @@ object DoobieFunction {
    *  @param readR the `Read[R]` instance used to read the query result into `R`
    *  @tparam F the effect type, which must have an `Async` and a `Monad` instance
    */
-  abstract class DoobieSingleResultFunction[I, R, F[_]: Async: Monad](functionNameOverride: Option[String] = None)(
+  abstract class DoobieSingleResultFunction[I, R, F[_]: Async](functionNameOverride: Option[String] = None)(
     implicit override val schema: DBSchema,
     val dbEngine: DoobieEngine[F],
     val readR: Read[R]
@@ -131,7 +131,7 @@ object DoobieFunction {
    *  `DoobieMultipleResultFunction` is an abstract class that extends `DBMultipleResultFunction` with `DoobiePgEngine` as the engine type.
    *  It represents a database function that returns multiple results.
    */
-  abstract class DoobieMultipleResultFunction[I, R, F[_]: Async: Monad](functionNameOverride: Option[String] = None)(
+  abstract class DoobieMultipleResultFunction[I, R, F[_]: Async](functionNameOverride: Option[String] = None)(
     implicit override val schema: DBSchema,
     val dbEngine: DoobieEngine[F],
     val readR: Read[R]
@@ -142,7 +142,7 @@ object DoobieFunction {
    *  `DoobieOptionalResultFunction` is an abstract class that extends `DBOptionalResultFunction` with `DoobiePgEngine` as the engine type.
    *  It represents a database function that returns an optional result.
    */
-  abstract class DoobieOptionalResultFunction[I, R, F[_]: Async: Monad](functionNameOverride: Option[String] = None)(
+  abstract class DoobieOptionalResultFunction[I, R, F[_]: Async](functionNameOverride: Option[String] = None)(
     implicit override val schema: DBSchema,
     val dbEngine: DoobieEngine[F],
     val readR: Read[R]

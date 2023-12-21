@@ -16,13 +16,11 @@
 
 package za.co.absa.fadb.slick
 
-import cats.implicits._
 import slick.jdbc.{GetResult, SQLActionBuilder}
 import za.co.absa.fadb.DBFunction.{DBMultipleResultFunction, DBOptionalResultFunction, DBSingleResultFunction}
 import za.co.absa.fadb.exceptions.StatusException
 import za.co.absa.fadb.{DBFunctionWithStatus, DBSchema, FunctionStatusWithData}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /**

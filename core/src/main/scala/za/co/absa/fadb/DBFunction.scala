@@ -16,7 +16,6 @@
 
 package za.co.absa.fadb
 
-import cats.Monad
 import za.co.absa.fadb.exceptions.StatusException
 import za.co.absa.fadb.status.handling.StatusHandling
 
@@ -32,7 +31,7 @@ import scala.language.higherKinds
  *  @tparam E - The type of the [[DBEngine]] engine.
  *  @tparam F - The type of the context in which the database function is executed.
  */
-abstract class DBFunction[I, R, E <: DBEngine[F], F[_]: Monad](functionNameOverride: Option[String] = None)(
+abstract class DBFunction[I, R, E <: DBEngine[F], F[_]](functionNameOverride: Option[String] = None)(
   implicit override val schema: DBSchema,
   val dBEngine: E
 ) extends DBFunctionFabric(functionNameOverride) {
@@ -84,7 +83,7 @@ abstract class DBFunction[I, R, E <: DBEngine[F], F[_]: Monad](functionNameOverr
  *  @tparam E - The type of the [[DBEngine]] engine.
  *  @tparam F - The type of the context in which the database function is executed.
  */
-abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]: Monad](functionNameOverride: Option[String] = None)(
+abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOverride: Option[String] = None)(
   implicit override val schema: DBSchema,
   val dBEngine: E
 ) extends DBFunctionFabric(functionNameOverride)
@@ -135,7 +134,7 @@ object DBFunction {
    *  `DBMultipleResultFunction` is an abstract class that represents a database function returning multiple results.
    *  It extends the [[DBFunction]] class and overrides the apply method to return a sequence of results.
    */
-  abstract class DBMultipleResultFunction[I, R, E <: DBEngine[F], F[_]: Monad](
+  abstract class DBMultipleResultFunction[I, R, E <: DBEngine[F], F[_]](
     functionNameOverride: Option[String] = None
   )(implicit schema: DBSchema, dBEngine: E)
       extends DBFunction[I, R, E, F](functionNameOverride) {
@@ -159,7 +158,7 @@ object DBFunction {
    *  `DBSingleResultFunction` is an abstract class that represents a database function returning a single result.
    *  It extends the [[DBFunction]] class and overrides the apply method to return a single result.
    */
-  abstract class DBSingleResultFunction[I, R, E <: DBEngine[F], F[_]: Monad](
+  abstract class DBSingleResultFunction[I, R, E <: DBEngine[F], F[_]](
     functionNameOverride: Option[String] = None
   )(implicit schema: DBSchema, dBEngine: E)
       extends DBFunction[I, R, E, F](functionNameOverride) {
@@ -182,7 +181,7 @@ object DBFunction {
    *  `DBOptionalResultFunction` is an abstract class that represents a database function returning an optional result.
    *  It extends the [[DBFunction]] class and overrides the apply method to return an optional result.
    */
-  abstract class DBOptionalResultFunction[I, R, E <: DBEngine[F], F[_]: Monad](
+  abstract class DBOptionalResultFunction[I, R, E <: DBEngine[F], F[_]](
     functionNameOverride: Option[String] = None
   )(implicit schema: DBSchema, dBEngine: E)
       extends DBFunction[I, R, E, F](functionNameOverride) {

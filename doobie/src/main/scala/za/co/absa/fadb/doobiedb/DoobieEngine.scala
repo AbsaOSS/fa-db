@@ -16,7 +16,6 @@
 
 package za.co.absa.fadb.doobiedb
 
-import cats.Monad
 import cats.effect.Async
 import cats.implicits._
 import doobie._
@@ -34,9 +33,9 @@ import scala.language.higherKinds
  *  `Async` is needed because Doobie requires it for non-blocking database operations.
  *
  *  @param transactor the Doobie transactor for executing SQL queries
- *  @tparam F the effect type, which must have an `Async` and a `Monad` instance
+ *  @tparam F the effect type, which must have an `Async` instance
  */
-class DoobieEngine[F[_]: Async: Monad](val transactor: Transactor[F]) extends DBEngine[F] {
+class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[F] {
 
   /** The type of Doobie queries that produce `T` */
   type QueryType[R] = DoobieQuery[R]
