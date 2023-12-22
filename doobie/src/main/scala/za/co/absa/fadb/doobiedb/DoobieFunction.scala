@@ -138,6 +138,13 @@ object DoobieFunction {
   ) extends DBMultipleResultFunction[I, R, DoobieEngine[F], F](functionNameOverride)
       with DoobieFunction[I, R]
 
+  abstract class DoobieStreamingResultFunction[I, R, F[_]: Async](functionNameOverride: Option[String] = None)(
+    implicit override val schema: DBSchema,
+    val dbEngine: DoobieStreamingEngine[F],
+    val readR: Read[R]
+  ) extends DBStreamingResultFunction[I, R, DoobieStreamingEngine[F], F](functionNameOverride)
+      with DoobieFunction[I, R]
+
   /**
    *  `DoobieOptionalResultFunction` is an abstract class that extends `DBOptionalResultFunction` with `DoobiePgEngine` as the engine type.
    *  It represents a database function that returns an optional result.

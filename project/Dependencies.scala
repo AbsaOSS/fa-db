@@ -21,6 +21,7 @@ object Dependencies {
   private def commonDependencies(scalaVersion: String): Seq[ModuleID] = Seq(
     "org.typelevel" %% "cats-core" % "2.9.0",
     "org.typelevel" %% "cats-effect" % "3.5.0",
+    "co.fs2" %% "fs2-core" % "3.7.0",
     "org.scalatest"      %% "scalatest" % "3.1.0"           % "test,it",
     "org.scalatest"      %% "scalatest-flatspec" % "3.2.0"  % "test,it",
     "org.scalatestplus"  %% "mockito-1-10" % "3.1.0.0"      % "test,it"
@@ -39,7 +40,8 @@ object Dependencies {
       "org.slf4j"            % "slf4j-nop"                    % "1.7.26",
       "com.typesafe.slick"  %% "slick-hikaricp"               % "3.3.3",
       "org.postgresql"       % "postgresql"                   % "42.6.0",
-      "com.github.tminglei" %% "slick-pg"                     % "0.20.4"   % Optional
+      "com.github.tminglei" %% "slick-pg"                     % "0.20.4"   % Optional,
+      "co.fs2" %% "fs2-reactive-streams" % "3.9.3"
     )
   }
 

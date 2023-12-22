@@ -128,6 +128,28 @@ abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOv
   override def checkStatus[A](statusWithData: FunctionStatusWithData[A]): Either[StatusException, A]
 }
 
+abstract class DBStreamingFunction[I, R, E <: DBStreamingEngine[F], F[_]](functionNameOverride: Option[String] = None)(
+  implicit override val schema: DBSchema,
+  val dbStreamingEngine: E
+) extends DBFunctionFabric(functionNameOverride) {
+
+  // A constructor that takes only the mandatory parameters and uses default values for the optional ones
+  def this()(implicit schema: DBSchema, dBEngine: E) = this(None)
+
+  // A constructor that allows specifying the function name as a string, but not as an option
+  def this(functionName: String)(implicit schema: DBSchema, dBEngine: E) = this(Some(functionName))
+
+  protected def streamResults(values: I): fs2.Stream[F, R] = dbStreamingEngine.runStreaming(query(values))
+
+  /**
+   *  Function to create the DB function call specific to the provided [[DBEngine]].
+   *  Expected to be implemented by the DBEngine specific mix-in.
+   *  @param values - The values to pass over to the database function.
+   *  @return - The SQL query in the format specific to the provided [[DBEngine]].
+   */
+  protected def query(values: I): dbStreamingEngine.QueryType[R]
+}
+
 object DBFunction {
 
   /**
@@ -152,6 +174,20 @@ object DBFunction {
      *               type `R`
      */
     def apply(values: I): F[Seq[R]] = multipleResults(values)
+  }
+
+  abstract class DBStreamingResultFunction[I, R, E <: DBStreamingEngine[F], F[_]](
+    functionNameOverride: Option[String] = None
+  )(implicit schema: DBSchema, dBStreamingEngine: E)
+      extends DBStreamingFunction[I, R, E, F](functionNameOverride) {
+
+    // A constructor that takes only the mandatory parameters and uses default values for the optional ones
+    def this()(implicit schema: DBSchema, dBStreamingEngine: E) = this(None)
+
+    // A constructor that allows specifying the function name as a string, but not as an option
+    def this(functionName: String)(implicit schema: DBSchema, dBStreamingEngine: E) = this(Some(functionName))
+
+    def apply(values: I): fs2.Stream[F, R] = streamResults(values)
   }
 
   /**
