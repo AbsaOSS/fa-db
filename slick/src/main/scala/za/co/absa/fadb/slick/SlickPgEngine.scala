@@ -49,11 +49,6 @@ class SlickPgEngine(val db: Database)(implicit val executor: ExecutionContext) e
     db.run(slickAction)
   }
 
-//  protected def runStreaming[R](query: QueryType[R]): fs2.Stream[Future, R] = {
-//    val slickPublisher = db.stream(query.sql.as[R](query.getResult))
-//    slickPublisher.toStreamBuffered[Future](100) // parameter for buffer size
-//  }
-
   /**
    *  Execution using Slick with status
    *  @param query  - the Slick query to execute
