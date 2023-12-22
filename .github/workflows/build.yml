@@ -33,7 +33,7 @@ jobs:
             scalaShort: "2.12"
             overall: 0.0
             changed: 80.0
-          - scala: 2.13.11
+          - scala: 2.13.12
             scalaShort: "2.13"
             overall: 0.0
             changed: 80.0
@@ -67,7 +67,7 @@ jobs:
             scalaShort: "2.12"
             overall: 0.0
             changed: 80.0
-          - scala: 2.13.11
+          - scala: 2.13.12
             scalaShort: "2.13"
             overall: 0.0
             changed: 80.0

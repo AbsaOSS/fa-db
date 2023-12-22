@@ -20,7 +20,7 @@ import com.github.sbt.jacoco.report.JacocoReportSettings
 ThisBuild / organization := "za.co.absa.fa-db"
 
 lazy val scala212 = "2.12.17"
-lazy val scala213 = "2.13.11"
+lazy val scala213 = "2.13.12"
 
 ThisBuild / scalaVersion := scala213
 ThisBuild / crossScalaVersions := Seq(scala212, scala213)
