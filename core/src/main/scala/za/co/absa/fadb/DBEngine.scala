@@ -39,7 +39,7 @@ abstract class DBEngine[F[_]: Monad] {
   /**
    *  The actual query executioner of the queries of the engine
    *  @param query  - the query to execute
-   *  @tparam R     - return the of the query
+   *  @tparam R     - return type of the query
    *  @return       - sequence of the results of database query
    */
   protected def run[R](query: QueryType[R]): F[Seq[R]]
@@ -47,15 +47,15 @@ abstract class DBEngine[F[_]: Monad] {
   /**
    *  The actual query executioner of the queries of the engine with status
    *  @param query  - the query to execute
-   *  @tparam R     - return the of the query
-   *  @return       - sequence of the results of database query
+   *  @tparam R     - return type of the query
+   *  @return       - result of database query with status
    */
   def runWithStatus[R](query: QueryWithStatusType[R]): F[Either[StatusException, R]]
 
   /**
    *  Public method to execute when query is expected to return multiple results
    *  @param query  - the query to execute
-   *  @tparam R     - return the of the query
+   *  @tparam R     - return type of the query
    *  @return       - sequence of the results of database query
    */
   def fetchAll[R](query: QueryType[R]): F[Seq[R]] = {
@@ -65,7 +65,7 @@ abstract class DBEngine[F[_]: Monad] {
   /**
    *  Public method to execute when query is expected to return exactly one row
    *  @param query  - the query to execute
-   *  @tparam R     - return the of the query
+   *  @tparam R     - return type of the query
    *  @return       - sequence of the results of database query
    */
   def fetchHead[R](query: QueryType[R]): F[R] = {
@@ -75,7 +75,7 @@ abstract class DBEngine[F[_]: Monad] {
   /**
    *  Public method to execute when query is expected to return one or no results
    *  @param query  - the query to execute
-   *  @tparam R     - return the of the query
+   *  @tparam R     - return type of the query
    *  @return       - sequence of the results of database query
    */
   def fetchHeadOption[R](query: QueryType[R]): F[Option[R]] = {
