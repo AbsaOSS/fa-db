@@ -74,7 +74,7 @@ private[fadb] abstract class DBFunction[I, R, E <: DBEngine[F], F[_]](functionNa
 
 /**
  *  `DBFunctionWithStatus` is an abstract class that represents a database function with a status.
- *  It extends the [[DBFunction]] class and adds handling for the status of the function invocation.
+ *  It extends the `DBFunction` class and adds handling for the status of the function invocation.
  *  @param functionNameOverride - Optional parameter to override the class name if it does not match the database function name.
  *  @param schema - The schema the function belongs to.
  *  @param dBEngine - The database engine that is supposed to execute the function (contains connection to the database).
@@ -100,7 +100,7 @@ abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOv
 
   /**
    *  Executes the database function and returns multiple results.
-   *  @param values
+   *  @param values - The values to pass over to the database function.
    *  @return A sequence of results from the database function.
    */
   def apply(values: I): F[Either[StatusException, R]] = dBEngine.runWithStatus(query(values))
@@ -169,7 +169,7 @@ object DBFunction {
 
   /**
    *  `DBMultipleResultFunction` is an abstract class that represents a database function returning multiple results.
-   *  It extends the [[DBFunction]] class and overrides the apply method to return a sequence of results.
+   *  It extends the `DBFunction` class and overrides the apply method to return a sequence of results.
    */
   abstract class DBMultipleResultFunction[I, R, E <: DBEngine[F], F[_]](
     functionNameOverride: Option[String] = None
@@ -193,7 +193,7 @@ object DBFunction {
 
   /**
    *  `DBSingleResultFunction` is an abstract class that represents a database function returning a single result.
-   *  It extends the [[DBFunction]] class and overrides the apply method to return a single result.
+   *  It extends the `DBFunction` class and overrides the apply method to return a single result.
    */
   abstract class DBSingleResultFunction[I, R, E <: DBEngine[F], F[_]](
     functionNameOverride: Option[String] = None
@@ -216,7 +216,7 @@ object DBFunction {
 
   /**
    *  `DBOptionalResultFunction` is an abstract class that represents a database function returning an optional result.
-   *  It extends the [[DBFunction]] class and overrides the apply method to return an optional result.
+   *  It extends the `DBFunction` class and overrides the apply method to return an optional result.
    */
   abstract class DBOptionalResultFunction[I, R, E <: DBEngine[F], F[_]](
     functionNameOverride: Option[String] = None

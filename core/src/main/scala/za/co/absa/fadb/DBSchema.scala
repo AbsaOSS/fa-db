@@ -40,7 +40,7 @@ abstract class DBSchema(schemaNameOverride: Option[String] = None)(implicit val 
   }
 
   /**
-   *  To easy pass over to [[DBFunction]] members of the schema
+   *  To easy pass over to `DBFunction` members of the schema
    */
   protected implicit val schema: DBSchema = this
 
