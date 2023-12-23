@@ -1,3 +1,19 @@
+/*
+ * Copyright 2022 ABSA Group Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package za.co.absa.fadb.doobiedb
 
 import cats.effect.IO
@@ -12,7 +28,7 @@ import za.co.absa.fadb.doobiedb.DoobieFunction.DoobieStreamingResultFunction
 class DoobieStreamingResultFunctionTest extends AnyFunSuite with DoobieTest {
 
   class GetActors(implicit schema: DBSchema, dbEngine: DoobieStreamingEngine[IO])
-    extends DoobieStreamingResultFunction[GetActorsQueryParameters, Actor, IO] {
+      extends DoobieStreamingResultFunction[GetActorsQueryParameters, Actor, IO] {
 
     override def sql(values: GetActorsQueryParameters)(implicit read: Read[Actor]): Fragment =
       sql"SELECT actor_id, first_name, last_name FROM ${Fragment.const(functionName)}(${values.firstName}, ${values.lastName})"
@@ -22,7 +38,8 @@ class DoobieStreamingResultFunctionTest extends AnyFunSuite with DoobieTest {
 
   test("Retrieving actor from database") {
     val expectedResultElem = Actor(49, "Pavel", "Marek")
-    val results = getActors(GetActorsQueryParameters(Some("Pavel"), Some("Marek"))).take(10).compile.toList.unsafeRunSync()
+    val results =
+      getActors(GetActorsQueryParameters(Some("Pavel"), Some("Marek"))).take(10).compile.toList.unsafeRunSync()
     assert(results.contains(expectedResultElem))
   }
 
