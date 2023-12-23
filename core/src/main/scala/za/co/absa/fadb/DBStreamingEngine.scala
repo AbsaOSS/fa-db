@@ -16,6 +16,8 @@
 
 package za.co.absa.fadb
 
+import scala.language.higherKinds
+
 /**
  *  `DBStreamingEngine` is an abstract class that represents a database engine.
  *  It provides methods to execute streaming queries from a database.

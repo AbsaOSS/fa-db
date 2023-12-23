@@ -22,6 +22,8 @@ import doobie.implicits.toDoobieStreamOps
 import doobie.util.Read
 import za.co.absa.fadb.DBStreamingEngine
 
+import scala.language.higherKinds
+
 /**
  *  `DoobieStreamingEngine` is a class that represents a database engine.
  *  It provides methods to execute streaming queries from a database.

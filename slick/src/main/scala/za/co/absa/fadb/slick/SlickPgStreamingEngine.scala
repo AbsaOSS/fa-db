@@ -21,6 +21,8 @@ import fs2.interop.reactivestreams.PublisherOps
 import slick.jdbc.JdbcBackend.Database
 import za.co.absa.fadb.DBStreamingEngine
 
+import scala.language.higherKinds
+
 /**
  *  `SlickStreamingEngine` is a class that represents a database engine.
  *  It provides methods to execute streaming queries from a database.
