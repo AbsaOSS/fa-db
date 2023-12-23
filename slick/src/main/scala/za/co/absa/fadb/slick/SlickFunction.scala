@@ -24,6 +24,8 @@ import za.co.absa.fadb.{DBFunctionWithStatus, DBSchema, DBStreamingFunction, Fun
 
 import scala.concurrent.Future
 
+import scala.language.higherKinds
+
 /**
  *  Base class for Slick DB functions.
  *
