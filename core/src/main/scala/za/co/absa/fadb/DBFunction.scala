@@ -31,7 +31,7 @@ import scala.language.higherKinds
  *  @tparam E - The type of the [[DBEngine]] engine.
  *  @tparam F - The type of the context in which the database function is executed.
  */
-abstract class DBFunction[I, R, E <: DBEngine[F], F[_]](functionNameOverride: Option[String] = None)(
+abstract private[fadb] class DBFunction[I, R, E <: DBEngine[F], F[_]](functionNameOverride: Option[String] = None)(
   implicit override val schema: DBSchema,
   val dBEngine: E
 ) extends DBFunctionFabric(functionNameOverride) {
@@ -128,6 +128,16 @@ abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOv
   override def checkStatus[A](statusWithData: FunctionStatusWithData[A]): Either[StatusException, A]
 }
 
+/**
+ *  `DBStreamingFunction` is an abstract class that represents a database function returning a stream of results.
+ *  @param functionNameOverride - Optional parameter to override the class name if it does not match the database function name.
+ *  @param schema - The schema the function belongs to.
+ *  @param dbStreamingEngine - The database engine that is supposed to execute the function (contains connection to the database).
+ *  @tparam I - The type covering the input fields of the database function.
+ *  @tparam R - The type covering the returned fields from the database function.
+ *  @tparam E - The type of the [[DBStreamingEngine]] engine.
+ *  @tparam F - The type of the context in which the database function is executed.
+ */
 abstract class DBStreamingFunction[I, R, E <: DBStreamingEngine[F], F[_]](functionNameOverride: Option[String] = None)(
   implicit override val schema: DBSchema,
   val dbStreamingEngine: E
@@ -139,8 +149,6 @@ abstract class DBStreamingFunction[I, R, E <: DBStreamingEngine[F], F[_]](functi
   // A constructor that allows specifying the function name as a string, but not as an option
   def this(functionName: String)(implicit schema: DBSchema, dBEngine: E) = this(Some(functionName))
 
-  protected def streamResults(values: I): fs2.Stream[F, R] = dbStreamingEngine.runStreaming(query(values))
-
   /**
    *  Function to create the DB function call specific to the provided [[DBEngine]].
    *  Expected to be implemented by the DBEngine specific mix-in.
@@ -148,6 +156,13 @@ abstract class DBStreamingFunction[I, R, E <: DBStreamingEngine[F], F[_]](functi
    *  @return - The SQL query in the format specific to the provided [[DBEngine]].
    */
   protected def query(values: I): dbStreamingEngine.QueryType[R]
+
+  /**
+   * Executes the database function and returns stream of results
+   * @param values The values to pass over to the database function
+   * @return A stream of results from the database function
+   */
+  def apply(values: I): fs2.Stream[F, R] = dbStreamingEngine.runStreaming(query(values))
 }
 
 object DBFunction {
@@ -174,20 +189,6 @@ object DBFunction {
      *               type `R`
      */
     def apply(values: I): F[Seq[R]] = multipleResults(values)
-  }
-
-  abstract class DBStreamingResultFunction[I, R, E <: DBStreamingEngine[F], F[_]](
-    functionNameOverride: Option[String] = None
-  )(implicit schema: DBSchema, dBStreamingEngine: E)
-      extends DBStreamingFunction[I, R, E, F](functionNameOverride) {
-
-    // A constructor that takes only the mandatory parameters and uses default values for the optional ones
-    def this()(implicit schema: DBSchema, dBStreamingEngine: E) = this(None)
-
-    // A constructor that allows specifying the function name as a string, but not as an option
-    def this(functionName: String)(implicit schema: DBSchema, dBStreamingEngine: E) = this(Some(functionName))
-
-    def apply(values: I): fs2.Stream[F, R] = streamResults(values)
   }
 
   /**

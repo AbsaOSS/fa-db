@@ -16,17 +16,16 @@
 
 package za.co.absa.fadb.doobiedb
 
-import cats.Monad
 import cats.effect.kernel.Async
 import doobie.util.Read
 import doobie.util.fragment.Fragment
 import za.co.absa.fadb.DBFunction._
 import za.co.absa.fadb.exceptions.StatusException
-import za.co.absa.fadb.{DBFunctionWithStatus, DBSchema, FunctionStatusWithData}
+import za.co.absa.fadb.{DBFunctionWithStatus, DBSchema, DBStreamingFunction, FunctionStatusWithData}
 
 import scala.language.higherKinds
 
-trait DoobieFunctionBase[R] {
+private[doobiedb] trait DoobieFunctionBase[R] {
   /**
    *  The `Read[R]` instance used to read the query result into `R`.
    */
@@ -138,11 +137,15 @@ object DoobieFunction {
   ) extends DBMultipleResultFunction[I, R, DoobieEngine[F], F](functionNameOverride)
       with DoobieFunction[I, R]
 
+  /**
+   * `DoobieStreamingResultFunction` is an abstract class that extends `DBStreamingResultFunction` with `DoobiePgEngine` as the engine type.
+   * It represents a database function that returns a stream of results.
+   */
   abstract class DoobieStreamingResultFunction[I, R, F[_]: Async](functionNameOverride: Option[String] = None)(
     implicit override val schema: DBSchema,
     val dbEngine: DoobieStreamingEngine[F],
     val readR: Read[R]
-  ) extends DBStreamingResultFunction[I, R, DoobieStreamingEngine[F], F](functionNameOverride)
+  ) extends DBStreamingFunction[I, R, DoobieStreamingEngine[F], F](functionNameOverride)
       with DoobieFunction[I, R]
 
   /**

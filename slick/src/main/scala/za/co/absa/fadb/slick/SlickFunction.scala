@@ -18,9 +18,9 @@ package za.co.absa.fadb.slick
 
 import cats.effect.kernel.Async
 import slick.jdbc.{GetResult, SQLActionBuilder}
-import za.co.absa.fadb.DBFunction.{DBMultipleResultFunction, DBOptionalResultFunction, DBSingleResultFunction, DBStreamingResultFunction}
+import za.co.absa.fadb.DBFunction.{DBMultipleResultFunction, DBOptionalResultFunction, DBSingleResultFunction}
 import za.co.absa.fadb.exceptions.StatusException
-import za.co.absa.fadb.{DBFunctionWithStatus, DBSchema, FunctionStatusWithData}
+import za.co.absa.fadb.{DBFunctionWithStatus, DBSchema, DBStreamingFunction, FunctionStatusWithData}
 
 import scala.concurrent.Future
 
@@ -103,10 +103,13 @@ object SlickFunction {
   ) extends DBMultipleResultFunction[I, R, SlickPgEngine, Future](functionNameOverride)
       with SlickFunction[I, R]
 
+  /**
+   *  Class for Slick DB functions with streaming results.
+   */
   abstract class SlickStreamingResultFunction[I, R, F[_]: Async](functionNameOverride: Option[String] = None)(implicit
     override val schema: DBSchema,
     dBEngine: SlickPgStreamingEngine[F]
-  ) extends DBStreamingResultFunction[I, R, SlickPgStreamingEngine[F], F](functionNameOverride)
+  ) extends DBStreamingFunction[I, R, SlickPgStreamingEngine[F], F](functionNameOverride)
       with SlickFunction[I, R]
 
   /**
