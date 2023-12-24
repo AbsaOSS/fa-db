@@ -32,7 +32,7 @@ import scala.language.higherKinds
 class DoobieStreamingEngine[F[_]: Async](val transactor: Transactor[F], chunkSize: Int = 512)
     extends DBStreamingEngine[F] {
 
-  /** The type of Doobie queries that produce `T` */
+  /** The type of Doobie queries that produce `R` */
   type QueryType[R] = DoobieQuery[R]
 
   /**

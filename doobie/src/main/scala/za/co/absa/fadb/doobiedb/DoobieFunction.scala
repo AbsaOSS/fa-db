@@ -90,7 +90,8 @@ private[doobiedb] trait DoobieFunctionWithStatus[I, R] extends DoobieFunctionBas
  */
 object DoobieFunction {
   /**
-   *  `DoobieSingleResultFunctionWithStatus` is an abstract class that extends `DBSingleResultFunctionWithStatus` with `DoobiePgEngine` as the engine type.
+   *  `DoobieSingleResultFunctionWithStatus` is an abstract class that extends `DBSingleResultFunctionWithStatus`
+   *  with `DoobieEngine` as the engine type.
    *  It represents a database function that returns a single result with status.
    *
    *  @param functionNameOverride the optional override for the function name
@@ -110,7 +111,7 @@ object DoobieFunction {
       with DoobieFunctionWithStatus[I, R]
 
   /**
-   *  `DoobieSingleResultFunction` is an abstract class that extends `DBSingleResultFunction` with `DoobiePgEngine` as the engine type.
+   *  `DoobieSingleResultFunction` is an abstract class that extends `DBSingleResultFunction` with `DoobieEngine` as the engine type.
    *  It represents a database function that returns a single result.
    *
    *  @param functionNameOverride the optional override for the function name
@@ -127,7 +128,8 @@ object DoobieFunction {
       with DoobieFunction[I, R]
 
   /**
-   *  `DoobieMultipleResultFunction` is an abstract class that extends `DBMultipleResultFunction` with `DoobiePgEngine` as the engine type.
+   *  `DoobieMultipleResultFunction` is an abstract class that extends `DBMultipleResultFunction`
+   *  with `DoobieEngine` as the engine type.
    *  It represents a database function that returns multiple results.
    */
   abstract class DoobieMultipleResultFunction[I, R, F[_]: Async](functionNameOverride: Option[String] = None)(
@@ -138,7 +140,8 @@ object DoobieFunction {
       with DoobieFunction[I, R]
 
   /**
-   * `DoobieStreamingResultFunction` is an abstract class that extends `DBStreamingResultFunction` with `DoobiePgEngine` as the engine type.
+   * `DoobieStreamingResultFunction` is an abstract class that extends `DBStreamingFunction`
+   * with `DoobieStreamingEngine` as the engine type.
    * It represents a database function that returns a stream of results.
    */
   abstract class DoobieStreamingResultFunction[I, R, F[_]: Async](functionNameOverride: Option[String] = None)(
@@ -149,7 +152,8 @@ object DoobieFunction {
       with DoobieFunction[I, R]
 
   /**
-   *  `DoobieOptionalResultFunction` is an abstract class that extends `DBOptionalResultFunction` with `DoobiePgEngine` as the engine type.
+   *  `DoobieOptionalResultFunction` is an abstract class that extends `DBOptionalResultFunction`
+   *  with `DoobieEngine` as the engine type.
    *  It represents a database function that returns an optional result.
    */
   abstract class DoobieOptionalResultFunction[I, R, F[_]: Async](functionNameOverride: Option[String] = None)(

@@ -30,7 +30,7 @@ import scala.language.higherKinds
  */
 class SlickPgStreamingEngine[F[_]: Async](val db: Database, chunkSize: Int = 512) extends DBStreamingEngine[F] {
 
-  /** The type of Slick queries that produce `T` */
+  /** The type of Slick queries that produce `R` */
   type QueryType[R] = SlickQuery[R]
 
   /**
