@@ -163,6 +163,16 @@ abstract class DBStreamingFunction[I, R, E <: DBStreamingEngine[F], F[_]](functi
    * @return A stream of results from the database function
    */
   def apply(values: I): fs2.Stream[F, R] = dbStreamingEngine.runStreaming(query(values))
+
+  /**
+   * Executes the database function and returns stream of results. Allows to specify chunk size.
+   * @param values The values to pass over to the database function
+   * @param chunkSize The chunk size to use for the stream
+   * @return A stream of results from the database function
+   */
+  def apply(values: I, chunkSize: Int): fs2.Stream[F, R] = {
+    dbStreamingEngine.runStreamingWithChunkSize(query(values), chunkSize)
+  }
 }
 
 object DBFunction {

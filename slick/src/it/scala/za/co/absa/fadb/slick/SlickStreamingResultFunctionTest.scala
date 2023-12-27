@@ -42,7 +42,7 @@ class SlickStreamingResultFunctionTest extends AnyFunSuite with SlickTest {
   test("Retrieving actors from database") {
     val expectedResultElem = Actor(49, "Pavel", "Marek")
     val results =
-      getActors(GetActorsQueryParameters(Some("Pavel"), Some("Marek"))).take(10).compile.toList.unsafeRunSync()
+      getActors(GetActorsQueryParameters(Some("Pavel"), Some("Marek")), 1024).take(10).compile.toList.unsafeRunSync()
     assert(results.contains(expectedResultElem))
   }
 

@@ -29,7 +29,7 @@ import scala.language.higherKinds
  *  It provides methods to execute streaming queries from a database.
  *  @tparam F - The type of the context in which the database queries are executed.
  */
-class DoobieStreamingEngine[F[_]: Async](val transactor: Transactor[F], chunkSize: Int = 512)
+class DoobieStreamingEngine[F[_]: Async](val transactor: Transactor[F], defaultChunkSize: Int = 512)
     extends DBStreamingEngine[F] {
 
   /** The type of Doobie queries that produce `R` */
@@ -43,16 +43,28 @@ class DoobieStreamingEngine[F[_]: Async](val transactor: Transactor[F], chunkSiz
    *  @return the query result as an `fs2.Stream[F, R]`
    */
   override def runStreaming[R](query: QueryType[R]): fs2.Stream[F, R] =
-    executeStreamingQuery(query)(query.readR)
+    executeStreamingQuery(query, defaultChunkSize)(query.readR)
 
   /**
    *  Executes a Doobie query and returns the result as an `fs2.Stream[F, R]`.
    *
    *  @param query the Doobie query to execute
+   *  @param chunkSize the chunk size to use when streaming the query result
    *  @param readR the `Read[R]` instance used to read the query result into `R`
    *  @return the query result as an `fs2.Stream[F, R]`
    */
-  private def executeStreamingQuery[R](query: QueryType[R])(implicit readR: Read[R]): fs2.Stream[F, R] = {
+  override def runStreamingWithChunkSize[R](query: QueryType[R], chunkSize: Int): fs2.Stream[F, R] =
+    executeStreamingQuery(query, chunkSize)(query.readR)
+
+  /**
+   *  Executes a Doobie query and returns the result as an `fs2.Stream[F, R]`.
+   *
+   *  @param query the Doobie query to execute
+   *  @param chunkSize the chunk size to use when streaming the query result
+   *  @param readR the `Read[R]` instance used to read the query result into `R`
+   *  @return the query result as an `fs2.Stream[F, R]`
+   */
+  private def executeStreamingQuery[R](query: QueryType[R], chunkSize: Int)(implicit readR: Read[R]): fs2.Stream[F, R] = {
     query.fragment.query[R].streamWithChunkSize(chunkSize).transact(transactor)
   }
 

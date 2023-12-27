@@ -28,7 +28,7 @@ import scala.language.higherKinds
  *  It provides methods to execute streaming queries from a database.
  *  @tparam F - The type of the context in which the database queries are executed.
  */
-class SlickPgStreamingEngine[F[_]: Async](val db: Database, chunkSize: Int = 512) extends DBStreamingEngine[F] {
+class SlickPgStreamingEngine[F[_]: Async](val db: Database, defaultChunkSize: Int = 512) extends DBStreamingEngine[F] {
 
   /** The type of Slick queries that produce `R` */
   type QueryType[R] = SlickQuery[R]
@@ -40,6 +40,18 @@ class SlickPgStreamingEngine[F[_]: Async](val db: Database, chunkSize: Int = 512
    *  @return the query result as an `fs2.Stream[F, R]`
    */
   def runStreaming[R](query: QueryType[R]): fs2.Stream[F, R] = {
+    val slickPublisher = db.stream(query.sql.as[R](query.getResult))
+    slickPublisher.toStreamBuffered[F](defaultChunkSize)
+  }
+
+  /**
+   *  Executes a Slick query and returns the result as an `fs2.Stream[F, R]`.
+   *
+   *  @param query the Slick query to execute
+   *  @param chunkSize the chunk size to use when streaming the query result
+   *  @return the query result as an `fs2.Stream[F, R]`
+   */
+  def runStreamingWithChunkSize[R](query: QueryType[R], chunkSize: Int): fs2.Stream[F, R] = {
     val slickPublisher = db.stream(query.sql.as[R](query.getResult))
     slickPublisher.toStreamBuffered[F](chunkSize)
   }

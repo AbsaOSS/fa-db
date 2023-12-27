@@ -32,11 +32,20 @@ abstract class DBStreamingEngine[F[_]] {
   type QueryType[R] <: Query[R]
 
   /**
-   *  The actual query executioner of the queries of the engine
-   *  @param query  - the query to execute
-   *  @tparam R     - return type of the query
-   *  @return       - stream of the results of database query
+   *  Executes a query and returns the result as an `fs2.Stream[F, R]`.
+   *
+   *  @param query the query to execute
+   *  @return the query result as an `fs2.Stream[F, R]`
    */
   def runStreaming[R](query: QueryType[R]): fs2.Stream[F, R]
+
+  /**
+   *  Executes a query and returns the result as an `fs2.Stream[F, R]`.
+   *
+   *  @param query the query to execute
+   *  @param chunkSize the chunk size to use when streaming the query result
+   *  @return the query result as an `fs2.Stream[F, R]`
+   */
+  def runStreamingWithChunkSize[R](query: QueryType[R], chunkSize: Int): fs2.Stream[F, R]
 
 }
