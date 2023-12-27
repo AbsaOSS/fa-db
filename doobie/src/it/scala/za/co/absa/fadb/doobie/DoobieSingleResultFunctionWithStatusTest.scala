@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.doobiedb
+package za.co.absa.fadb.doobie
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
@@ -24,7 +24,7 @@ import doobie.util.Read
 import doobie.util.invariant.NonNullableColumnRead
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
-import za.co.absa.fadb.doobiedb.DoobieFunction.DoobieSingleResultFunctionWithStatus
+import za.co.absa.fadb.doobie.DoobieFunction.DoobieSingleResultFunctionWithStatus
 import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
 
 class DoobieSingleResultFunctionWithStatusTest extends AnyFunSuite with DoobieTest {

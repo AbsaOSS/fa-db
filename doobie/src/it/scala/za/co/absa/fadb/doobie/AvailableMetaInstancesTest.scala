@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.doobiedb
+package za.co.absa.fadb.doobie
 
 import doobie.util.meta.Meta
 import org.scalatest.funsuite.AnyFunSuite
