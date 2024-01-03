@@ -89,7 +89,7 @@ jobs:
           java-version: "adopt@1.8"
       - name: Add coverage to PR
         id: jacoco
-        uses: madrapps/jacoco-report@v1.3
+        uses: madrapps/jacoco-report@v1.4
         with:
           paths: >
             ${{ github.workspace }}/core/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml,
