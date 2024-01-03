@@ -116,10 +116,12 @@ As the name suggests it runs on [Slick library](https://github.com/slick/slick) 
 It brings:
 
 * `class SlickPgEngine` - implementation of _Core_'s `DBEngine` executing the queries via Slick
+* `class SlickPgStreamingEngine` - implementation of _Core_'s `DBStreamingEngine` executing the queries via Slick in a streaming fashion
 * `class SlickSingleResultFunction` - abstract class for DB functions returning single result
 * `class SlickMultipleResultFunction` - abstract class for DB functions returning sequence of results
 * `class SlickOptionalResultFunction` - abstract class for DB functions returning optional result
 * `class SlickSingleResultFunctionWithStatus` - abstract class for DB functions with status handling; it requires an implementation of `StatusHandling` to be mixed-in (`StandardStatusHandling` available out-of-the-box)
+* `class SlickStreamingResultFunction` - abstract class for DB functions returning sequence of results (fs2.Stream) in a streaming fashion
 * `trait FaDbPostgresProfile` - to bring support for Postgres and its extended data types in one class (except JSON, as there are multiple implementations for this data type in _Slick-Pg_)
 * `object FaDbPostgresProfile` - instance of the above trait for direct use
 
@@ -148,11 +150,12 @@ As the name suggests it runs on [Doobie library](https://tpolecat.github.io/doob
 It brings:
 
 * `class DoobieEngine` - implementation of _Core_'s `DBEngine` executing the queries via Doobie. The class is type parameterized with the effect type.
+* `class DoobieStreamingEngine` - implementation of _Core_'s `DBStreamingEngine` executing the queries via Doobie in a streaming fashion. The class is type parameterized with the effect type.
 * `class DoobieSingleResultFunction` - abstract class for DB functions returning single result
 * `class DoobieMultipleResultFunction` - abstract class for DB functions returning sequence of results
 * `class DoobieOptionalResultFunction` - abstract class for DB functions returning optional result
 * `class DoobieSingleResultFunctionWithStatus` - abstract class for DB functions with status handling; it requires an implementation of `StatusHandling` to be mixed-in (`StandardStatusHandling` available out-of-the-box)
-
+* `class DoobieStreamingResultFunction` - abstract class for DB functions returning sequence of results (fs2.Stream) in a streaming fashion
 Since Doobie also interoperates with ZIO, there is an example of how a database connection can be properly established within a ZIO application. Please see [this file](doobie/zio-setup.md) for more details.
 
 ## Testing
