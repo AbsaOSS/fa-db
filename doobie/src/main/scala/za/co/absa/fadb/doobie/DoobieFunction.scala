@@ -26,6 +26,11 @@ import za.co.absa.fadb.{DBFunctionWithStatus, DBSchema, DBStreamingFunction, Fun
 import scala.language.higherKinds
 
 private[doobie] trait DoobieFunctionBase[R] {
+import za.co.absa.fadb.{DBFunctionWithStatus, DBSchema, FunctionStatusWithData}
+
+import scala.language.higherKinds
+
+trait DoobieFunctionBase[R] {
   /**
    *  The `Read[R]` instance used to read the query result into `R`.
    */

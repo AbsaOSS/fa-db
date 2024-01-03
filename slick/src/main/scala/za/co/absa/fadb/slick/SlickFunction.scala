@@ -20,6 +20,9 @@ import cats.effect.kernel.Async
 import slick.jdbc.{GetResult, SQLActionBuilder}
 import za.co.absa.fadb.DBFunction.{DBMultipleResultFunction, DBOptionalResultFunction, DBSingleResultFunction}
 import za.co.absa.fadb.exceptions.StatusException
+import za.co.absa.fadb.{DBFunctionWithStatus, DBSchema, FunctionStatusWithData}
+import za.co.absa.fadb.DBFunction.{DBMultipleResultFunction, DBOptionalResultFunction, DBSingleResultFunction}
+import za.co.absa.fadb.exceptions.StatusException
 import za.co.absa.fadb.{DBFunctionWithStatus, DBSchema, DBStreamingFunction, FunctionStatusWithData}
 
 import scala.concurrent.Future
