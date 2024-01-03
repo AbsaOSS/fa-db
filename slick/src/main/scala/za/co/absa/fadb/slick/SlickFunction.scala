@@ -22,7 +22,6 @@ import za.co.absa.fadb.exceptions.StatusException
 import za.co.absa.fadb.{DBFunctionWithStatus, DBSchema, FunctionStatusWithData}
 
 import scala.concurrent.Future
-import scala.language.higherKinds
 
 /**
  *  Base class for Slick DB functions.

@@ -100,7 +100,7 @@ abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOv
 
   /**
    *  Executes the database function and returns multiple results.
-   *  @param values
+   *  @param values the values to pass over to the database function.
    *  @return A sequence of results from the database function.
    */
   def apply(values: I): F[Either[StatusException, R]] = dBEngine.runWithStatus(query(values))
