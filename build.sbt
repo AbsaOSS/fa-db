@@ -98,7 +98,7 @@ lazy val faDBDoobie = (project in file("doobie"))
     Defaults.itSettings,
   ).dependsOn(faDbCore)
   .settings(
-    jacocoReportSettings := commonJacocoReportSettings.withTitle(s"doobie:slick Jacoco Report - scala:${scalaVersion.value}"),
+    jacocoReportSettings := commonJacocoReportSettings.withTitle(s"fa-db:doobie Jacoco Report - scala:${scalaVersion.value}"),
     jacocoExcludes := commonJacocoExcludes
   )
 
