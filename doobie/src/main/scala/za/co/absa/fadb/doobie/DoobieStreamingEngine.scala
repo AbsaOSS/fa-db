@@ -20,7 +20,7 @@ import cats.effect.Async
 import doobie.Transactor
 import doobie.implicits.toDoobieStreamOps
 import doobie.util.Read
-import za.co.absa.fadb.DBStreamingEngine
+import za.co.absa.fadb.streaming.DBStreamingEngine
 
 import scala.language.higherKinds
 

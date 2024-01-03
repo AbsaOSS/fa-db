@@ -21,11 +21,7 @@ import doobie.util.Read
 import doobie.util.fragment.Fragment
 import za.co.absa.fadb.DBFunction._
 import za.co.absa.fadb.exceptions.StatusException
-import za.co.absa.fadb.{DBFunctionWithStatus, DBSchema, DBStreamingFunction, FunctionStatusWithData}
-
-import scala.language.higherKinds
-
-private[doobie] trait DoobieFunctionBase[R] {
+import za.co.absa.fadb.streaming.DBStreamingFunction
 import za.co.absa.fadb.{DBFunctionWithStatus, DBSchema, FunctionStatusWithData}
 
 import scala.language.higherKinds

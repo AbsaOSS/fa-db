@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.slick
+package za.co.absa.fadb.slick.streaming
 
 import cats.effect.Async
 import fs2.interop.reactivestreams.PublisherOps
 import slick.jdbc.JdbcBackend.Database
-import za.co.absa.fadb.DBStreamingEngine
+import za.co.absa.fadb.slick.SlickQuery
+import za.co.absa.fadb.streaming.DBStreamingEngine
 
 import scala.language.higherKinds
 

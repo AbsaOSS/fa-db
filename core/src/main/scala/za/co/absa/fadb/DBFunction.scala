@@ -123,64 +123,9 @@ abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOv
    *  @return       the SQL query in the format specific to the provided [[DBEngine]]
    */
   protected def query(values: I): dBEngine.QueryWithStatusType[R]
-   *  Function to create the DB function call specific to the provided [[DBEngine]]. Expected to be implemented by the
-   *  DBEngine specific mix-in.
-   *  @param values the values to pass over to the database function
-   *  @return       the SQL query in the format specific to the provided [[DBEngine]]
-   */
-  protected def query(values: I): dBEngine.QueryWithStatusType[R]
 
   // To be provided by an implementation of QueryStatusHandling
   override def checkStatus[A](statusWithData: FunctionStatusWithData[A]): Either[StatusException, A]
-}
-
-/**
- *  `DBStreamingFunction` is an abstract class that represents a database function returning a stream of results.
- *  @param functionNameOverride - Optional parameter to override the class name if it does not match the database function name.
- *  @param schema - The schema the function belongs to.
- *  @param dbStreamingEngine - The database engine that is supposed to execute the function (contains connection to the database).
- *  @tparam I - The type covering the input fields of the database function.
- *  @tparam R - The type covering the returned fields from the database function.
- *  @tparam E - The type of the [[DBStreamingEngine]] engine.
- *  @tparam F - The type of the context in which the database function is executed.
- */
-abstract class DBStreamingFunction[I, R, E <: DBStreamingEngine[F], F[_]](functionNameOverride: Option[String] = None)(
-  implicit override val schema: DBSchema,
-  val dbStreamingEngine: E
-) extends DBFunctionFabric(functionNameOverride) {
-
-  // A constructor that takes only the mandatory parameters and uses default values for the optional ones
-  def this()(implicit schema: DBSchema, dBEngine: E) = this(None)
-
-  // A constructor that allows specifying the function name as a string, but not as an option
-  def this(functionName: String)(implicit schema: DBSchema, dBEngine: E) = this(Some(functionName))
-
-  /**
-   *  Function to create the DB function call specific to the provided [[DBEngine]].
-   *  Expected to be implemented by the DBEngine specific mix-in.
-   *  @param values - The values to pass over to the database function.
-   *  @return - The SQL query in the format specific to the provided [[DBEngine]].
-   */
-  protected def query(values: I): dbStreamingEngine.QueryType[R]
-
-  // To be provided by an implementation of QueryStatusHandling
-  override def checkStatus[A](statusWithData: FunctionStatusWithData[A]): Either[StatusException, A]
-  /**
-   * Executes the database function and returns stream of results
-   * @param values The values to pass over to the database function
-   * @return A stream of results from the database function
-   */
-  def apply(values: I): fs2.Stream[F, R] = dbStreamingEngine.runStreaming(query(values))
-
-  /**
-   * Executes the database function and returns stream of results. Allows to specify chunk size.
-   * @param values The values to pass over to the database function
-   * @param chunkSize The chunk size to use for the stream
-   * @return A stream of results from the database function
-   */
-  def apply(values: I, chunkSize: Int): fs2.Stream[F, R] = {
-    dbStreamingEngine.runStreamingWithChunkSize(query(values), chunkSize)
-  }
 }
 
 object DBFunction {

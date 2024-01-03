@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.slick
+package za.co.absa.fadb.slick.streaming
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import org.scalatest.funsuite.AnyFunSuite
 import slick.jdbc.SQLActionBuilder
 import za.co.absa.fadb.DBSchema
-import za.co.absa.fadb.slick.SlickFunction.SlickStreamingResultFunction
 import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
+import za.co.absa.fadb.slick.{Actor, ActorSlickConverter, SlickTest}
 
 class SlickStreamingResultFunctionTest extends AnyFunSuite with SlickTest {
 

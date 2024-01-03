@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb
+package za.co.absa.fadb.streaming
+
+import za.co.absa.fadb.Query
 
 import scala.language.higherKinds
 
