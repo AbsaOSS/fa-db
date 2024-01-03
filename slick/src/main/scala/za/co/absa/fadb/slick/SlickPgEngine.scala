@@ -16,37 +16,47 @@
 
 package za.co.absa.fadb.slick
 
-
+import cats.implicits._
+import slick.jdbc.PostgresProfile.api._
 import za.co.absa.fadb.DBEngine
+import za.co.absa.fadb.exceptions.StatusException
 
 import scala.concurrent.{ExecutionContext, Future}
-import slick.jdbc.PostgresProfile.api._
-
 import scala.language.higherKinds
 
 /**
-  * [[DBEngine]] based on the Slick library in the Postgres flavor
-  * @param db - the Slick database
-  */
-class SlickPgEngine(val db: Database)(implicit val executor: ExecutionContext) extends DBEngine {
+ *  [[DBEngine]] based on the Slick library in the Postgres flavor
+ *
+ *  @param db - the Slick database
+ */
+class SlickPgEngine(val db: Database)(implicit val executor: ExecutionContext) extends DBEngine[Future] {
 
   /**
-    * The type of Queries for Slick
-    * @tparam T - the return type of the query
-    */
-  type QueryType[T] = SlickQuery[T]
+   *  The type of Queries for Slick
+   *  @tparam R - the return type of the query
+   */
+  type QueryType[R] = SlickQuery[R]
+  type QueryWithStatusType[R] = SlickQueryWithStatus[R]
 
   /**
-    * Execution using Slick
-    * @param query  - the Slick query to execute
-    * @tparam R     - return the of the query
-    * @return       - sequence of the results of database query
-    */
+   *  Execution using Slick
+   *  @param query  - the Slick query to execute
+   *  @tparam R     - return the of the query
+   *  @return       - sequence of the results of database query
+   */
   override protected def run[R](query: QueryType[R]): Future[Seq[R]] = {
-    // It can be expected that a GetResult will be passed into the run function as converter.
-    // Unfortunately it has to be recreated to be used by Slick
     val slickAction = query.sql.as[R](query.getResult)
     db.run(slickAction)
   }
 
+  /**
+   *  Execution using Slick with status
+   *  @param query  - the Slick query to execute
+   *  @tparam R     - return the of the query
+   *  @return       - either status exception or result of database query
+   */
+  override def runWithStatus[R](query: QueryWithStatusType[R]): Future[Either[StatusException, R]] = {
+    val slickAction = query.sql.as[Either[StatusException, R]](query.getStatusExceptionOrData).head
+    db.run(slickAction)
+  }
 }

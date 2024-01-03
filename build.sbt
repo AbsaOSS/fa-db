@@ -19,11 +19,11 @@ import com.github.sbt.jacoco.report.JacocoReportSettings
 
 ThisBuild / organization := "za.co.absa.fa-db"
 
-lazy val scala211 = "2.11.12"
 lazy val scala212 = "2.12.17"
+lazy val scala213 = "2.13.12"
 
-ThisBuild / scalaVersion := scala211
-ThisBuild / crossScalaVersions := Seq(scala211, scala212)
+ThisBuild / scalaVersion := scala212
+ThisBuild / crossScalaVersions := Seq(scala212, scala213)
 
 ThisBuild / versionScheme := Some("early-semver")
 
@@ -49,7 +49,7 @@ lazy val commonJacocoExcludes: Seq[String] = Seq(
 )
 
 lazy val parent = (project in file("."))
-  .aggregate(faDbCore, faDBSlick, faDBExamples)
+  .aggregate(faDbCore, faDBSlick, faDBDoobie, faDBExamples)
   .settings(
     name := "root",
     libraryDependencies ++= rootDependencies(scalaVersion.value),
@@ -85,6 +85,20 @@ lazy val faDBSlick = (project in file("slick"))
   ).dependsOn(faDbCore)
   .settings(
     jacocoReportSettings := commonJacocoReportSettings.withTitle(s"fa-db:slick Jacoco Report - scala:${scalaVersion.value}"),
+    jacocoExcludes := commonJacocoExcludes
+  )
+
+lazy val faDBDoobie = (project in file("doobie"))
+  .configs(IntegrationTest)
+  .settings(
+    name := "doobie",
+    libraryDependencies ++= doobieDependencies(scalaVersion.value),
+    javacOptions ++= commonJavacOptions,
+    scalacOptions ++= commonScalacOptions,
+    Defaults.itSettings,
+  ).dependsOn(faDbCore)
+  .settings(
+    jacocoReportSettings := commonJacocoReportSettings.withTitle(s"fa-db:doobie Jacoco Report - scala:${scalaVersion.value}"),
     jacocoExcludes := commonJacocoExcludes
   )
 

@@ -16,22 +16,20 @@
 
 package za.co.absa.fadb.status.handling.implementations
 
+import za.co.absa.fadb.FunctionStatusWithData
+import za.co.absa.fadb.exceptions.{OtherStatusException, StatusException}
 import za.co.absa.fadb.status.handling.StatusHandling
-import za.co.absa.fadb.status.{FunctionStatus, StatusException}
-
-import scala.util.{Failure, Success, Try}
 
 /**
-  *
-  */
+ *  Trait represents user defined status handling
+ */
 trait UserDefinedStatusHandling extends StatusHandling {
   def OKStatuses: Set[Integer]
 
-  def checkStatus(status: FunctionStatus): Try[FunctionStatus] = {
-    if (OKStatuses.contains(status.statusCode)) {
-      Success(status)
+  override def checkStatus[A](statusWithData: FunctionStatusWithData[A]): Either[StatusException, A] =
+    if (OKStatuses.contains(statusWithData.functionStatus.statusCode)) {
+      Right(statusWithData.data)
     } else {
-      Failure(StatusException(status))
+      Left(OtherStatusException(statusWithData.functionStatus))
     }
-  }
 }

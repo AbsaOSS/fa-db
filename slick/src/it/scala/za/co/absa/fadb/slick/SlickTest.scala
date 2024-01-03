@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.exceptions
+package za.co.absa.fadb.slick
 
-/**
-  * General Fa-DB exception class
-  * @param message  - the message describing the reason of exception
-  */
-class DBFailException(message: String) extends Exception(message) {
-  override def equals(obj: Any): Boolean = {
-    obj match {
-      case other: DBFailException => (other.getMessage == message)  && (getClass == other.getClass)
-      case _ => false
-    }
-  }
-}
+import slick.jdbc.JdbcBackend.Database
+import za.co.absa.fadb.DBSchema
 
-object DBFailException {
-  def apply(message: String): DBFailException = new DBFailException(message)
+trait SlickTest {
+  case class CreateActorRequestBody(firstName: String, lastName: String)
+  case class GetActorsQueryParameters(firstName: Option[String], lastName: Option[String])
+
+  import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits._
+  object Runs extends DBSchema
+
+  val db = Database.forConfig("postgrestestdb")
 }

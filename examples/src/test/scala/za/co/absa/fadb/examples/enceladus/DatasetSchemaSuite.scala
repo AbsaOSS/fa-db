@@ -20,8 +20,8 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import za.co.absa.fadb.examples.enceladus.DatasetSchema._
 import slick.jdbc.PostgresProfile.api._
+import za.co.absa.fadb.exceptions.StatusException
 import za.co.absa.fadb.slick.SlickPgEngine
-import za.co.absa.fadb.status.StatusException
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration

@@ -17,63 +17,97 @@
 package za.co.absa.fadb.slick
 
 import slick.jdbc.{GetResult, SQLActionBuilder}
-import za.co.absa.fadb.DBFunctionFabric
+import za.co.absa.fadb.DBFunction.{DBMultipleResultFunction, DBOptionalResultFunction, DBSingleResultFunction}
+import za.co.absa.fadb.exceptions.StatusException
+import za.co.absa.fadb.{DBFunctionWithStatus, DBSchema, FunctionStatusWithData}
+
+import scala.concurrent.Future
 
 /**
-  * Mix-in trait to use [[za.co.absa.fadb.DBFunction DBFunction]] with [[SlickPgEngine]]. Implements the abstract function `query`
-  * @tparam I - The input type of the function
-  * @tparam R - The return type of the function
-  */
-trait SlickFunction[I, R] extends DBFunctionFabric {
+ *  Base class for Slick DB functions.
+ *
+ *  @tparam I the input type of the function
+ *  @tparam R the result type of the function
+ */
+private[slick] trait SlickFunctionBase[I, R] {
 
   /**
-    * A reference to the [[SlickPgEngine]] to use the [[za.co.absa.fadb.DBFunction DBFunction]] with
-    */
-  implicit val dbEngine: SlickPgEngine
-
-  /**
-    * This is expected to return SQL part of the [[SlickQuery]] (eventually returned by the `SlickPgFunction.query` function
-    * @param values - the values to pass over to the database function
-    * @return       - the Slick representation of the SQL
-    */
-  protected def sql(values: I): SQLActionBuilder
-
-  /**
-    * This is expected to return a method to convert the [[slick.jdbc.PositionedResult slick.PositionedResult]], the Slick general SQL result
-    * format into the `R` type
-    * @return - the converting function
-    */
+   *  The `GetResult[R]` instance used to read the query result into `R`.
+   */
   protected def slickConverter: GetResult[R]
 
   /**
-    * Alias to use within the SQL query
-    */
-  protected val alias = "FNC"
+   *  Generates a Slick `SQLActionBuilder` representing the SQL query for the function.
+   *
+   *  @param values the input values for the function
+   *  @return the Slick `SQLActionBuilder` representing the SQL query
+   */
+  protected def sql(values: I): SQLActionBuilder
+
+  def fieldsToSelect: Seq[String]
+}
+
+private[slick] trait SlickFunction[I, R] extends SlickFunctionBase[I, R] {
 
   /**
-    * Helper function to use in the actual DB function class
-    * @return the SELECT part of the function call SQL query
-    */
-  protected def selectEntry: String = { // TODO Not suggested to use until #6 will be implemented
-    val fieldsSeq = fieldsToSelect
-    if (fieldsSeq.isEmpty) {
-      "*"
-    } else {
-      val aliasToUse = if (alias.isEmpty) {
-        ""
-      } else {
-        s"$alias."
-      }
-      fieldsToSelect.map(aliasToUse + _).mkString(",")
-    }
-  }
+   *  Generates a `SlickQuery[R]` representing the SQL query for the function.
+   *
+   *  @param values the input values for the function
+   *  @return the `SlickQuery[R]` representing the SQL query
+   */
+  protected def query(values: I): SlickQuery[R] = new SlickQuery(sql(values), slickConverter)
+}
+
+private[slick] trait SlickFunctionWithStatus[I, R] extends SlickFunctionBase[I, R] {
 
   /**
-    * This mix-in main reason of existence. It implements the `query` function for [[za.co.absa.fadb.DBFunction DBFunction]] for [[SlickPgEngine]]
-    * @param values - the values to pass over to the database function
-    * @return       - the SQL query in [[SlickQuery]] form
-    */
-  protected def query(values: I): dbEngine.QueryType[R] = {
-    new SlickQuery(sql(values), slickConverter)
-  }
+   *  Generates a `SlickQueryWithStatus[R]` representing the SQL query for the function with status support.
+   *
+   *  @param values the input values for the function
+   *  @return the `SlickQueryWithStatus[R]` representing the SQL query
+   */
+  protected def query(values: I): SlickQueryWithStatus[R] =
+    new SlickQueryWithStatus[R](sql(values), slickConverter, checkStatus)
+
+  // Expected to be mixed in by an implementation of StatusHandling
+  def checkStatus[A](statusWithData: FunctionStatusWithData[A]): Either[StatusException, A]
+}
+
+object SlickFunction {
+
+  /**
+   *  Class for Slick DB functions with status support.
+   */
+  abstract class SlickSingleResultFunctionWithStatus[I, R](functionNameOverride: Option[String] = None)(implicit
+    override val schema: DBSchema,
+    dBEngine: SlickPgEngine
+  ) extends DBFunctionWithStatus[I, R, SlickPgEngine, Future](functionNameOverride)
+      with SlickFunctionWithStatus[I, R]
+
+  /**
+   *  Class for Slick DB functions with single result.
+   */
+  abstract class SlickSingleResultFunction[I, R](functionNameOverride: Option[String] = None)(implicit
+    override val schema: DBSchema,
+    dBEngine: SlickPgEngine
+  ) extends DBSingleResultFunction[I, R, SlickPgEngine, Future](functionNameOverride)
+      with SlickFunction[I, R]
+
+  /**
+   *  Class for Slick DB functions with multiple results.
+   */
+  abstract class SlickMultipleResultFunction[I, R](functionNameOverride: Option[String] = None)(implicit
+    override val schema: DBSchema,
+    dBEngine: SlickPgEngine
+  ) extends DBMultipleResultFunction[I, R, SlickPgEngine, Future](functionNameOverride)
+      with SlickFunction[I, R]
+
+  /**
+   *  Class for Slick DB functions with optional result.
+   */
+  abstract class SlickOptionalResultFunction[I, R](functionNameOverride: Option[String] = None)(implicit
+    override val schema: DBSchema,
+    dBEngine: SlickPgEngine
+  ) extends DBOptionalResultFunction[I, R, SlickPgEngine, Future](functionNameOverride)
+      with SlickFunction[I, R]
 }

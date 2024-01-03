@@ -16,10 +16,14 @@
 
 package za.co.absa.fadb
 
+import cats.implicits._
 import org.scalatest.funsuite.AnyFunSuite
-
-import scala.concurrent.{ExecutionContext, Future}
+import za.co.absa.fadb.DBFunction.DBSingleResultFunction
+import za.co.absa.fadb.exceptions.StatusException
 import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits.namingConvention
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class DBFunctionSuite extends AnyFunSuite {
 
@@ -27,34 +31,38 @@ class DBFunctionSuite extends AnyFunSuite {
     throw new Exception("Should never get here")
   }
 
-  private implicit object EngineThrow extends DBEngine {
+  class EngineThrow extends DBEngine[Future] {
     override def run[R](query: QueryType[R]): Future[Seq[R]] = neverHappens
-
-    override implicit val executor: ExecutionContext = ExecutionContext.Implicits.global
+    override def runWithStatus[R](query: QueryWithStatusType[R]): Future[Either[StatusException, R]] = neverHappens
   }
 
-  private object FooNamed extends DBSchema(EngineThrow)
-  private object FooNameless extends DBSchema(EngineThrow, "")
+  private object FooNamed extends DBSchema
+  private object FooNameless extends DBSchema("")
 
   test("Function name check"){
-    case class MyFunction(override val schema: DBSchema) extends DBFunction[Unit, Unit, DBEngine](schema) {
+
+    class MyFunction(implicit override val schema: DBSchema, val dbEngine: EngineThrow)
+      extends DBSingleResultFunction[Unit, Unit, EngineThrow, Future](None) {
+
       override protected def query(values: Unit): dBEngine.QueryType[Unit] = neverHappens
     }
 
-    val fnc1 = MyFunction(FooNamed)
-    val fnc2 = MyFunction(FooNameless)
+    val fnc1 = new MyFunction()(FooNamed, new EngineThrow)
+    val fnc2 = new MyFunction()(FooNameless, new EngineThrow)
 
     assert(fnc1.functionName == "foo_named.my_function")
     assert(fnc2.functionName == "my_function")
   }
 
   test("Function name override check"){
-    case class MyFunction(override val schema: DBSchema) extends DBFunction[Unit, Unit, DBEngine](schema, "bar") {
+    class MyFunction(implicit override val schema: DBSchema, val dbEngine: EngineThrow)
+      extends DBSingleResultFunction[Unit, Unit, EngineThrow, Future](Some("bar")) {
+
       override protected def query(values: Unit): dBEngine.QueryType[Unit] = neverHappens
     }
 
-    val fnc1 = MyFunction(FooNamed)
-    val fnc2 = MyFunction(FooNameless)
+    val fnc1 = new MyFunction()(FooNamed, new EngineThrow)
+    val fnc2 = new MyFunction()(FooNameless, new EngineThrow)
 
     assert(fnc1.functionName == "foo_named.bar")
     assert(fnc2.functionName == "bar")

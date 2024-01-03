@@ -17,36 +17,22 @@
 package za.co.absa.fadb.status
 
 import org.scalatest.funsuite.AnyFunSuite
-import za.co.absa.fadb.status.StatusException._
+import za.co.absa.fadb.exceptions._
 
 class StatusExceptionSuite extends AnyFunSuite {
   test("Test equals - when they are the same") {
     val statusException = DataConflictException(FunctionStatus(10, "OK"))
-    val otherStatusException = DataConflictException(10, "OK")
+    val otherStatusException = DataConflictException(FunctionStatus(10, "OK"))
 
     assert(statusException == otherStatusException)
   }
 
   test("Test equals - when they are different") {
-    val statusException = DataNotFoundException(10, "OK")
-    val otherStatusException = DataNotFoundException(10, "Hello")
-    val anotherStatusException = DataNotFoundException(11, "OK")
+    val statusException = DataNotFoundException(FunctionStatus(10, "OK"))
+    val otherStatusException = DataNotFoundException(FunctionStatus(10, "Hello"))
+    val anotherStatusException = DataNotFoundException(FunctionStatus(11, "OK"))
 
     assert(statusException != otherStatusException)
     assert(statusException != anotherStatusException)
-  }
-
-  test("Test equals - when values are same but classes differ") {
-    val statusException = StatusException(10, "OK")
-    val otherStatusException = ServerMisconfigurationException(10, "OK")
-
-    assert(statusException != otherStatusException)
-  }
-
-  test("Test equals - when values are same but classes inheritance differ") {
-    val statusException = StatusException(10, "OK")
-    val otherException = new ClassNotFoundException()
-
-    assert(statusException != otherException)
   }
 }

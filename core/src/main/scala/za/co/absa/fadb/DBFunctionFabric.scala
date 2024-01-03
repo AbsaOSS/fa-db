@@ -17,19 +17,47 @@
 package za.co.absa.fadb
 
 /**
-  * This trait serves the purpose of introducing functions that are common to all DB Function objects and mix-in traits
-  * that offer certain implementations. This trait should help with the inheritance of all of these
-  */
-trait DBFunctionFabric {
+ *  This trait serves the purpose of introducing functions that are common to all DB Function objects and mix-in traits
+ *  that offer certain implementations. This trait should help with the inheritance of all of these
+ */
+abstract class DBFunctionFabric(functionNameOverride: Option[String])(implicit val schema: DBSchema) {
+  /**
+   * Alias of the function, based on the class name
+   */
+  protected val alias = "FNC"
 
   /**
-    * Name of the function the class represents
-    */
-  def functionName: String
+   * Name of the function, based on the class name, unless it is overridden in the constructor
+   */
+  val functionName: String = {
+    val fn = functionNameOverride.getOrElse(schema.objectNameFromClassName(getClass))
+    if (schema.schemaName.isEmpty) {
+      fn
+    } else {
+      s"${schema.schemaName}.$fn"
+    }
+  }
 
   /**
-    * List of fields to select from the DB function.
-    * @return - list of fields to select
-    */
-  protected def fieldsToSelect: Seq[String] = Seq.empty
+   *  List of fields to select from the DB function.
+   *  @return - list of fields to select
+   */
+  def fieldsToSelect: Seq[String] = Seq.empty
+
+  /*
+    *  Generates a list of select columns for the function
+   */
+  def selectEntry: String = {
+    val fieldsSeq = fieldsToSelect
+    if (fieldsSeq.isEmpty) {
+      "*"
+    } else {
+      val aliasToUse = if (alias.isEmpty) {
+        ""
+      } else {
+        s"$alias."
+      }
+      fieldsToSelect.map(aliasToUse + _).mkString(",")
+    }
+  }
 }

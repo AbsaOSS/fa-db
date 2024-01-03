@@ -16,228 +16,187 @@
 
 package za.co.absa.fadb
 
-import za.co.absa.fadb.naming.NamingConvention
-import scala.concurrent.Future
+import za.co.absa.fadb.exceptions.StatusException
+import za.co.absa.fadb.status.handling.StatusHandling
+
+import scala.language.higherKinds
 
 /**
-  *
-  * @param functionNameOverride - in case the class name would not match the database function name, this gives the
-  *                             possibility of override
-  * @param schema               - the schema the function belongs into
-  * @param dBEngine             - the database engine that is supposed to execute the function (presumably contains
-  *                             connection to the database
-  * @tparam I                   - the type covering the input fields of the database function
-  * @tparam R                   - the type covering the returned fields from the database function
-  * @tparam E                   - the type of the [[DBEngine]] engine
-  */
-abstract class DBFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
-                                              (implicit val schema: DBSchema, val dBEngine: E) extends DBFunctionFabric {
+ *  `DBFunction` is an abstract class that represents a database function.
+ *  @param functionNameOverride - Optional parameter to override the class name if it does not match the database function name.
+ *  @param schema - The schema the function belongs to.
+ *  @param dBEngine - The database engine that is supposed to execute the function (contains connection to the database).
+ *  @tparam I - The type covering the input fields of the database function.
+ *  @tparam R - The type covering the returned fields from the database function.
+ *  @tparam E - The type of the [[DBEngine]] engine.
+ *  @tparam F - The type of the context in which the database function is executed.
+ */
+abstract class DBFunction[I, R, E <: DBEngine[F], F[_]](functionNameOverride: Option[String] = None)(
+  implicit override val schema: DBSchema,
+  val dBEngine: E
+) extends DBFunctionFabric(functionNameOverride) {
 
-  /* alternative constructors for different availability of input parameters */
-  def this(functionNameOverride: String)
-          (implicit schema: DBSchema, dBEngine: E) = {
-    this(Option(functionNameOverride))(schema, dBEngine)
-  }
+  // A constructor that takes only the mandatory parameters and uses default values for the optional ones
+  def this()(implicit schema: DBSchema, dBEngine: E) = this(None)
 
-  def this(schema: DBSchema, functionNameOverride: String)
-          (implicit dBEngine: E) = {
-    this(Option(functionNameOverride))(schema, dBEngine)
-  }
-
-  /* only one constructor of a class can have default values for parameters*/
-  def this(schema: DBSchema)
-          (implicit dBEngine: E) = {
-    this(None)(schema, dBEngine)
-  }
-
-  def this(dBEngine: E, functionNameOverride: String)
-          (implicit schema: DBSchema)  = {
-    this(Option(functionNameOverride))(schema, dBEngine)
-  }
-
-  def this(dBEngine: E)
-          (implicit schema: DBSchema)  = {
-    this(None)(schema, dBEngine)
-  }
+  // A constructor that allows specifying the function name as a string, but not as an option
+  def this(functionName: String)(implicit schema: DBSchema, dBEngine: E) = this(Some(functionName))
 
   /**
-    * Function to create the DB function call specific to the provided [[DBEngine]]. Expected to be implemented by the
-    * DBEngine specific mix-in.
-    * @param values - the values to pass over to the database function
-    * @return       - the SQL query in the format specific to the provided [[DBEngine]]
-    */
+   *  Executes the database function and returns multiple results.
+   *  @param values - The values to pass over to the database function.
+   *  @return - A sequence of results from the database function.
+   */
+  protected def multipleResults(values: I): F[Seq[R]] = dBEngine.fetchAll(query(values))
+
+  /**
+   *  Executes the database function and returns a single result.
+   *  @param values - The values to pass over to the database function.
+   *  @return - A single result from the database function.
+   */
+  protected def singleResult(values: I): F[R] = dBEngine.fetchHead(query(values))
+
+  /**
+   *  Executes the database function and returns an optional result.
+   *  @param values - The values to pass over to the database function.
+   *  @return - An optional result from the database function.
+   */
+  protected def optionalResult(values: I): F[Option[R]] = dBEngine.fetchHeadOption(query(values))
+
+  /**
+   *  Function to create the DB function call specific to the provided [[DBEngine]].
+   *  Expected to be implemented by the DBEngine specific mix-in.
+   *  @param values - The values to pass over to the database function.
+   *  @return - The SQL query in the format specific to the provided [[DBEngine]].
+   */
   protected def query(values: I): dBEngine.QueryType[R]
+}
+
+/**
+ *  `DBFunctionWithStatus` is an abstract class that represents a database function with a status.
+ *  It extends the [[DBFunction]] class and adds handling for the status of the function invocation.
+ *  @param functionNameOverride - Optional parameter to override the class name if it does not match the database function name.
+ *  @param schema - The schema the function belongs to.
+ *  @param dBEngine - The database engine that is supposed to execute the function (contains connection to the database).
+ *  @tparam I - The type covering the input fields of the database function.
+ *  @tparam R - The type covering the returned fields from the database function.
+ *  @tparam E - The type of the [[DBEngine]] engine.
+ *  @tparam F - The type of the context in which the database function is executed.
+ */
+abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOverride: Option[String] = None)(
+  implicit override val schema: DBSchema,
+  val dBEngine: E
+) extends DBFunctionFabric(functionNameOverride)
+    with StatusHandling {
+
+  private val defaultStatusField = "status"
+  private val defaultStatusTextField = "statusText"
+
+  // A constructor that takes only the mandatory parameters and uses default values for the optional ones
+  def this()(implicit schema: DBSchema, dBEngine: E) = this(None)
+
+  // A constructor that allows specifying the function name as a string, but not as an option
+  def this(functionName: String)(implicit schema: DBSchema, dBEngine: E) = this(Some(functionName))
 
   /**
-    * Name of the function, based on the class name, unless it is overridden in the constructor
-    */
-  val functionName: String = {
-    val fn = functionNameOverride.getOrElse(schema.objectNameFromClassName(getClass))
-    if (schema.schemaName.isEmpty) {
-      fn
-    } else {
-      s"${schema.schemaName}.$fn"
-    }
+   *  Executes the database function and returns multiple results.
+   *  @param values
+   *  @return A sequence of results from the database function.
+   */
+  def apply(values: I): F[Either[StatusException, R]] = dBEngine.runWithStatus(query(values))
+
+  /**
+   *  The fields to select from the database function call
+   *  @return the fields to select from the database function call
+   */
+  override def fieldsToSelect: Seq[String] = {
+    Seq(
+      schema.namingConvention.stringPerConvention(defaultStatusField),
+      schema.namingConvention.stringPerConvention(defaultStatusTextField)
+    ) ++ super.fieldsToSelect
   }
 
-  def namingConvention: NamingConvention = schema.namingConvention
-
   /**
-    * List of fields to select from the DB function. Expected to be based on the return type `R`
-    * @return - list of fields to select
-    */
-  override protected def fieldsToSelect: Seq[String] = super.fieldsToSelect //TODO should get the names from R #6
+   *  Function to create the DB function call specific to the provided [[DBEngine]]. Expected to be implemented by the
+   *  DBEngine specific mix-in.
+   *  @param values the values to pass over to the database function
+   *  @return       the SQL query in the format specific to the provided [[DBEngine]]
+   */
+  protected def query(values: I): dBEngine.QueryWithStatusType[R]
 
-  /*these 3 functions has to be defined here and not in the ancestors, as there the query type is not compatible - path-dependent types*/
-  protected def multipleResults(values: I): Future[Seq[R]] = dBEngine.fetchAll(query(values))
-  protected def singleResult(values: I): Future[R] = dBEngine.fetchHead(query(values))
-  protected def optionalResult(values: I): Future[Option[R]] = dBEngine.fetchHeadOption(query(values))
-
+  // To be provided by an implementation of QueryStatusHandling
+  override def checkStatus[A](statusWithData: FunctionStatusWithData[A]): Either[StatusException, A]
 }
 
 object DBFunction {
+
   /**
-    * Represents a function returning a set (in DB sense) of rows
-    * @param functionNameOverride - in case the class name would not match the database function name, this gives the
-    *                             possibility of override
-    * @param schema               - the schema the function belongs into
-    * @param dBEngine             - the database engine that is supposed to execute the function (presumably contains
-    *                             connection to the database
-    * @tparam I                   - the type covering the input fields of the database function
-    * @tparam R                   - the type covering the returned fields from the database function
-    * @tparam E                   - the type of the [[DBEngine]] engine
-    */
-  abstract class DBMultipleResultFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
-                                                              (implicit schema: DBSchema, dBEngine: E)
-    extends DBFunction[I, R, E](functionNameOverride) {
+   *  `DBMultipleResultFunction` is an abstract class that represents a database function returning multiple results.
+   *  It extends the [[DBFunction]] class and overrides the apply method to return a sequence of results.
+   */
+  abstract class DBMultipleResultFunction[I, R, E <: DBEngine[F], F[_]](
+    functionNameOverride: Option[String] = None
+  )(implicit schema: DBSchema, dBEngine: E)
+      extends DBFunction[I, R, E, F](functionNameOverride) {
 
-    def this(functionNameOverride: String)
-            (implicit schema: DBSchema, dBEngine: E) = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
+    // A constructor that takes only the mandatory parameters and uses default values for the optional ones
+    def this()(implicit schema: DBSchema, dBEngine: E) = this(None)
 
-    def this(schema: DBSchema, functionNameOverride: String)
-            (implicit dBEngine: E) = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(schema: DBSchema)
-            (implicit dBEngine: E) = {
-      this(None)(schema, dBEngine)
-    }
-
-    def this(dBEngine: E, functionNameOverride: String)
-            (implicit schema: DBSchema)  = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(dBEngine: E)
-            (implicit schema: DBSchema)  = {
-      this(None)(schema, dBEngine)
-    }
+    // A constructor that allows specifying the function name as a string, but not as an option
+    def this(functionName: String)(implicit schema: DBSchema, dBEngine: E) = this(Some(functionName))
 
     /**
-      * For easy and convenient execution of the DB function call
-      * @param values - the values to pass over to the database function
-      * @return       - a sequence of values, each coming from a row returned from the DB function transformed to scala
-      *               type `R`
-      */
-    def apply(values: I): Future[Seq[R]] = multipleResults(values)
+     *  For easy and convenient execution of the DB function call
+     *  @param values - the values to pass over to the database function
+     *  @return       - a sequence of values, each coming from a row returned from the DB function transformed to scala
+     *               type `R`
+     */
+    def apply(values: I): F[Seq[R]] = multipleResults(values)
   }
 
   /**
-    * Represents a function returning exactly one record
-    * @param functionNameOverride - in case the class name would not match the database function name, this gives the
-    *                             possibility of override
-    * @param schema               - the schema the function belongs into
-    * @param dBEngine             - the database engine that is supposed to execute the function (presumably contains
-    *                             connection to the database
-    * @tparam I                   - the type covering the input fields of the database function
-    * @tparam R                   - the type covering the returned fields from the database function
-    * @tparam E                   - the type of the [[DBEngine]] engine
-    */
-  abstract class DBSingleResultFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
-                                                            (implicit schema: DBSchema, dBEngine: E)
-    extends DBFunction[I, R, E](functionNameOverride) {
+   *  `DBSingleResultFunction` is an abstract class that represents a database function returning a single result.
+   *  It extends the [[DBFunction]] class and overrides the apply method to return a single result.
+   */
+  abstract class DBSingleResultFunction[I, R, E <: DBEngine[F], F[_]](
+    functionNameOverride: Option[String] = None
+  )(implicit schema: DBSchema, dBEngine: E)
+      extends DBFunction[I, R, E, F](functionNameOverride) {
 
-    def this(functionNameOverride: String)
-            (implicit schema: DBSchema, dBEngine: E) = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
+    // A constructor that takes only the mandatory parameters and uses default values for the optional ones
+    def this()(implicit schema: DBSchema, dBEngine: E) = this(None)
 
-    def this(schema: DBSchema, functionNameOverride: String)
-            (implicit dBEngine: E) = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(schema: DBSchema)
-            (implicit dBEngine: E) = {
-      this(None)(schema, dBEngine)
-    }
-
-    def this(dBEngine: E, functionNameOverride: String)
-            (implicit schema: DBSchema)  = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(dBEngine: E)
-            (implicit schema: DBSchema)  = {
-      this(None)(schema, dBEngine)
-    }
+    // A constructor that allows specifying the function name as a string, but not as an option
+    def this(functionName: String)(implicit schema: DBSchema, dBEngine: E) = this(Some(functionName))
 
     /**
-      * For easy and convenient execution of the DB function call
-      * @param values - the values to pass over to the database function
-      * @return       - the value returned from the DB function transformed to scala type `R`
-      */
-    def apply(values: I): Future[R] = singleResult(values)
+     *  For easy and convenient execution of the DB function call
+     *  @param values - the values to pass over to the database function
+     *  @return       - the value returned from the DB function transformed to scala type `R`
+     */
+    def apply(values: I): F[R] = singleResult(values)
   }
 
   /**
-    * Represents a function returning one optional record
-    * @param functionNameOverride - in case the class name would not match the database function name, this gives the
-    *                             possibility of override
-    * @param schema               - the schema the function belongs into
-    * @param dBEngine             - the database engine that is supposed to execute the function (presumably contains
-    *                             connection to the database
-    * @tparam I                   - the type covering the input fields of the database function
-    * @tparam R                   - the type covering the returned fields from the database function
-    * @tparam E                   - the type of the [[DBEngine]] engine
-    */
-  abstract class DBOptionalResultFunction[I, R, E <: DBEngine](functionNameOverride: Option[String] = None)
-                                                              (implicit schema: DBSchema, dBEngine: E)
-    extends DBFunction[I, R, E](functionNameOverride) {
+   *  `DBOptionalResultFunction` is an abstract class that represents a database function returning an optional result.
+   *  It extends the [[DBFunction]] class and overrides the apply method to return an optional result.
+   */
+  abstract class DBOptionalResultFunction[I, R, E <: DBEngine[F], F[_]](
+    functionNameOverride: Option[String] = None
+  )(implicit schema: DBSchema, dBEngine: E)
+      extends DBFunction[I, R, E, F](functionNameOverride) {
 
-    def this(functionNameOverride: String)
-            (implicit schema: DBSchema, dBEngine: E) = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
+    // A constructor that takes only the mandatory parameters and uses default values for the optional ones
+    def this()(implicit schema: DBSchema, dBEngine: E) = this(None)
 
-    def this(schema: DBSchema, functionNameOverride: String)
-            (implicit dBEngine: E) = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(schema: DBSchema)
-            (implicit dBEngine: E) = {
-      this(None)(schema, dBEngine)
-    }
-
-    def this(dBEngine: E, functionNameOverride: String)
-            (implicit schema: DBSchema)  = {
-      this(Option(functionNameOverride))(schema, dBEngine)
-    }
-
-    def this(dBEngine: E)
-            (implicit schema: DBSchema)  = {
-      this(None)(schema, dBEngine)
-    }
+    // A constructor that allows specifying the function name as a string, but not as an option
+    def this(functionName: String)(implicit schema: DBSchema, dBEngine: E) = this(Some(functionName))
 
     /**
-      * For easy and convenient execution of the DB function call
-      * @param values - the values to pass over to the database function
-      * @return       - the value returned from the DB function transformed to scala type `R` if a row is returned, otherwise `None`
-      */
-    def apply(values: I): Future[Option[R]] = optionalResult(values)
+     *  For easy and convenient execution of the DB function call
+     *  @param values - the values to pass over to the database function
+     *  @return       - the value returned from the DB function transformed to scala type `R` if a row is returned, otherwise `None`
+     */
+    def apply(values: I): F[Option[R]] = optionalResult(values)
   }
 }
