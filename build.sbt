@@ -50,7 +50,9 @@ lazy val commonJacocoExcludes: Seq[String] = Seq(
   // at this point code is tested using integration tests
   "za.co.absa.fadb.status.handling.implementations.UserDefinedStatusHandling",
   "za.co.absa.fadb.DBEngine",
-  "za.co.absa.fadb.DBFunction"
+  "za.co.absa.fadb.DBFunction",
+  "za.co.absa.fadb.slick.*",
+  "za.co.absa.fadb.doobie.*"
 )
 
 lazy val parent = (project in file("."))
