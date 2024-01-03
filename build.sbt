@@ -46,14 +46,6 @@ lazy val commonJacocoReportSettings: JacocoReportSettings = JacocoReportSettings
   * or  `za.co.absa.fadb.naming.NamingConvention*` to filter the class and all related objects
   */
 lazy val commonJacocoExcludes: Seq[String] = Seq(
-  // temporary excludes until we have a better way how to test against a database
-  // at this point code is tested using integration tests
-  "za.co.absa.fadb.status.handling.implementations.UserDefinedStatusHandling",
-  "za.co.absa.fadb.DBEngine",
-  "za.co.absa.fadb.DBFunction",
-  "za.co.absa.fadb.DBFunction.*",
-  "za.co.absa.fadb.slick.*",
-  "za.co.absa.fadb.doobie.*"
 )
 
 lazy val parent = (project in file("."))

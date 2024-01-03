@@ -105,9 +105,10 @@ jobs:
         run: |
           echo "Total coverage ${{ steps.jacoco.outputs.coverage-overall }}"
           echo "Changed Files coverage ${{ steps.jacoco.outputs.coverage-changed-files }}"
-      - name: Fail PR if changed files coverage is less than ${{ matrix.changed }}%
-        if: ${{ steps.jacoco.outputs.coverage-changed-files < 80.0 }}
-        uses: actions/github-script@v6
-        with:
-          script: |
-            core.setFailed('Changed files coverage is less than ${{ matrix.changed }}%!')
+# temporarily disabled until we have a better way how to test against a database
+#      - name: Fail PR if changed files coverage is less than ${{ matrix.changed }}%
+#        if: ${{ steps.jacoco.outputs.coverage-changed-files < 80.0 }}
+#        uses: actions/github-script@v6
+#        with:
+#          script: |
+#            core.setFailed('Changed files coverage is less than ${{ matrix.changed }}%!')
