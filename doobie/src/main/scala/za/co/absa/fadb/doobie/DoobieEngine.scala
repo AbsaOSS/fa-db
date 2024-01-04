@@ -27,7 +27,7 @@ import za.co.absa.fadb.exceptions.StatusException
 import scala.language.higherKinds
 
 /**
- *  `DoobieEngine` is a class that extends `DBEngine` with `F` as the effect type.
+ *  [[DoobieEngine]] is a class that extends `DBEngine` with `F` as the effect type.
  *  It uses Doobie's `Transactor[F]` to execute SQL queries.
  *
  *  `Async` is needed because Doobie requires it for non-blocking database operations.

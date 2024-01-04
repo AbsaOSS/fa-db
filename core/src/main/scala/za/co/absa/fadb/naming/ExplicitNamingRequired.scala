@@ -19,15 +19,15 @@ package za.co.absa.fadb.naming
 import za.co.absa.fadb.exceptions.NamingException
 
 /**
- *  [[ExplicitNamingRequired]] is a [[NamingConvention]] that throws a [[NamingException]] for any string.
+ *  [[ExplicitNamingRequired]] is a [[NamingConvention]] that throws a [[za.co.absa.fadb.exceptions.NamingException]] for any string.
  *  This is used when explicit naming is required and no other naming convention should be applied.
  */
 class ExplicitNamingRequired extends NamingConvention {
 
   /**
-   *  Throws a [[NamingException]] with a message indicating that explicit naming is required.
+   *  Throws a [[za.co.absa.fadb.exceptions.NamingException]] with a message indicating that explicit naming is required.
    *  @param original - The original string.
-   *  @return Nothing, as a [[NamingException]] is always thrown.
+   *  @return Nothing, as a [[za.co.absa.fadb.exceptions.NamingException]] is always thrown.
    */
   override def stringPerConvention(original: String): String = {
     val message = s"No convention for '$original', explicit naming required."
@@ -37,13 +37,13 @@ class ExplicitNamingRequired extends NamingConvention {
 
 /**
  *  [[ExplicitNamingRequired.Implicits]] provides an implicit [[NamingConvention]] instance that
- *  throws a [[NamingException]] for any string.
+ *  throws a [[za.co.absa.fadb.exceptions.NamingException]] for any string.
  */
 object ExplicitNamingRequired {
   object Implicits {
 
     /**
-     *  An implicit [[NamingConvention]] instance that throws a [[NamingException]] for any string.
+     *  An implicit [[NamingConvention]] instance that throws a [[za.co.absa.fadb.exceptions.NamingException]] for any string.
      */
     implicit val namingConvention: NamingConvention = new ExplicitNamingRequired()
   }
