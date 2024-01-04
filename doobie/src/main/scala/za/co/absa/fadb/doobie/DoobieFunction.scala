@@ -86,13 +86,13 @@ private[doobie] trait DoobieFunctionWithStatus[I, R] extends DoobieFunctionBase[
 }
 
 /**
- *  [[DoobieFunction]] is an object that contains several abstract classes extending different types of database functions.
+ *  An object that contains several abstract classes extending different types of database functions.
  *  These classes use [[doobie.Fragment]] to represent SQL queries and [[DoobieEngine]] to execute them.
  */
 object DoobieFunction {
   /**
    *  [[DoobieSingleResultFunctionWithStatus]] is an abstract class that extends
-   *  [[za.co.absa.fadb.DBFunction.DBSingleResultFunctionWithStatus]] with [[DoobieEngine]] as the engine type.
+   *  [[za.co.absa.fadb.DBFunctionWithStatus]] with [[DoobieEngine]] as the engine type.
    *  It represents a database function that returns a single result with status.
    *
    *  @param functionNameOverride the optional override for the function name
