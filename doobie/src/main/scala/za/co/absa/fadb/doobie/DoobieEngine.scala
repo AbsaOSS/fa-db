@@ -28,12 +28,12 @@ import scala.language.higherKinds
 
 /**
  *  [[DoobieEngine]] is a class that extends [[DBEngine]] with `F` as the effect type.
- *  It uses Doobie's [[doobie.Transactor]] to execute SQL queries.
+ *  It uses [[doobie.Transactor]] to execute SQL queries.
  *
- *  [[Async]] is needed because Doobie requires it for non-blocking database operations.
+ *  [[cats.effect.Async]] is needed because Doobie requires it for non-blocking database operations.
  *
- *  @param transactor the Doobie [[doobie.Transactor]] for executing SQL queries
- *  @tparam F the effect type, which must have an [[Async]] instance
+ *  @param transactor the [[doobie.Transactor]] for executing SQL queries
+ *  @tparam F the effect type, which must have an [[cats.effect.Async]] instance
  */
 class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[F] {
 
