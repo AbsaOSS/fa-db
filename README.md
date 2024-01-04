@@ -14,6 +14,8 @@ ___
 - [Usage](#usage)
 - [Concepts](#concepts)
 - [Slick module](#slick-module)
+- [Slick streaming module](#slick-streaming-module)
+- [Doobie module](#doobie-module)
 - [Testing](#testing)
 - [How to Release](#how-to-release)
 <!-- tocstop -->
@@ -54,10 +56,12 @@ Currently, the library is developed with Postgres as the target DB. But the appr
 
 #### Sbt
 
-Import one of the two available module at the moment. Slick module works with Scala Futures. Doobie module works with any effect type (typically IO or ZIO) provided cats effect's Async instance is available.
+Slick module works with Scala Futures. Slick-streaming provides also streaming support for Slick with fs2 streams and any effect type provided cats effect's Async instance is available. 
+Doobie module provides both non-streaming and streaming functions and works with any effect type (typically IO or ZIO) provided cats effect's Async instance is available.
 
 ```scala
 libraryDependencies *= "za.co.absa.fa-db" %% "slick"  % "X.Y.Z"
+libraryDependencies *= "za.co.absa.fa-db" %% "slick-streaming"  % "X.Y.Z"
 libraryDependencies *= "za.co.absa.fa-db" %% "doobie"  % "X.Y.Z"
 ```
 
@@ -67,13 +71,20 @@ libraryDependencies *= "za.co.absa.fa-db" %% "doobie"  % "X.Y.Z"
 
 Modules:
 * Core [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/core_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/core_2.12)
+* Streaming [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/streaming_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/streaming_2.12)
 * Slick [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/slick_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/slick_2.12)
+* Slick-streaming [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/slick-streaming_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/slick-streaming_2.12)
 * Doobie [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/doobie_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/doobie_2.12)
 
 ```xml
 <dependency>
     <groupId>za.co.absa.fa-db</groupId>
     <artifactId>slick_2.12</artifactId>
+    <version>${latest_version}</version>
+</dependency>
+<dependency>
+    <groupId>za.co.absa.fa-db</groupId>
+    <artifactId>slick-streaming_2.12</artifactId>
     <version>${latest_version}</version>
 </dependency>
 <dependency>
@@ -86,13 +97,20 @@ Modules:
 ### Scala 2.13
 Modules:
 * Core [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/core_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/core_2.13)
+* Streaming [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/streaming_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/streaming_2.13)
 * Slick [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/slick_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/slick_2.13)
+* Slick-streaming [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/slick-streaming_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/slick-streaming_2.13)
 * Doobie [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/doobie_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/doobie_2.13)
 
 ```xml
 <dependency>
     <groupId>za.co.absa.fa-db</groupId>
     <artifactId>slick_2.13</artifactId>
+    <version>${latest_version}</version>
+</dependency>
+<dependency>
+    <groupId>za.co.absa.fa-db</groupId>
+    <artifactId>slick-streaming_2.13</artifactId>
     <version>${latest_version}</version>
 </dependency>
 <dependency>
@@ -116,12 +134,10 @@ As the name suggests it runs on [Slick library](https://github.com/slick/slick) 
 It brings:
 
 * `class SlickPgEngine` - implementation of _Core_'s `DBEngine` executing the queries via Slick
-* `class SlickPgStreamingEngine` - implementation of _Core_'s `DBStreamingEngine` executing the queries via Slick in a streaming fashion
 * `class SlickSingleResultFunction` - abstract class for DB functions returning single result
 * `class SlickMultipleResultFunction` - abstract class for DB functions returning sequence of results
 * `class SlickOptionalResultFunction` - abstract class for DB functions returning optional result
 * `class SlickSingleResultFunctionWithStatus` - abstract class for DB functions with status handling; it requires an implementation of `StatusHandling` to be mixed-in (`StandardStatusHandling` available out-of-the-box)
-* `class SlickStreamingResultFunction` - abstract class for DB functions returning sequence of results (fs2.Stream) in a streaming fashion
 * `trait FaDbPostgresProfile` - to bring support for Postgres and its extended data types in one class (except JSON, as there are multiple implementations for this data type in _Slick-Pg_)
 * `object FaDbPostgresProfile` - instance of the above trait for direct use
 
@@ -143,6 +159,13 @@ val hStore: Option[Map[String, String]] = pr.nextHStoreOption
 val macAddr: Option[MacAddrString] = pr.nextMacAddrOption
 ```
 
+## Slick streaming module
+
+It additionally brings:
+
+* `class SlickPgStreamingEngine` - implementation of _Streaming_'s `DBStreamingEngine` executing the queries via Slick in a streaming fashion
+* `class SlickStreamingResultFunction` - abstract class for DB functions returning sequence of results (fs2.Stream) in a streaming fashion
+
 ## Doobie module
 
 As the name suggests it runs on [Doobie library](https://tpolecat.github.io/doobie/). The main benefit of the module is that it allows to use any effect type (typically IO or ZIO) therefore is more suitable for functional programming. It also brings in the [Doobie-Postgres library](https://tpolecat.github.io/doobie/docs/14-PostgreSQL.html) for extended Postgres type support.
@@ -150,12 +173,13 @@ As the name suggests it runs on [Doobie library](https://tpolecat.github.io/doob
 It brings:
 
 * `class DoobieEngine` - implementation of _Core_'s `DBEngine` executing the queries via Doobie. The class is type parameterized with the effect type.
-* `class DoobieStreamingEngine` - implementation of _Core_'s `DBStreamingEngine` executing the queries via Doobie in a streaming fashion. The class is type parameterized with the effect type.
+* `class DoobieStreamingEngine` - implementation of _Streamings_'s `DBStreamingEngine` executing the queries via Doobie in a streaming fashion. The class is type parameterized with the effect type.
 * `class DoobieSingleResultFunction` - abstract class for DB functions returning single result
 * `class DoobieMultipleResultFunction` - abstract class for DB functions returning sequence of results
 * `class DoobieOptionalResultFunction` - abstract class for DB functions returning optional result
 * `class DoobieSingleResultFunctionWithStatus` - abstract class for DB functions with status handling; it requires an implementation of `StatusHandling` to be mixed-in (`StandardStatusHandling` available out-of-the-box)
 * `class DoobieStreamingResultFunction` - abstract class for DB functions returning sequence of results (fs2.Stream) in a streaming fashion
+* 
 Since Doobie also interoperates with ZIO, there is an example of how a database connection can be properly established within a ZIO application. Please see [this file](doobie/zio-setup.md) for more details.
 
 ## Testing

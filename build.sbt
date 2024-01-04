@@ -80,7 +80,7 @@ lazy val faDBStreaming = (project in file("streaming"))
     libraryDependencies ++= streamingDependencies(scalaVersion.value),
     javacOptions ++= commonJavacOptions,
     scalacOptions ++= commonScalacOptions,
-    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value, // printScalaVersion is run with compile
+    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value,
     Defaults.itSettings,
   ).dependsOn(faDbCore)
   .settings(
@@ -95,7 +95,7 @@ lazy val faDBSlick = (project in file("slick"))
     libraryDependencies ++= slickDependencies(scalaVersion.value),
     javacOptions ++= commonJavacOptions,
     scalacOptions ++= commonScalacOptions,
-    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value, // printScalaVersion is run with compile
+    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value,
     Defaults.itSettings,
   ).dependsOn(faDbCore)
   .settings(
@@ -110,7 +110,7 @@ lazy val faDBSlickStreaming = (project in file("slick-streaming"))
     libraryDependencies ++= slickStreamingDependencies(scalaVersion.value),
     javacOptions ++= commonJavacOptions,
     scalacOptions ++= commonScalacOptions,
-    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value, // printScalaVersion is run with compile
+    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value,
     Defaults.itSettings,
   ).dependsOn(faDbCore, faDBStreaming, faDBSlick)
   .settings(
@@ -138,7 +138,7 @@ lazy val faDBExamples = (project in file("examples"))
     name := "examples",
     libraryDependencies ++= examplesDependencies(scalaVersion.value),
     Test / parallelExecution := false,
-    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value, // printScalaVersion is run with compile
+    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value,
     publish / skip := true
   ).dependsOn(faDbCore, faDBSlick)
   .settings(
