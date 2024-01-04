@@ -24,7 +24,7 @@ import za.co.absa.fadb.{FunctionStatusWithData, Query, QueryWithStatus}
 /**
  *  SQL query representation for Slick
  *  @param sql        - the SQL query in Slick format
- *  @param getResult  - function that converts the [[slick.jdbc.PositionedResult slick.PositionedResult]]
+ *  @param getResult  - function that converts the [[slick.jdbc.PositionedResult]]
  *                    (the result of Slick execution) into the desired `R` type
  *  @tparam R         - the return type of the query
  */
@@ -33,7 +33,7 @@ class SlickQuery[R](val sql: SQLActionBuilder, val getResult: GetResult[R]) exte
 /**
  *  SQL query representation for Slick with status
  *  @param sql        - the SQL query in Slick format
- *  @param getResult  - function that converts the [[slick.jdbc.PositionedResult slick.PositionedResult]]
+ *  @param getResult  - function that converts the [[slick.jdbc.PositionedResult]]
  *                    (the result of Slick execution) into the desired `R` type
  *  @tparam R         - the return type of the query
  */

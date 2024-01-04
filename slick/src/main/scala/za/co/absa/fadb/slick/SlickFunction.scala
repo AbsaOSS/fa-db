@@ -32,15 +32,15 @@ import scala.concurrent.Future
 private[slick] trait SlickFunctionBase[I, R] {
 
   /**
-   *  The `GetResult[R]` instance used to read the query result into `R`.
+   *  The [[slick.jdbc.GetResult]] instance used to read the query result into `R`.
    */
   protected def slickConverter: GetResult[R]
 
   /**
-   *  Generates a Slick `SQLActionBuilder` representing the SQL query for the function.
+   *  Generates a Slick [[slick.jdbc.SQLActionBuilder]] representing the SQL query for the function.
    *
    *  @param values the input values for the function
-   *  @return the Slick `SQLActionBuilder` representing the SQL query
+   *  @return the Slick [[slick.jdbc.SQLActionBuilder]]  representing the SQL query
    */
   protected def sql(values: I): SQLActionBuilder
 
@@ -50,10 +50,10 @@ private[slick] trait SlickFunctionBase[I, R] {
 trait SlickFunction[I, R] extends SlickFunctionBase[I, R] {
 
   /**
-   *  Generates a `SlickQuery[R]` representing the SQL query for the function.
+   *  Generates a [[SlickQuery]] for type `R` representing the SQL query for the function.
    *
    *  @param values the input values for the function
-   *  @return the `SlickQuery[R]` representing the SQL query
+   *  @return the [[SlickQuery]] for type `R` representing the SQL query
    */
   protected def query(values: I): SlickQuery[R] = new SlickQuery(sql(values), slickConverter)
 }
@@ -61,10 +61,10 @@ trait SlickFunction[I, R] extends SlickFunctionBase[I, R] {
 private[slick] trait SlickFunctionWithStatus[I, R] extends SlickFunctionBase[I, R] {
 
   /**
-   *  Generates a `SlickQueryWithStatus[R]` representing the SQL query for the function with status support.
+   *  Generates a [[SlickQueryWithStatus]] for type `R` representing the SQL query for the function with status support.
    *
    *  @param values the input values for the function
-   *  @return the `SlickQueryWithStatus[R]` representing the SQL query
+   *  @return the [[SlickQueryWithStatus]] for type `R` representing the SQL query
    */
   protected def query(values: I): SlickQueryWithStatus[R] =
     new SlickQueryWithStatus[R](sql(values), slickConverter, checkStatus)
