@@ -39,7 +39,6 @@ class DoobieStreamingEngine[F[_]: Async](val transactor: Transactor[F], defaultC
    *  Executes a Doobie query and returns the result as an [[fs2.Stream]] for effect type `F` and value type `R`.
    *
    *  @param query the [[DoobieQuery]] to execute
-   *  @param readR the [[doobie.Read]] instance used to read the query result into `R`
    *  @return the query result as an [[fs2.Stream]] for effect type `F` and value type `R`
    */
   override def runStreaming[R](query: QueryType[R]): fs2.Stream[F, R] =
@@ -50,7 +49,6 @@ class DoobieStreamingEngine[F[_]: Async](val transactor: Transactor[F], defaultC
    *
    *  @param query the Doobie query to execute
    *  @param chunkSize the chunk size to use when streaming the query result
-   *  @param readR the [[doobie.Read]] instance used to read the query result into `R`
    *  @return the query result as an [[fs2.Stream]] for effect type `F` and value type `R`
    */
   override def runStreamingWithChunkSize[R](query: QueryType[R], chunkSize: Int): fs2.Stream[F, R] =
