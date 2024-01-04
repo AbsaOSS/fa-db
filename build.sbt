@@ -49,7 +49,7 @@ lazy val commonJacocoExcludes: Seq[String] = Seq(
 )
 
 lazy val parent = (project in file("."))
-  .aggregate(faDbCore, faDBSlick, faDBDoobie, faDBExamples)
+  .aggregate(faDbCore, faDBStreaming, faDBSlick, faDBSlickStreaming, faDBDoobie, faDBExamples)
   .settings(
     name := "root",
     libraryDependencies ++= rootDependencies(scalaVersion.value),

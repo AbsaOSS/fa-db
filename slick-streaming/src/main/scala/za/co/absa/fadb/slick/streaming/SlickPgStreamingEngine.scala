@@ -25,7 +25,7 @@ import za.co.absa.fadb.streaming.DBStreamingEngine
 import scala.language.higherKinds
 
 /**
- *  [[SlickStreamingEngine]] is a class that represents a database engine.
+ *  [[SlickPgStreamingEngine]] is a class that represents a database engine.
  *  It provides methods to execute streaming queries from a database.
  *  @tparam F - The type of the context in which the database queries are executed.
  */
