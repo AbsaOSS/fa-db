@@ -21,7 +21,7 @@ import za.co.absa.fadb.exceptions._
 import za.co.absa.fadb.status.handling.StatusHandling
 
 /**
- *  `StandardStatusHandling` is a trait that extends the `StatusHandling` interface.
+ *  [[StandardStatusHandling]] is a trait that implements the [[StatusHandling]] interface.
  *  It provides a standard implementation for checking the status of a function invocation.
  */
 trait StandardStatusHandling extends StatusHandling {

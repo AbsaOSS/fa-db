@@ -17,7 +17,7 @@
 package za.co.absa.fadb.naming
 
 /**
- *  `NamingConvention` is a base trait that defines the interface for different naming conventions.
+ *  [[NamingConvention]] is a base trait that defines the interface for different naming conventions.
  *  It provides methods to convert a class name according to given naming convention.
  */
 trait NamingConvention {

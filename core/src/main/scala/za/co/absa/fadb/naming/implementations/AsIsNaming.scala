@@ -20,8 +20,9 @@ import za.co.absa.fadb.naming.{LettersCase, NamingConvention}
 import LettersCase.AsIs
 
 /**
- *  `AsIsNaming` provides a naming convention that leaves strings as they are.
+ *  [[AsIsNaming]] provides a naming convention that leaves strings as they are.
  *  It implements the [[NamingConvention]] trait.
+ *
  *  @param lettersCase - The case of the letters in the string.
  */
 class AsIsNaming(lettersCase: LettersCase) extends NamingConvention {
@@ -37,7 +38,7 @@ class AsIsNaming(lettersCase: LettersCase) extends NamingConvention {
 }
 
 /**
- *  `AsIsNaming.Implicits` provides an implicit [[NamingConvention]] instance that leaves strings as they are.
+ *  [[AsIsNaming.Implicits]] provides an implicit [[NamingConvention]] instance that leaves strings as they are.
  */
 object AsIsNaming {
   object Implicits {
