@@ -27,13 +27,13 @@ import za.co.absa.fadb.exceptions.StatusException
 import scala.language.higherKinds
 
 /**
- *  `DoobieEngine` is a class that extends `DBEngine` with `F` as the effect type.
- *  It uses Doobie's `Transactor[F]` to execute SQL queries.
+ *  [[DoobieEngine]] is a class that extends [[za.co.absa.fadb.DBEngine]] with `F` as the effect type.
+ *  It uses [[doobie.Transactor]] to execute SQL queries.
  *
- *  `Async` is needed because Doobie requires it for non-blocking database operations.
+ *  [[cats.effect.Async]] is needed because Doobie requires it for non-blocking database operations.
  *
- *  @param transactor the Doobie transactor for executing SQL queries
- *  @tparam F the effect type, which must have an `Async` instance
+ *  @param transactor the [[doobie.Transactor]] for executing SQL queries
+ *  @tparam F the effect type, which must have an [[cats.effect.Async]] instance
  */
 class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[F] {
 
@@ -45,7 +45,7 @@ class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[
    *  Executes a Doobie query and returns the result as an `F[Seq[R]]`.
    *
    *  @param query the Doobie query to execute
-   *  @param readR the `Read[R]` instance used to read the query result into `R`
+   *  @param readR the [[doobie.Read]] instance used to read the query result into `R`
    *  @return the query result as an `F[Seq[R]]`
    */
   private def executeQuery[R](query: QueryType[R])(implicit readR: Read[R]): F[Seq[R]] = {
@@ -56,7 +56,7 @@ class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[
    *  Executes a Doobie query and returns the result as an `F[Either[StatusException, R]]`.
    *
    *  @param query the Doobie query to execute
-   *  @param readStatusWithDataR the `Read[StatusWithData[R]]` instance used to read the query result into `StatusWithData[R]`
+   *  @param readStatusWithDataR the [[doobie.Read]] instance used to read the query result into `StatusWithData[R]`
    *  @return the query result as an `F[Either[StatusException, R]]`
    */
   private def executeQueryWithStatus[R](

@@ -19,8 +19,7 @@ import sbt._
 object Dependencies {
 
   private def commonDependencies(scalaVersion: String): Seq[ModuleID] = Seq(
-    "org.typelevel" %% "cats-core" % "2.9.0",
-    "org.typelevel" %% "cats-effect" % "3.5.0",
+    "org.typelevel"      %% "cats-core" % "2.9.0",
     "org.scalatest"      %% "scalatest" % "3.1.0"           % "test,it",
     "org.scalatest"      %% "scalatest-flatspec" % "3.2.0"  % "test,it",
     "org.scalatestplus"  %% "mockito-1-10" % "3.1.0.0"      % "test,it"
@@ -33,20 +32,32 @@ object Dependencies {
     )
   }
 
+  def streamingDependencies(scalaVersion: String): Seq[ModuleID] = {
+    commonDependencies(scalaVersion) ++ Seq(
+      "co.fs2" %% "fs2-core" % "3.7.0",
+    )
+  }
+
   def slickDependencies(scalaVersion: String): Seq[ModuleID] = {
     commonDependencies(scalaVersion) ++ Seq(
       "com.typesafe.slick"  %% "slick"                        % "3.3.3",
       "org.slf4j"            % "slf4j-nop"                    % "1.7.26",
       "com.typesafe.slick"  %% "slick-hikaricp"               % "3.3.3",
       "org.postgresql"       % "postgresql"                   % "42.6.0",
-      "com.github.tminglei" %% "slick-pg"                     % "0.20.4"   % Optional
+      "com.github.tminglei" %% "slick-pg"                     % "0.20.4"   % Optional,
+    )
+  }
+
+  def slickStreamingDependencies(scalaVersion: String): Seq[ModuleID] = {
+    commonDependencies(scalaVersion) ++ slickDependencies(scalaVersion) ++ streamingDependencies(scalaVersion) ++ Seq(
+      "co.fs2" %% "fs2-reactive-streams" % "3.9.3"
     )
   }
 
   def doobieDependencies(scalaVersion: String): Seq[ModuleID] = {
     commonDependencies(scalaVersion) ++ Seq(
-      "org.tpolecat" %% "doobie-core" % "1.0.0-RC2",
-      "org.tpolecat" %% "doobie-hikari" % "1.0.0-RC2",
+      "org.tpolecat" %% "doobie-core"     % "1.0.0-RC2",
+      "org.tpolecat" %% "doobie-hikari"   % "1.0.0-RC2",
       "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC2"
     )
   }

@@ -23,21 +23,21 @@ import za.co.absa.fadb.status.FunctionStatus
 import za.co.absa.fadb.{FunctionStatusWithData, Query, QueryWithStatus}
 
 /**
- *  `DoobieQuery` is a class that extends `Query` with `R` as the result type.
- *  It uses Doobie's `Fragment` to represent SQL queries.
+ *  [[DoobieQuery]] is a class that extends [[za.co.absa.fadb.Query]] with `R` as the result type.
+ *  It uses [[doobie.Fragment]] to represent SQL queries.
  *
- *  @param fragment the Doobie fragment representing the SQL query
- *  @param readR the `Read[R]` instance used to read the query result into `R`
+ *  @param fragment the [[doobie.Fragment]] representing the SQL query
+ *  @param readR the [[doobie.Read]] instance used to read the query result into `R`
  */
 class DoobieQuery[R](val fragment: Fragment)(implicit val readR: Read[R]) extends Query[R]
 
 /**
- *  `DoobieQueryWithStatus` is a class that extends `QueryWithStatus` with `R` as the result type.
- *  It uses Doobie's `Fragment` to represent SQL queries.
+ *  [[DoobieQueryWithStatus]] is a class that extends [[za.co.absa.fadb.QueryWithStatus]] with `R` as the result type.
+ *  It uses [[doobie.Fragment]] to represent SQL queries.
  *
- *  @param fragment the Doobie fragment representing the SQL query
+ *  @param fragment the [[doobie.Fragment]] representing the SQL query
  *  @param checkStatus the function to check the status of the query
- *  @param readStatusWithDataR the `Read[StatusWithData[R]]` instance used to read the query result into `StatusWithData[R]`
+ *  @param readStatusWithDataR the [[doobie.Read]] instance used to read the query result into `StatusWithData[R]`
  */
 class DoobieQueryWithStatus[R](
   val fragment: Fragment,
@@ -45,7 +45,7 @@ class DoobieQueryWithStatus[R](
 )(implicit val readStatusWithDataR: Read[StatusWithData[R]])
     extends QueryWithStatus[StatusWithData[R], R, R] {
 
-  /*
+  /**
    * Processes the status of the query and returns the status with data
    * @param initialResult - the initial result of the query
    * @return the status with data
@@ -53,7 +53,7 @@ class DoobieQueryWithStatus[R](
   override def processStatus(initialResult: StatusWithData[R]): FunctionStatusWithData[R] =
     FunctionStatusWithData(FunctionStatus(initialResult.status, initialResult.statusText), initialResult.data)
 
-  /*
+  /**
    * Converts the status with data to either a status exception or the data
    * @param statusWithData - the status with data
    * @return either a status exception or the data

@@ -20,7 +20,7 @@ import za.co.absa.fadb.naming.{LettersCase, NamingConvention}
 import LettersCase.LowerCase
 
 /**
- *  `SnakeCaseNaming` provides a naming convention that converts camel case strings to snake case.
+ *  [[SnakeCaseNaming]] provides a naming convention that converts camel case strings to snake case.
  *  It implements the [[NamingConvention]] trait.
  *  @param lettersCase - The case of the letters in the string.
  */
@@ -51,7 +51,7 @@ class SnakeCaseNaming(lettersCase: LettersCase) extends NamingConvention {
 }
 
 /**
- *  `SnakeCaseNaming.Implicits` provides an implicit [[NamingConvention]] instance that converts camel case strings to snake case.
+ *  [[SnakeCaseNaming.Implicits]] provides an implicit [[NamingConvention]] instance that converts camel case strings to snake case.
  */
 object SnakeCaseNaming {
   object Implicits {

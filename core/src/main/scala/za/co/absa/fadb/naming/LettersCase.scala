@@ -17,7 +17,7 @@
 package za.co.absa.fadb.naming
 
 /**
- *  `LettersCase` is a sealed trait that represents different cases of letters.
+ *  [[LettersCase]] is a sealed trait that represents different cases of letters.
  *  It provides a method to convert a string to the specific case.
  */
 sealed trait LettersCase {
@@ -33,21 +33,21 @@ sealed trait LettersCase {
 object LettersCase {
 
   /**
-   *  `AsIs` is a [[LettersCase]] that leaves strings as they are.
+   *  [[AsIs]] is a [[LettersCase]] that leaves strings as they are.
    */
   case object AsIs extends LettersCase {
     override def convert(s: String): String = s
   }
 
   /**
-   *  `LowerCase` is a [[LettersCase]] that converts strings to lower case.
+   *  [[LowerCase]] is a [[LettersCase]] that converts strings to lower case.
    */
   case object LowerCase extends LettersCase {
     override def convert(s: String): String = s.toLowerCase
   }
 
   /**
-   *  `UpperCase` is a [[LettersCase]] that converts strings to upper case.
+   *  [[UpperCase]] is a [[LettersCase]] that converts strings to upper case.
    */
   case object UpperCase extends LettersCase {
     override def convert(s: String): String = s.toUpperCase

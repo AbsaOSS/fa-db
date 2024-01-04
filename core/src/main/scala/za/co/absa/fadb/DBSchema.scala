@@ -22,7 +22,7 @@ import za.co.absa.fadb.naming.NamingConvention
  *  An abstract class, an ancestor to represent a database schema
  *  The database name of the schema is derived from the class name based on the provided naming convention
  *  @param schemaNameOverride - in case the class name would not match the database schema name, this gives the
- *  @param namingConvention   - the [[za.co.absa.fadb.naming.NamingConvention NamingConvention]]
+ *  @param namingConvention   - the [[za.co.absa.fadb.naming.NamingConvention]]
  *                           prescribing how to convert a class name into a db object name
  */
 abstract class DBSchema(schemaNameOverride: Option[String] = None)(implicit val namingConvention: NamingConvention) {
@@ -46,7 +46,7 @@ abstract class DBSchema(schemaNameOverride: Option[String] = None)(implicit val 
 
   /**
    *  Function to convert a class to the associated DB object name, based on the class' name. For transformation from the
-   *  class name to usual db name the schema's [[za.co.absa.fadb.naming.NamingConvention NamingConvention]] is used.
+   *  class name to usual db name the schema's [[za.co.absa.fadb.naming.NamingConvention]] is used.
    *  @param c  - class which name to use to get the DB object name
    *  @return   - the db object name
    */

@@ -22,7 +22,7 @@ import za.co.absa.fadb.slick.support.PgUUIDSupport
 /**
  *  DB profile recommended to use with SlickPgEngine to offer support for all extended Postgres types.
  *  JSON is not included, as they are multiple JSON implementations. Choose the one of your liking and extend
- *  `FaDbPostgresProfile` with it. More on [SlickPG](https://github.com/tminglei/slick-pg/tree/master) page.
+ *  [[FaDbPostgresProfile]] with it. More on [SlickPG](https://github.com/tminglei/slick-pg/tree/master) page.
  */
 trait FaDbPostgresProfile
     extends ExPostgresProfile

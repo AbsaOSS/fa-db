@@ -25,7 +25,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.language.higherKinds
 
 /**
- *  [[DBEngine]] based on the Slick library in the Postgres flavor
+ *  [[za.co.absa.fadb.DBEngine]] based on the Slick library in the Postgres flavor
  *
  *  @param db - the Slick database
  */

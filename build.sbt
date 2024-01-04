@@ -49,7 +49,7 @@ lazy val commonJacocoExcludes: Seq[String] = Seq(
 )
 
 lazy val parent = (project in file("."))
-  .aggregate(faDbCore, faDBSlick, faDBDoobie, faDBExamples)
+  .aggregate(faDbCore, faDBStreaming, faDBSlick, faDBSlickStreaming, faDBDoobie, faDBExamples)
   .settings(
     name := "root",
     libraryDependencies ++= rootDependencies(scalaVersion.value),
@@ -73,6 +73,21 @@ lazy val faDbCore = (project in file("core"))
     jacocoExcludes := commonJacocoExcludes
   )
 
+lazy val faDBStreaming = (project in file("streaming"))
+  .configs(IntegrationTest)
+  .settings(
+    name := "streaming",
+    libraryDependencies ++= streamingDependencies(scalaVersion.value),
+    javacOptions ++= commonJavacOptions,
+    scalacOptions ++= commonScalacOptions,
+    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value,
+    Defaults.itSettings,
+  ).dependsOn(faDbCore)
+  .settings(
+    jacocoReportSettings := commonJacocoReportSettings.withTitle(s"fa-db:streaming Jacoco Report - scala:${scalaVersion.value}"),
+    jacocoExcludes := commonJacocoExcludes
+  )
+
 lazy val faDBSlick = (project in file("slick"))
   .configs(IntegrationTest)
   .settings(
@@ -80,11 +95,26 @@ lazy val faDBSlick = (project in file("slick"))
     libraryDependencies ++= slickDependencies(scalaVersion.value),
     javacOptions ++= commonJavacOptions,
     scalacOptions ++= commonScalacOptions,
-    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value, // printScalaVersion is run with compile
+    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value,
     Defaults.itSettings,
   ).dependsOn(faDbCore)
   .settings(
     jacocoReportSettings := commonJacocoReportSettings.withTitle(s"fa-db:slick Jacoco Report - scala:${scalaVersion.value}"),
+    jacocoExcludes := commonJacocoExcludes
+  )
+
+lazy val faDBSlickStreaming = (project in file("slick-streaming"))
+  .configs(IntegrationTest)
+  .settings(
+    name := "slick-streaming",
+    libraryDependencies ++= slickStreamingDependencies(scalaVersion.value),
+    javacOptions ++= commonJavacOptions,
+    scalacOptions ++= commonScalacOptions,
+    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value,
+    Defaults.itSettings,
+  ).dependsOn(faDbCore, faDBStreaming, faDBSlick)
+  .settings(
+    jacocoReportSettings := commonJacocoReportSettings.withTitle(s"fa-db:slick-streaming Jacoco Report - scala:${scalaVersion.value}"),
     jacocoExcludes := commonJacocoExcludes
   )
 
@@ -96,7 +126,7 @@ lazy val faDBDoobie = (project in file("doobie"))
     javacOptions ++= commonJavacOptions,
     scalacOptions ++= commonScalacOptions,
     Defaults.itSettings,
-  ).dependsOn(faDbCore)
+  ).dependsOn(faDbCore, faDBStreaming)
   .settings(
     jacocoReportSettings := commonJacocoReportSettings.withTitle(s"fa-db:doobie Jacoco Report - scala:${scalaVersion.value}"),
     jacocoExcludes := commonJacocoExcludes
@@ -108,7 +138,7 @@ lazy val faDBExamples = (project in file("examples"))
     name := "examples",
     libraryDependencies ++= examplesDependencies(scalaVersion.value),
     Test / parallelExecution := false,
-    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value, // printScalaVersion is run with compile
+    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value,
     publish / skip := true
   ).dependsOn(faDbCore, faDBSlick)
   .settings(
