@@ -21,7 +21,7 @@ import za.co.absa.fadb.Query
 import scala.language.higherKinds
 
 /**
- *  `DBStreamingEngine` is an abstract class that represents a database engine.
+ *  [[DBStreamingEngine]] is an abstract class that represents a database engine.
  *  It provides methods to execute streaming queries from a database.
  *  @tparam F - The type of the context in which the database queries are executed.
  */
@@ -34,19 +34,19 @@ abstract class DBStreamingEngine[F[_]] {
   type QueryType[R] <: Query[R]
 
   /**
-   *  Executes a query and returns the result as an `fs2.Stream[F, R]`.
+   *  Executes a query and returns the result as an [[fs2.Stream]] for effect type `F` and value type `R`.
    *
    *  @param query the query to execute
-   *  @return the query result as an `fs2.Stream[F, R]`
+   *  @return the query result as an [[fs2.Stream]] for effect type `F` and value type `R`
    */
   def runStreaming[R](query: QueryType[R]): fs2.Stream[F, R]
 
   /**
-   *  Executes a query and returns the result as an `fs2.Stream[F, R]`.
+   *  Executes a query and returns the result as an [[fs2.Stream]] for effect type `F` and value type `R`.
    *
    *  @param query the query to execute
    *  @param chunkSize the chunk size to use when streaming the query result
-   *  @return the query result as an `fs2.Stream[F, R]`
+   *  @return the query result as an [[fs2.Stream]] for effect type `F` and value type `R`
    */
   def runStreamingWithChunkSize[R](query: QueryType[R], chunkSize: Int): fs2.Stream[F, R]
 

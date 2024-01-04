@@ -21,7 +21,7 @@ import za.co.absa.fadb.{DBEngine, DBFunctionFabric, DBSchema}
 import scala.language.higherKinds
 
 /**
- *  `DBStreamingFunction` is an abstract class that represents a database function returning a stream of results.
+ *  [[DBStreamingFunction]] is an abstract class that represents a database function returning a stream of results.
  *
  *  @param functionNameOverride - Optional parameter to override the class name if it does not match the database function name.
  *  @param schema - The schema the function belongs to.

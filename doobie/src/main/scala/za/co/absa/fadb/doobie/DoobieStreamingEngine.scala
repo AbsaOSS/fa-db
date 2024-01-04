@@ -36,33 +36,33 @@ class DoobieStreamingEngine[F[_]: Async](val transactor: Transactor[F], defaultC
   type QueryType[R] = DoobieQuery[R]
 
   /**
-   *  Executes a Doobie query and returns the result as an `fs2.Stream[F, R]`.
+   *  Executes a Doobie query and returns the result as an [[fs2.Stream]] for effect type `F` and value type `R`.
    *
    *  @param query the [[DoobieQuery]] to execute
    *  @param readR the [[doobie.Read]] instance used to read the query result into `R`
-   *  @return the query result as an `fs2.Stream[F, R]`
+   *  @return the query result as an [[fs2.Stream]] for effect type `F` and value type `R`
    */
   override def runStreaming[R](query: QueryType[R]): fs2.Stream[F, R] =
     executeStreamingQuery(query, defaultChunkSize)(query.readR)
 
   /**
-   *  Executes a Doobie query and returns the result as an `fs2.Stream[F, R]`.
+   *  Executes a Doobie query and returns the result as an [[fs2.Stream]] for effect type `F` and value type `R`.
    *
    *  @param query the Doobie query to execute
    *  @param chunkSize the chunk size to use when streaming the query result
    *  @param readR the [[doobie.Read]] instance used to read the query result into `R`
-   *  @return the query result as an `fs2.Stream[F, R]`
+   *  @return the query result as an [[fs2.Stream]] for effect type `F` and value type `R`
    */
   override def runStreamingWithChunkSize[R](query: QueryType[R], chunkSize: Int): fs2.Stream[F, R] =
     executeStreamingQuery(query, chunkSize)(query.readR)
 
   /**
-   *  Executes a Doobie query and returns the result as an `fs2.Stream[F, R]`.
+   *  Executes a Doobie query and returns the result as an [[fs2.Stream]] for effect type `F` and value type `R`.
    *
    *  @param query the [[DoobieQuery]]  to execute
    *  @param chunkSize the chunk size to use when streaming the query result
    *  @param readR the [[doobie.Read]] instance used to read the query result into `R`
-   *  @return the query result as an `fs2.Stream[F, R]`
+   *  @return the query result as an [[fs2.Stream]] for effect type `F` and value type `R`
    */
   private def executeStreamingQuery[R](query: QueryType[R], chunkSize: Int)(implicit readR: Read[R]): fs2.Stream[F, R] = {
     query.fragment.query[R].streamWithChunkSize(chunkSize).transact(transactor)

@@ -25,7 +25,7 @@ import za.co.absa.fadb.streaming.DBStreamingEngine
 import scala.language.higherKinds
 
 /**
- *  `SlickStreamingEngine` is a class that represents a database engine.
+ *  [[SlickStreamingEngine]] is a class that represents a database engine.
  *  It provides methods to execute streaming queries from a database.
  *  @tparam F - The type of the context in which the database queries are executed.
  */
@@ -35,10 +35,10 @@ class SlickPgStreamingEngine[F[_]: Async](val db: Database, defaultChunkSize: In
   type QueryType[R] = SlickQuery[R]
 
   /**
-   *  Executes a Slick query and returns the result as an `fs2.Stream[F, R]`.
+   *  Executes a Slick query and returns the result as an [[fs2.Stream]] for effect type `F` and value type `R`.
    *
    *  @param query the Slick query to execute
-   *  @return the query result as an `fs2.Stream[F, R]`
+   *  @return the query result as an [[fs2.Stream]] for effect type `F` and value type `R`
    */
   def runStreaming[R](query: QueryType[R]): fs2.Stream[F, R] = {
     val slickPublisher = db.stream(query.sql.as[R](query.getResult))
@@ -46,11 +46,11 @@ class SlickPgStreamingEngine[F[_]: Async](val db: Database, defaultChunkSize: In
   }
 
   /**
-   *  Executes a Slick query and returns the result as an `fs2.Stream[F, R]`.
+   *  Executes a Slick query and returns the result as an [[fs2.Stream]] for effect type `F` and value type `R`.
    *
    *  @param query the Slick query to execute
    *  @param chunkSize the chunk size to use when streaming the query result
-   *  @return the query result as an `fs2.Stream[F, R]`
+   *  @return the query result as an [[fs2.Stream]] for effect type `F` and value type `R`
    */
   def runStreamingWithChunkSize[R](query: QueryType[R], chunkSize: Int): fs2.Stream[F, R] = {
     val slickPublisher = db.stream(query.sql.as[R](query.getResult))
