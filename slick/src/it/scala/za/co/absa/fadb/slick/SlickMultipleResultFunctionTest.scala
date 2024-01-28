@@ -16,33 +16,46 @@
 
 package za.co.absa.fadb.slick
 
+import cats.implicits.catsSyntaxApplicativeError
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuite
-import slick.jdbc.SQLActionBuilder
 import za.co.absa.fadb.DBSchema
-import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
 import za.co.absa.fadb.slick.SlickFunction.SlickMultipleResultFunction
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+
+import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
 
 class SlickMultipleResultFunctionTest extends AnyFunSuite with SlickTest with ScalaFutures {
 
   class GetActors(implicit override val schema: DBSchema, val dbEngine: SlickPgEngine)
-      extends SlickMultipleResultFunction[GetActorsQueryParameters, Actor]
-      with ActorSlickConverter {
-
-    override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("actor_id", "first_name", "last_name")
-
-    override protected def sql(values: GetActorsQueryParameters): SQLActionBuilder = {
-      sql"""SELECT #$selectEntry FROM #$functionName(${values.firstName},${values.lastName}) #$alias;"""
-    }
-  }
+      extends SlickMultipleResultFunction[GetActorsQueryParameters, Actor] (
+        values => {
+//          throw new Exception("boom!")
+//          Seq(s"#${values.firstName}::TEXT", s"#${values.firstName}::TEXT") // initial
+//          Seq(sql"${values.firstName}::TEXT", sql"${values.firstName}::TEXT")
+          Seq(
+//            values.firstName.map(value => sql"#$value::TEXT").getOrElse(sql"NULL::TEXT"),
+//            values.firstName.map(value => sql"$value"),
+//            values.lastName.map(value => sql"#$value::TEXT").getOrElse(sql"NULL::TEXT")
+//            values.lastName.map(value => sql"$value")
+            sql"${values.firstName}",
+            sql"${values.lastName}"
+          )
+        }
+      )
+      with ActorSlickConverter
 
   private val getActors = new GetActors()(Runs, new SlickPgEngine(db))
 
-  test("Retrieving actors from database") {
+  test("Retrieving actors from database; handling exception") {
     val expectedResultElem = Actor(49, "Pavel", "Marek")
-    val results = getActors(GetActorsQueryParameters(Some("Pavel"), Some("Marek")))
+    val results = getActors(GetActorsQueryParameters(Some("Pavel"), Some("Marek")))//.handleErrorWith(_ => Future(Seq(expectedResultElem)))
     assert(results.futureValue.contains(expectedResultElem))
+  }
+
+  test("Retrieving actors from database; not handling exception") {
+    assertThrows[Exception](getActors(GetActorsQueryParameters(Some("Pavel"), Some("Marek"))).futureValue)
   }
 }

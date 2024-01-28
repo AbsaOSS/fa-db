@@ -16,6 +16,7 @@
 
 package za.co.absa.fadb.doobie
 
+import cats.Monad
 import cats.effect.Async
 import cats.implicits._
 import doobie._

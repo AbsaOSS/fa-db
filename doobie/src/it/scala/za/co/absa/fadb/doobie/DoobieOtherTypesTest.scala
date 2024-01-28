@@ -19,8 +19,6 @@ package za.co.absa.fadb.doobie
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import doobie.implicits.toSqlInterpolator
-import doobie.util.Read
-import doobie.util.fragment.Fragment
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.doobie.DoobieFunction.{DoobieSingleResultFunction, DoobieSingleResultFunctionWithStatus}
@@ -49,32 +47,25 @@ class DoobieOtherTypesTest extends AnyFunSuite with DoobieTest {
                              arrayCol: Array[Int]
                            )
 
-
   class ReadOtherTypes(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
-    extends DoobieSingleResultFunction[Int, OtherTypesData, IO] {
-
-    override def sql(values: Int)(implicit read: Read[OtherTypesData]): Fragment =
-      sql"SELECT * FROM ${Fragment.const(functionName)}($values)"
-  }
+    extends DoobieSingleResultFunction[Int, OtherTypesData, IO] (values => Seq(fr"$values"))
 
   class InsertOtherTypes(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
-    extends DoobieSingleResultFunctionWithStatus[OtherTypesData, Option[Int], IO] with StandardStatusHandling {
-
-    override def sql(values: OtherTypesData)(implicit read: Read[StatusWithData[Option[Int]]]): Fragment =
-      sql"""
-           SELECT * FROM ${Fragment.const(functionName)}(
-             ${values.id},
-             ${values.ltreeCol}::ltree,
-             ${values.inetCol}::inet,
-             ${values.macaddrCol}::macaddr,
-             ${values.hstoreCol}::hstore,
-             ${values.cidrCol}::cidr,
-             ${values.jsonCol}::json,
-             ${values.jsonbCol}::jsonb,
-             ${values.uuidCol}::uuid,
-             ${values.arrayCol}::integer[]
-           )
-         """
+    extends DoobieSingleResultFunctionWithStatus[OtherTypesData, Option[Int], IO] (
+      values => Seq(
+        fr"${values.id}",
+        fr"${values.ltreeCol}::ltree",
+        fr"${values.inetCol}::inet",
+        fr"${values.macaddrCol}::macaddr",
+        fr"${values.hstoreCol}::hstore",
+        fr"${values.cidrCol}::cidr",
+        fr"${values.jsonCol}::json",
+        fr"${values.jsonbCol}::jsonb",
+        fr"${values.uuidCol}::uuid",
+        fr"${values.arrayCol}::integer[]"
+      )
+    ) with StandardStatusHandling {
+    override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("o_id")
   }
 
   private val readOtherTypes = new ReadOtherTypes()(Runs, new DoobieEngine(transactor))

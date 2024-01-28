@@ -19,8 +19,6 @@ package za.co.absa.fadb.doobie
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import doobie.implicits.toSqlInterpolator
-import doobie.util.Read
-import doobie.util.fragment.Fragment
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.doobie.DoobieFunction.DoobieSingleResultFunction
@@ -28,20 +26,19 @@ import za.co.absa.fadb.doobie.DoobieFunction.DoobieSingleResultFunction
 class DoobieSingleResultFunctionTest extends AnyFunSuite with DoobieTest {
 
   class CreateActor(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
-      extends DoobieSingleResultFunction[CreateActorRequestBody, Int, IO] {
-
-    // do not remove the example below
-    // override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("o_actor_id")
-
-    override def sql(values: CreateActorRequestBody)(implicit read: Read[Int]): Fragment =
-      sql"SELECT o_actor_id FROM ${Fragment.const(functionName)}(${values.firstName}, ${values.lastName})"
-      // do not remove the example below, it has to be used with the override def fieldsToSelect
-      // sql"SELECT ${Fragment.const(selectEntry)} FROM ${Fragment.const(functionName)}(${values.firstName}, ${values.lastName}) ${Fragment.const(alias)}"
+      extends DoobieSingleResultFunction[CreateActorRequestBody, Int, IO] (
+          values => {
+            throw new Exception("boom")
+             Seq(fr"${values.firstName}", fr"${values.lastName}")
+          }
+      ) {
+     override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("o_actor_id")
   }
 
   private val createActor = new CreateActor()(Runs, new DoobieEngine(transactor))
 
-  test("Inserting an actor into database") {
-    assert(createActor(CreateActorRequestBody("Pavel", "Marek")).unsafeRunSync().isInstanceOf[Int])
+  test("Inserting an actor into database & handling an error") {
+    val result = createActor(CreateActorRequestBody("Pavel", "Marek")).handleErrorWith(_ => IO(Int.MaxValue)).unsafeRunSync()
+    assert(result == Int.MaxValue)
   }
 }

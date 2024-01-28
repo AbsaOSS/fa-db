@@ -19,8 +19,6 @@ package za.co.absa.fadb.doobie
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import doobie.implicits.toSqlInterpolator
-import doobie.util.Read
-import doobie.util.fragment.Fragment
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.doobie.DoobieFunction.{DoobieSingleResultFunction, DoobieSingleResultFunctionWithStatus}
@@ -46,30 +44,24 @@ class DatesTimesTest extends AnyFunSuite with DoobieTest {
                              )
 
   class GetAllDateTimeTypes(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
-      extends DoobieSingleResultFunction[Int, DatesTimes, IO] {
-
-    override def sql(values: Int)(implicit read: Read[DatesTimes]): Fragment =
-      sql"SELECT * FROM ${Fragment.const(functionName)}($values)"
-  }
+      extends DoobieSingleResultFunction[Int, DatesTimes, IO](values => Seq(fr"$values"))
 
   class InsertDatesTimes(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
-      extends DoobieSingleResultFunctionWithStatus[DatesTimes, Int, IO] with StandardStatusHandling {
-
-    override def sql(values: DatesTimes)(implicit read: Read[StatusWithData[Int]]): Fragment =
-      sql"""
-           SELECT * FROM ${Fragment.const(functionName)}(
-            ${values.offsetDateTime},
-            ${values.instant},
-            ${values.zonedDateTime},
-            ${values.localDateTime},
-            ${values.localDate},
-            ${values.localTime},
-            ${values.sqlDate},
-            ${values.sqlTime},
-            ${values.sqlTimestamp},
-            ${values.utilDate}
-           )
-        """
+      extends DoobieSingleResultFunctionWithStatus[DatesTimes, Int, IO] (
+        values => Seq(
+          fr"${values.offsetDateTime}",
+          fr"${values.instant}",
+          fr"${values.zonedDateTime}",
+          fr"${values.localDateTime}",
+          fr"${values.localDate}",
+          fr"${values.localTime}",
+          fr"${values.sqlDate}",
+          fr"${values.sqlTime}",
+          fr"${values.sqlTimestamp}",
+          fr"${values.utilDate}"
+        )
+      ) with StandardStatusHandling {
+    override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("o_id")
   }
 
   private val getAllDateTimeTypes = new GetAllDateTimeTypes()(Runs, new DoobieEngine(transactor))

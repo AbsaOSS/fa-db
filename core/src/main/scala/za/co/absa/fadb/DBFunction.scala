@@ -16,6 +16,8 @@
 
 package za.co.absa.fadb
 
+import cats.{Monad, MonadError}
+import cats.implicits.toFlatMapOps
 import za.co.absa.fadb.exceptions.StatusException
 import za.co.absa.fadb.status.handling.StatusHandling
 
@@ -31,7 +33,7 @@ import scala.language.higherKinds
  *  @tparam E - The type of the [[DBEngine]] engine.
  *  @tparam F - The type of the context in which the database function is executed.
  */
-abstract class DBFunction[I, R, E <: DBEngine[F], F[_]](functionNameOverride: Option[String] = None)(
+abstract class DBFunction[I, R, E <: DBEngine[F], F[_]: Monad](functionNameOverride: Option[String] = None)(
   implicit override val schema: DBSchema,
   val dBEngine: E
 ) extends DBFunctionFabric(functionNameOverride) {
@@ -47,21 +49,28 @@ abstract class DBFunction[I, R, E <: DBEngine[F], F[_]](functionNameOverride: Op
    *  @param values - The values to pass over to the database function.
    *  @return - A sequence of results from the database function.
    */
-  protected def multipleResults(values: I): F[Seq[R]] = dBEngine.fetchAll(query(values))
+  protected def multipleResults(values: I, selectEntry: String, functionName: String, alias: String)(implicit ME: MonadError[F, Throwable]): F[Seq[R]] =
+    query(values, selectEntry, functionName, alias).flatMap(q => dBEngine.fetchAll(q))
+//    dBEngine.fetchAll(query(values))
 
   /**
    *  Executes the database function and returns a single result.
    *  @param values - The values to pass over to the database function.
    *  @return - A single result from the database function.
    */
-  protected def singleResult(values: I): F[R] = dBEngine.fetchHead(query(values))
+  protected def singleResult(values: I, selectEntry: String, functionName: String, alias: String)(implicit ME: MonadError[F, Throwable]): F[R] =
+    query(values, selectEntry, functionName, alias).flatMap(q => dBEngine.fetchHead(q))
+//    dBEngine.fetchHead(query(values))
 
   /**
    *  Executes the database function and returns an optional result.
    *  @param values - The values to pass over to the database function.
    *  @return - An optional result from the database function.
    */
-  protected def optionalResult(values: I): F[Option[R]] = dBEngine.fetchHeadOption(query(values))
+  protected def optionalResult(values: I, selectEntry: String, functionName: String, alias: String)(implicit ME: MonadError[F, Throwable]): F[Option[R]] = {
+    query(values, selectEntry, functionName, alias).flatMap(q => dBEngine.fetchHeadOption(q))
+//    dBEngine.fetchHeadOption(query(values))
+  }
 
   /**
    *  Function to create the DB function call specific to the provided [[DBEngine]].
@@ -69,7 +78,8 @@ abstract class DBFunction[I, R, E <: DBEngine[F], F[_]](functionNameOverride: Op
    *  @param values - The values to pass over to the database function.
    *  @return - The SQL query in the format specific to the provided [[DBEngine]].
    */
-  protected def query(values: I): dBEngine.QueryType[R]
+//  protected def query(values: I)(implicit ME: MonadError[F, Throwable]): F[dBEngine.QueryType[R]]
+  protected def query(values: I, selectEntry: String, functionName: String, alias: String)(implicit ME: MonadError[F, Throwable]): F[dBEngine.QueryType[R]]
 }
 
 /**
@@ -83,7 +93,7 @@ abstract class DBFunction[I, R, E <: DBEngine[F], F[_]](functionNameOverride: Op
  *  @tparam E - The type of the [[DBEngine]] engine.
  *  @tparam F - The type of the context in which the database function is executed.
  */
-abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOverride: Option[String] = None)(
+abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]: Monad](functionNameOverride: Option[String] = None)(
   implicit override val schema: DBSchema,
   val dBEngine: E
 ) extends DBFunctionFabric(functionNameOverride)
@@ -103,7 +113,10 @@ abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOv
    *  @param values
    *  @return A sequence of results from the database function.
    */
-  def apply(values: I): F[Either[StatusException, R]] = dBEngine.runWithStatus(query(values))
+  def apply(values: I)(implicit ME: MonadError[F, Throwable]): F[Either[StatusException, R]] = {
+    query(values, selectEntry, functionName, alias).flatMap(q => dBEngine.runWithStatus(q))
+//    dBEngine.runWithStatus(query(values))
+  }
 
   /**
    *  The fields to select from the database function call
@@ -122,7 +135,8 @@ abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOv
    *  @param values the values to pass over to the database function
    *  @return       the SQL query in the format specific to the provided [[DBEngine]]
    */
-  protected def query(values: I): dBEngine.QueryWithStatusType[R]
+  protected def query(values: I, selectEntry: String, functionName: String, alias: String)(implicit ME: MonadError[F, Throwable]): F[dBEngine.QueryWithStatusType[R]]
+//  protected def query(values: I, selectEntry: String, functionName: String, alias: String)(implicit ev: Monad[F]): F[dBEngine.QueryWithStatusType[R]]
 
   // To be provided by an implementation of QueryStatusHandling
   override def checkStatus[A](statusWithData: FunctionStatusWithData[A]): Either[StatusException, A]
@@ -134,7 +148,7 @@ object DBFunction {
    *  `DBMultipleResultFunction` is an abstract class that represents a database function returning multiple results.
    *  It extends the [[DBFunction]] class and overrides the apply method to return a sequence of results.
    */
-  abstract class DBMultipleResultFunction[I, R, E <: DBEngine[F], F[_]](
+  abstract class DBMultipleResultFunction[I, R, E <: DBEngine[F], F[_]: Monad](
     functionNameOverride: Option[String] = None
   )(implicit schema: DBSchema, dBEngine: E)
       extends DBFunction[I, R, E, F](functionNameOverride) {
@@ -151,14 +165,15 @@ object DBFunction {
      *  @return       - a sequence of values, each coming from a row returned from the DB function transformed to scala
      *               type `R`
      */
-    def apply(values: I): F[Seq[R]] = multipleResults(values)
+    def apply(values: I)(implicit ME: MonadError[F, Throwable]): F[Seq[R]] =
+      multipleResults(values, selectEntry, functionName, alias)
   }
 
   /**
    *  `DBSingleResultFunction` is an abstract class that represents a database function returning a single result.
    *  It extends the [[DBFunction]] class and overrides the apply method to return a single result.
    */
-  abstract class DBSingleResultFunction[I, R, E <: DBEngine[F], F[_]](
+  abstract class DBSingleResultFunction[I, R, E <: DBEngine[F], F[_]: Monad](
     functionNameOverride: Option[String] = None
   )(implicit schema: DBSchema, dBEngine: E)
       extends DBFunction[I, R, E, F](functionNameOverride) {
@@ -174,14 +189,15 @@ object DBFunction {
      *  @param values - the values to pass over to the database function
      *  @return       - the value returned from the DB function transformed to scala type `R`
      */
-    def apply(values: I): F[R] = singleResult(values)
+    def apply(values: I)(implicit ME: MonadError[F, Throwable]): F[R] =
+      singleResult(values, selectEntry, functionName, alias)
   }
 
   /**
    *  `DBOptionalResultFunction` is an abstract class that represents a database function returning an optional result.
    *  It extends the [[DBFunction]] class and overrides the apply method to return an optional result.
    */
-  abstract class DBOptionalResultFunction[I, R, E <: DBEngine[F], F[_]](
+  abstract class DBOptionalResultFunction[I, R, E <: DBEngine[F], F[_]: Monad](
     functionNameOverride: Option[String] = None
   )(implicit schema: DBSchema, dBEngine: E)
       extends DBFunction[I, R, E, F](functionNameOverride) {
@@ -197,6 +213,7 @@ object DBFunction {
      *  @param values - the values to pass over to the database function
      *  @return       - the value returned from the DB function transformed to scala type `R` if a row is returned, otherwise `None`
      */
-    def apply(values: I): F[Option[R]] = optionalResult(values)
+    def apply(values: I)(implicit ME: MonadError[F, Throwable]): F[Option[R]] =
+      optionalResult(values, selectEntry, functionName, alias)
   }
 }

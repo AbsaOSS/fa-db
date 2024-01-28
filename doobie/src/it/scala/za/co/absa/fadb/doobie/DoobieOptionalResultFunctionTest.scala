@@ -19,8 +19,6 @@ package za.co.absa.fadb.doobie
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import doobie.implicits.toSqlInterpolator
-import doobie.util.Read
-import doobie.util.fragment.Fragment
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.doobie.DoobieFunction.DoobieOptionalResultFunction
@@ -28,11 +26,7 @@ import za.co.absa.fadb.doobie.DoobieFunction.DoobieOptionalResultFunction
 class DoobieOptionalResultFunctionTest extends AnyFunSuite with DoobieTest {
 
   class GetActorById(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
-      extends DoobieOptionalResultFunction[Int, Actor, IO] {
-
-    override def sql(values: Int)(implicit read: Read[Actor]): Fragment =
-      sql"SELECT actor_id, first_name, last_name FROM ${Fragment.const(functionName)}($values)"
-  }
+    extends DoobieOptionalResultFunction[Int, Actor, IO](id => Seq(fr"$id"))
 
   private val createActor = new GetActorById()(Runs, new DoobieEngine(transactor))
 
