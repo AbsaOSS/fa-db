@@ -17,15 +17,11 @@
 package za.co.absa.fadb.slick
 
 import cats.MonadError
-import slick.jdbc.SetParameter
-//import cats.implicits.catsStdInstancesForFuture
 import slick.jdbc.{GetResult, SQLActionBuilder}
 import za.co.absa.fadb.DBFunction.{DBMultipleResultFunction, DBOptionalResultFunction, DBSingleResultFunction}
 import za.co.absa.fadb.exceptions.StatusException
-import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
 import za.co.absa.fadb.{DBFunctionWithStatus, DBSchema, FunctionStatusWithData}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.language.higherKinds
 
@@ -42,29 +38,24 @@ private[slick] trait SlickFunctionBase[I, R] {
    */
   protected def slickConverter: GetResult[R]
 
-  def toSQLActionBuilder: I => Seq[SQLActionBuilder]
-
   /**
    *  Generates a Slick `SQLActionBuilder` representing the SQL query for the function.
    *
    *  @param values the input values for the function
    *  @return the Slick `SQLActionBuilder` representing the SQL query
    */
-//  def sql(values: I, selectEntry: String, functionName: String, alias: String)(implicit
-//    ME: MonadError[Future, Throwable]
-//  ): Future[SQLActionBuilder] = {
-//    ME.catchNonFatal(toSQLActionBuilder(values))
-//  }
+  def sql(values: I): SQLActionBuilder
 
-  def sql(values: I, selectEntry: String, functionName: String, alias: String)(implicit
-    ME: MonadError[Future, Throwable]
-  ): Future[SQLActionBuilder] = {
-    ME.catchNonFatal {
-      val fragments = toSQLActionBuilder(values)
-      val args = fragments.map(_.queryParts.mkString).mkString(", ") // Concatenate the arguments with commas
-      val query = s"SELECT $selectEntry FROM $functionName($args) $alias"
-      sql"$query"
-    }
+  /**
+   * Generates a Slick `SQLActionBuilder` representing the SQL query for the function in the context of Future.
+   * @param sqlActionBuilder Slick `SQLActionBuilder` representing the SQL query
+   * @param ME MonadError instance for Future
+   * @return the Slick `SQLActionBuilder` representing the SQL query wrapped in `Future`
+   */
+  protected final def meSql(
+    sqlActionBuilder: => SQLActionBuilder
+  )(implicit ME: MonadError[Future, Throwable]): Future[SQLActionBuilder] = {
+    ME.catchNonFatal(sqlActionBuilder)
   }
 
   def fieldsToSelect: Seq[String]
@@ -74,14 +65,12 @@ private[slick] trait SlickFunction[I, R] extends SlickFunctionBase[I, R] {
 
   /**
    *  Generates a `SlickQuery[R]` representing the SQL query for the function.
-   *
    *  @param values the input values for the function
-   *  @return the `SlickQuery[R]` representing the SQL query
+   *  @param ME MonadError instance for Future
+   *  @return the `SlickQuery[R]` representing the SQL query wrapped in `Future`
    */
-  protected def query(values: I, selectEntry: String, functionName: String, alias: String)(implicit
-    ME: MonadError[Future, Throwable]
-  ): Future[SlickQuery[R]] = {
-    ME.flatMap(sql(values, selectEntry, functionName, alias))(sth => ME.pure(new SlickQuery[R](sth, slickConverter)))
+  protected def query(values: I)(implicit ME: MonadError[Future, Throwable]): Future[SlickQuery[R]] = {
+    ME.flatMap(meSql(sql(values)))(sth => ME.pure(new SlickQuery[R](sth, slickConverter)))
   }
 }
 
@@ -89,16 +78,12 @@ private[slick] trait SlickFunctionWithStatus[I, R] extends SlickFunctionBase[I, 
 
   /**
    *  Generates a `SlickQueryWithStatus[R]` representing the SQL query for the function with status support.
-   *
    *  @param values the input values for the function
-   *  @return the `SlickQueryWithStatus[R]` representing the SQL query
+   *  @param ME MonadError instance for Future
+   *  @return the `SlickQueryWithStatus[R]` representing the SQL query wrapped in `Future`
    */
-  protected def query(values: I, selectEntry: String, functionName: String, alias: String)(implicit
-    ME: MonadError[Future, Throwable]
-  ): Future[SlickQueryWithStatus[R]] = {
-    ME.flatMap(sql(values, selectEntry, functionName, alias))(sth =>
-      ME.pure(new SlickQueryWithStatus[R](sth, slickConverter, checkStatus))
-    )
+  protected def query(values: I)(implicit ME: MonadError[Future, Throwable]): Future[SlickQueryWithStatus[R]] = {
+    ME.flatMap(meSql(sql(values)))(sth => ME.pure(new SlickQueryWithStatus[R](sth, slickConverter, checkStatus)))
   }
 
   // Expected to be mixed in by an implementation of StatusHandling
@@ -111,67 +96,43 @@ object SlickFunction {
    *  Class for Slick DB functions with status support.
    */
   abstract class SlickSingleResultFunctionWithStatus[I, R](
-    override val toSQLActionBuilder: I => Seq[SQLActionBuilder],
     functionNameOverride: Option[String] = None
   )(implicit
     override val schema: DBSchema,
     dBEngine: SlickPgEngine
   ) extends DBFunctionWithStatus[I, R, SlickPgEngine, Future](functionNameOverride)
-      with SlickFunctionWithStatus[I, R] {
-
-    final def sql(values: I)(implicit ME: MonadError[Future, Throwable]): Future[SQLActionBuilder] = {
-      super.sql(values, selectEntry, functionName, alias)
-    }
-  }
+      with SlickFunctionWithStatus[I, R]
 
   /**
    *  Class for Slick DB functions with single result.
    */
   abstract class SlickSingleResultFunction[I, R](
-    override val toSQLActionBuilder: I => Seq[SQLActionBuilder],
     functionNameOverride: Option[String] = None
   )(implicit
     override val schema: DBSchema,
     dBEngine: SlickPgEngine
   ) extends DBSingleResultFunction[I, R, SlickPgEngine, Future](functionNameOverride)
-      with SlickFunction[I, R] {
-
-    final def sql(values: I)(implicit ME: MonadError[Future, Throwable]): Future[SQLActionBuilder] = {
-      super.sql(values, selectEntry, functionName, alias)
-    }
-  }
+      with SlickFunction[I, R]
 
   /**
    *  Class for Slick DB functions with multiple results.
    */
   abstract class SlickMultipleResultFunction[I, R](
-    override val toSQLActionBuilder: I => Seq[SQLActionBuilder],
     functionNameOverride: Option[String] = None
   )(implicit
     override val schema: DBSchema,
     dBEngine: SlickPgEngine
   ) extends DBMultipleResultFunction[I, R, SlickPgEngine, Future](functionNameOverride)
-      with SlickFunction[I, R] {
-
-    final def sql(values: I)(implicit ME: MonadError[Future, Throwable]): Future[SQLActionBuilder] = {
-      super.sql(values, selectEntry, functionName, alias)
-    }
-  }
+      with SlickFunction[I, R]
 
   /**
    *  Class for Slick DB functions with optional result.
    */
   abstract class SlickOptionalResultFunction[I, R](
-    override val toSQLActionBuilder: I => Seq[SQLActionBuilder],
     functionNameOverride: Option[String] = None
   )(implicit
     override val schema: DBSchema,
     dBEngine: SlickPgEngine
   ) extends DBOptionalResultFunction[I, R, SlickPgEngine, Future](functionNameOverride)
-      with SlickFunction[I, R] {
-
-    final def sql(values: I)(implicit ME: MonadError[Future, Throwable]): Future[SQLActionBuilder] = {
-      super.sql(values, selectEntry, functionName, alias)
-    }
-  }
+      with SlickFunction[I, R]
 }
