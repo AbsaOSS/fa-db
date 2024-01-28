@@ -16,7 +16,7 @@
 
 package za.co.absa.fadb.doobie
 
-import cats._
+import cats.MonadError
 import doobie.implicits.toSqlInterpolator
 import doobie.util.Read
 import doobie.util.fragment.Fragment
@@ -52,7 +52,17 @@ trait DoobieFunction[I, R, F[_]] extends DoobieFunctionBase[R] {
    */
   def toFragmentsSeq: I => Seq[Fragment]
 
-  def meSql(values: I, selectEntry: String, functionName: String, alias: String)(implicit
+  /**
+   *  Generates a `Fragment` representing the SQL query for the function.
+   *  @param values the input values for the function
+   *  @param selectEntry columns names for the select statement
+   *  @param functionName name of the function
+   *  @param alias alias for the sql query
+   *  @param read Read instance for R type
+   *  @param ME MonadError instance for F type
+   *  @return the `Fragment` representing the SQL query
+   */
+  private def meSql(values: I, selectEntry: String, functionName: String, alias: String)(implicit
     read: Read[R],
     ME: MonadError[F, Throwable]
   ): F[Fragment] = {
@@ -72,16 +82,29 @@ trait DoobieFunction[I, R, F[_]] extends DoobieFunctionBase[R] {
    *  @param values the input values for the function
    *  @return the `DoobieQuery[R]` representing the SQL query
    */
-  protected def queryWithAllInputParams(values: I, selectEntry: String, functionName: String, alias: String)(implicit
+  private def queryWithAllInputParams(values: I, selectEntry: String, functionName: String, alias: String)(implicit
     ME: MonadError[F, Throwable]
   ): F[DoobieQuery[R]] = {
     ME.flatMap(meSql(values, selectEntry, functionName, alias))(fr => ME.pure(new DoobieQuery[R](fr)))
   }
 
+  /**
+   *  Generates a `DoobieQuery[R]` representing the SQL query for the function.
+   *  @param values the input values for the function
+   *  @param ME MonadError instance for F type
+   *  @return the `DoobieQuery[R]` representing the SQL query
+   */
   protected def query(values: I)(implicit ME: MonadError[F, Throwable]): F[DoobieQuery[R]] = {
     queryWithAllInputParams(values, selectEntry, functionName, alias)
   }
 
+  /**
+   *  Generates a `Fragment` representing the SQL query for the function.
+   *  @param values the input values for the function
+   *  @param read the `Read[R]` instance used to read the query result into `R`
+   *  @param ME MonadError instance for F type
+   *  @return the `Fragment` representing the SQL query
+   */
   protected final def sql(values: I)(implicit read: Read[R], ME: MonadError[F, Throwable]): F[Fragment] = {
     meSql(values, selectEntry, functionName, alias)(read, ME)
   }
@@ -103,7 +126,17 @@ trait DoobieFunctionWithStatus[I, R, F[_]] extends DoobieFunctionBase[R] {
    */
   def toFragmentsSeq: I => Seq[Fragment]
 
-  def meSql(values: I, selectEntry: String, functionName: String, alias: String)(implicit
+  /**
+   *  Generates a `Fragment` representing the SQL query for the function.
+   *  @param values the input values for the function
+   *  @param selectEntry columns names for the select statement
+   *  @param functionName name of the function
+   *  @param alias alias for the sql query
+   *  @param read Read instance for R type
+   *  @param ME MonadError instance for F type
+   *  @return the `Fragment` representing the SQL query
+   */
+  private def meSql(values: I, selectEntry: String, functionName: String, alias: String)(implicit
     read: Read[StatusWithData[R]],
     ME: MonadError[F, Throwable]
   ): F[Fragment] = {
@@ -127,7 +160,16 @@ trait DoobieFunctionWithStatus[I, R, F[_]] extends DoobieFunctionBase[R] {
     queryWithAllInputParams(values, selectEntry, functionName, alias)
   }
 
-  protected def queryWithAllInputParams(values: I, selectEntry: String, functionName: String, alias: String)(implicit
+  /**
+   *  Generates a `DoobieQueryWithStatus[R]` representing the SQL query for the function.
+   *  @param values the input values for the function
+   *  @param selectEntry columns names for the select statement
+   *  @param functionName name of the function
+   *  @param alias alias for the sql query
+   *  @param ME MonadError instance for F type
+   *  @return the `DoobieQueryWithStatus[R]` representing the SQL query
+   */
+  private def queryWithAllInputParams(values: I, selectEntry: String, functionName: String, alias: String)(implicit
     ME: MonadError[F, Throwable]
   ): F[DoobieQueryWithStatus[R]] = {
     ME.flatMap(meSql(values, selectEntry, functionName, alias))(fr =>
@@ -135,7 +177,16 @@ trait DoobieFunctionWithStatus[I, R, F[_]] extends DoobieFunctionBase[R] {
     )
   }
 
-  protected final def sql(values: I)(implicit read: Read[StatusWithData[R]], ME: MonadError[F, Throwable]): F[Fragment] = {
+  /**
+   *  Generates a `Fragment` representing the SQL query for the function.
+   *  @param values the input values for the function
+   *  @param read the `Read[StatusWithData[R]]` instance used to read the query result with status into `StatusWithData[R]`
+   *  @param ME MonadError instance for F type
+   *  @return the `Fragment` representing the SQL query
+   */
+  protected final def sql(
+    values: I
+  )(implicit read: Read[StatusWithData[R]], ME: MonadError[F, Throwable]): F[Fragment] = {
     meSql(values, selectEntry, functionName, alias)(read, ME)
   }
 
@@ -161,7 +212,7 @@ object DoobieFunction {
    *  @param readSelectWithStatus the `Read[StatusWithData[R]]` instance used to read the query result with status into `StatusWithData[R]`
    *  @tparam F the effect type, which must have an `Async` and a `Monad` instance
    */
-  abstract class DoobieSingleResultFunctionWithStatus[I, R, F[_]: Monad](
+  abstract class DoobieSingleResultFunctionWithStatus[I, R, F[_]](
     override val toFragmentsSeq: I => Seq[Fragment],
     functionNameOverride: Option[String] = None
   )(implicit
@@ -183,7 +234,7 @@ object DoobieFunction {
    *  @param readR the `Read[R]` instance used to read the query result into `R`
    *  @tparam F the effect type, which must have an `Async` and a `Monad` instance
    */
-  abstract class DoobieSingleResultFunction[I, R, F[_]: Monad](
+  abstract class DoobieSingleResultFunction[I, R, F[_]](
     override val toFragmentsSeq: I => Seq[Fragment],
     functionNameOverride: Option[String] = None
   )(implicit
@@ -197,7 +248,7 @@ object DoobieFunction {
    *  `DoobieMultipleResultFunction` is an abstract class that extends `DBMultipleResultFunction` with `DoobiePgEngine` as the engine type.
    *  It represents a database function that returns multiple results.
    */
-  abstract class DoobieMultipleResultFunction[I, R, F[_]: Monad](
+  abstract class DoobieMultipleResultFunction[I, R, F[_]](
     override val toFragmentsSeq: I => Seq[Fragment],
     functionNameOverride: Option[String] = None
   )(implicit
@@ -211,7 +262,7 @@ object DoobieFunction {
    *  `DoobieOptionalResultFunction` is an abstract class that extends `DBOptionalResultFunction` with `DoobiePgEngine` as the engine type.
    *  It represents a database function that returns an optional result.
    */
-  abstract class DoobieOptionalResultFunction[I, R, F[_]: Monad](
+  abstract class DoobieOptionalResultFunction[I, R, F[_]](
     override val toFragmentsSeq: I => Seq[Fragment],
     functionNameOverride: Option[String] = None
   )(implicit

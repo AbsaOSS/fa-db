@@ -44,13 +44,13 @@ private[slick] trait SlickFunctionBase[I, R] {
    *  @param values the input values for the function
    *  @return the Slick `SQLActionBuilder` representing the SQL query
    */
-  def sql(values: I): SQLActionBuilder
+  protected def sql(values: I): SQLActionBuilder
 
   /**
-   * Generates a Slick `SQLActionBuilder` representing the SQL query for the function in the context of Future.
-   * @param sqlActionBuilder Slick `SQLActionBuilder` representing the SQL query
-   * @param ME MonadError instance for Future
-   * @return the Slick `SQLActionBuilder` representing the SQL query wrapped in `Future`
+   *  Generates a Slick `SQLActionBuilder` representing the SQL query for the function in the context of Future.
+   *  @param sqlActionBuilder Slick `SQLActionBuilder` representing the SQL query
+   *  @param ME MonadError instance for Future
+   *  @return the Slick `SQLActionBuilder` representing the SQL query wrapped in `Future`
    */
   protected final def meSql(
     sqlActionBuilder: => SQLActionBuilder
@@ -70,7 +70,7 @@ private[slick] trait SlickFunction[I, R] extends SlickFunctionBase[I, R] {
    *  @return the `SlickQuery[R]` representing the SQL query wrapped in `Future`
    */
   protected def query(values: I)(implicit ME: MonadError[Future, Throwable]): Future[SlickQuery[R]] = {
-    ME.flatMap(meSql(sql(values)))(sth => ME.pure(new SlickQuery[R](sth, slickConverter)))
+    ME.flatMap(meSql(sql(values)))(sqlActionBuilder => ME.pure(new SlickQuery[R](sqlActionBuilder, slickConverter)))
   }
 }
 
@@ -83,7 +83,9 @@ private[slick] trait SlickFunctionWithStatus[I, R] extends SlickFunctionBase[I, 
    *  @return the `SlickQueryWithStatus[R]` representing the SQL query wrapped in `Future`
    */
   protected def query(values: I)(implicit ME: MonadError[Future, Throwable]): Future[SlickQueryWithStatus[R]] = {
-    ME.flatMap(meSql(sql(values)))(sth => ME.pure(new SlickQueryWithStatus[R](sth, slickConverter, checkStatus)))
+    ME.flatMap(meSql(sql(values)))(sqlActionBuilder =>
+      ME.pure(new SlickQueryWithStatus[R](sqlActionBuilder, slickConverter, checkStatus))
+    )
   }
 
   // Expected to be mixed in by an implementation of StatusHandling

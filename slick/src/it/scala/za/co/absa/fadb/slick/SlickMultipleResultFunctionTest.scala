@@ -37,7 +37,6 @@ class SlickMultipleResultFunctionTest extends AnyFunSuite with SlickTest with Sc
     override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("actor_id", "first_name", "last_name")
 
     override def sql(values: GetActorsQueryParameters): SQLActionBuilder = {
-      1 / 0
       sql"""SELECT #$selectEntry FROM #$functionName(${values.firstName},${values.lastName}) #$alias;"""
     }
   }
@@ -46,7 +45,7 @@ class SlickMultipleResultFunctionTest extends AnyFunSuite with SlickTest with Sc
 
   test("Retrieving actors from database") {
     val expectedResultElem = Actor(49, "Pavel", "Marek")
-    val results = getActors(GetActorsQueryParameters(Some("Pavel"), Some("Marek"))).handleErrorWith(_ => Future(Seq(expectedResultElem)))
+    val results = getActors(GetActorsQueryParameters(Some("Pavel"), Some("Marek")))
     assert(results.futureValue.contains(expectedResultElem))
   }
 }
