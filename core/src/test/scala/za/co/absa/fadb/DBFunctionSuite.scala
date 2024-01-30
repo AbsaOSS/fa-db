@@ -46,7 +46,7 @@ class DBFunctionSuite extends AnyFunSuite {
       extends DBSingleResultFunction[Unit, Unit, EngineThrow, Future](None) {
 
       override protected def query(values: Unit)
-                                  (implicit ME: MonadError[Future, Throwable]
+                                  (implicit me: MonadError[Future, Throwable]
                                   ): Future[dBEngine.QueryType[Unit]] = neverHappens
     }
 
@@ -61,7 +61,7 @@ class DBFunctionSuite extends AnyFunSuite {
     class MyFunction(implicit override val schema: DBSchema, val dbEngine: EngineThrow)
       extends DBSingleResultFunction[Unit, Unit, EngineThrow, Future](Some("bar")) {
 
-      override protected def query(values: Unit)(implicit ME: MonadError[Future, Throwable]
+      override protected def query(values: Unit)(implicit me: MonadError[Future, Throwable]
       ): Future[dBEngine.QueryType[Unit]] = neverHappens
     }
 

@@ -49,13 +49,13 @@ private[slick] trait SlickFunctionBase[I, R] {
   /**
    *  Generates a Slick `SQLActionBuilder` representing the SQL query for the function in the context of Future.
    *  @param sqlActionBuilder Slick `SQLActionBuilder` representing the SQL query
-   *  @param ME MonadError instance for Future
+   *  @param me MonadError instance for Future
    *  @return the Slick `SQLActionBuilder` representing the SQL query wrapped in `Future`
    */
   protected final def meSql(
     sqlActionBuilder: => SQLActionBuilder
-  )(implicit ME: MonadError[Future, Throwable]): Future[SQLActionBuilder] = {
-    ME.catchNonFatal(sqlActionBuilder)
+  )(implicit me: MonadError[Future, Throwable]): Future[SQLActionBuilder] = {
+    me.catchNonFatal(sqlActionBuilder)
   }
 
   def fieldsToSelect: Seq[String]
@@ -66,11 +66,11 @@ private[slick] trait SlickFunction[I, R] extends SlickFunctionBase[I, R] {
   /**
    *  Generates a `SlickQuery[R]` representing the SQL query for the function.
    *  @param values the input values for the function
-   *  @param ME MonadError instance for Future
+   *  @param me MonadError instance for Future
    *  @return the `SlickQuery[R]` representing the SQL query wrapped in `Future`
    */
-  protected def query(values: I)(implicit ME: MonadError[Future, Throwable]): Future[SlickQuery[R]] = {
-    ME.flatMap(meSql(sql(values)))(sqlActionBuilder => ME.pure(new SlickQuery[R](sqlActionBuilder, slickConverter)))
+  protected def query(values: I)(implicit me: MonadError[Future, Throwable]): Future[SlickQuery[R]] = {
+    me.flatMap(meSql(sql(values)))(sqlActionBuilder => me.pure(new SlickQuery[R](sqlActionBuilder, slickConverter)))
   }
 }
 
@@ -79,12 +79,12 @@ private[slick] trait SlickFunctionWithStatus[I, R] extends SlickFunctionBase[I, 
   /**
    *  Generates a `SlickQueryWithStatus[R]` representing the SQL query for the function with status support.
    *  @param values the input values for the function
-   *  @param ME MonadError instance for Future
+   *  @param me MonadError instance for Future
    *  @return the `SlickQueryWithStatus[R]` representing the SQL query wrapped in `Future`
    */
-  protected def query(values: I)(implicit ME: MonadError[Future, Throwable]): Future[SlickQueryWithStatus[R]] = {
-    ME.flatMap(meSql(sql(values)))(sqlActionBuilder =>
-      ME.pure(new SlickQueryWithStatus[R](sqlActionBuilder, slickConverter, checkStatus))
+  protected def query(values: I)(implicit me: MonadError[Future, Throwable]): Future[SlickQueryWithStatus[R]] = {
+    me.flatMap(meSql(sql(values)))(sqlActionBuilder =>
+      me.pure(new SlickQueryWithStatus[R](sqlActionBuilder, slickConverter, checkStatus))
     )
   }
 

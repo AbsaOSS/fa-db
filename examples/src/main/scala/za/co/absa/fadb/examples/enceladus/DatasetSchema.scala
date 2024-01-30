@@ -108,7 +108,7 @@ object DatasetSchema {
  final class List(implicit override val schema: DBSchema,  val dbEngine: SlickPgEngine)
    extends SlickMultipleResultFunction[Boolean, SchemaHeader] {
 
-   override def apply(values: Boolean = false)(implicit ME: MonadError[Future, Throwable]): Future[Seq[SchemaHeader]] = super.apply(values)
+   override def apply(values: Boolean = false)(implicit me: MonadError[Future, Throwable]): Future[Seq[SchemaHeader]] = super.apply(values)
 
    override protected def sql(values: Boolean): SQLActionBuilder = {
      sql"""SELECT A.entity_name, A.entity_latest_version

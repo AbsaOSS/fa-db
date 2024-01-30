@@ -28,12 +28,8 @@ import za.co.absa.fadb.doobie.DoobieFunction.DoobieMultipleResultFunction
 
 class DoobieMultipleResultFunctionTest extends AnyFunSuite with DoobieTest {
 
-//  implicit def toFragmentsFunctionSemigroup[T]: Semigroup[T => Seq[Fragment]] = {
-//    (f1: T => Seq[Fragment], f2: T => Seq[Fragment]) => (params: T) => f1(params) ++ f2(params)
-//  }
-
-  implicit def toSeqFunctionSemigroup[A, B]: Semigroup[A => Seq[B]] = {
-    (f1: A => Seq[B], f2: A => Seq[B]) => (params: A) => f1(params) ++ f2(params)
+  implicit def toFragmentsFunctionSemigroup[T]: Semigroup[T => Seq[Fragment]] = {
+    (f1: T => Seq[Fragment], f2: T => Seq[Fragment]) => (params: T) => f1(params) ++ f2(params)
   }
 
   private val firstNameFragment: GetActorsQueryParameters => Seq[Fragment] = params => Seq(fr"${params.firstName}")
@@ -45,6 +41,7 @@ class DoobieMultipleResultFunctionTest extends AnyFunSuite with DoobieTest {
   // using Semigroup's combine method, |+| is syntactical sugar for combine method
   private val combinedUsingSemigroup = firstNameFragment |+| lastNameFragment
 
+  // not combined, defined as one function
   private val getActorsQueryFragments: GetActorsQueryParameters => Seq[Fragment] = {
     values => Seq(fr"${values.firstName}", fr"${values.lastName}")
   }
