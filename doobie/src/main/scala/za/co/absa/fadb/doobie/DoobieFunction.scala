@@ -110,7 +110,7 @@ trait DoobieFunction[I, R, F[_]] extends DoobieFunctionBase[R] {
   /**
    *  Generates a `Fragment` representing the SQL query for the function.
    *  @param values the input values for the function
-   *  @param read the `Read[R]` instance used to read the query result into `R`
+   *  @param read Read instance for `R` type
    *  @param me MonadError instance for F type
    *  @return the `Fragment` representing the SQL query
    */
@@ -185,7 +185,7 @@ trait DoobieFunctionWithStatus[I, R, F[_]] extends DoobieFunctionBase[R] {
   /**
    *  Generates a `Fragment` representing the SQL query for the function.
    *  @param values the input values for the function
-   *  @param read the `Read[StatusWithData[R]]` instance used to read the query result with status into `StatusWithData[R]`
+   *  @param read Read instance for `StatusWithData[R]`
    *  @param me MonadError instance for F type
    *  @return the `Fragment` representing the SQL query
    */
@@ -200,21 +200,20 @@ trait DoobieFunctionWithStatus[I, R, F[_]] extends DoobieFunctionBase[R] {
 }
 
 /**
- *  `DoobieFunction` is an object that contains several abstract classes extending different types of database functions.
+ *  `DoobieFunction` is an object that contains several abstract classes extending different types of db functions.
  *  These classes use Doobie's `Fragment` to represent SQL queries and `DoobieEngine` to execute them.
  */
 object DoobieFunction {
 
   /**
-   *  `DoobieSingleResultFunctionWithStatus` is an abstract class that extends `DBSingleResultFunctionWithStatus` with `DoobiePgEngine` as the engine type.
-   *  It represents a database function that returns a single result with status.
+   *  `DoobieSingleResultFunctionWithStatus` represents a db function that returns a single result with status.
    *
    *  @param toFragmentsSeq a function that generates a sequence of `Fragment`s
    *  @param functionNameOverride the optional override for the function name
    *  @param schema the database schema
    *  @param dbEngine the `DoobieEngine` instance used to execute SQL queries
-   *  @param readR the `Read[R]` instance used to read the query result into `R`
-   *  @param readSelectWithStatus the `Read[StatusWithData[R]]` instance used to read the query result with status into `StatusWithData[R]`
+   *  @param readR Read instance for `R`
+   *  @param readSelectWithStatus Read instance for `StatusWithData[R]`
    *  @tparam F the effect type, which must have an `Async` and a `Monad` instance
    */
   abstract class DoobieSingleResultFunctionWithStatus[I, R, F[_]](
@@ -229,8 +228,7 @@ object DoobieFunction {
       with DoobieFunctionWithStatus[I, R, F]
 
   /**
-   *  `DoobieSingleResultFunction` is an abstract class that extends `DBSingleResultFunction` with `DoobiePgEngine` as the engine type.
-   *  It represents a database function that returns a single result.
+   *  `DoobieSingleResultFunction` represents a db function that returns a single result.
    *
    *  @param toFragmentsSeq a function that generates a sequence of `Fragment`s
    *  @param functionNameOverride the optional override for the function name
@@ -250,8 +248,7 @@ object DoobieFunction {
       with DoobieFunction[I, R, F]
 
   /**
-   *  `DoobieMultipleResultFunction` is an abstract class that extends `DBMultipleResultFunction` with `DoobiePgEngine` as the engine type.
-   *  It represents a database function that returns multiple results.
+   *  `DoobieMultipleResultFunction` represents a db function that returns multiple results.
    */
   abstract class DoobieMultipleResultFunction[I, R, F[_]](
     override val toFragmentsSeq: I => Seq[Fragment],
@@ -264,8 +261,7 @@ object DoobieFunction {
       with DoobieFunction[I, R, F]
 
   /**
-   *  `DoobieOptionalResultFunction` is an abstract class that extends `DBOptionalResultFunction` with `DoobiePgEngine` as the engine type.
-   *  It represents a database function that returns an optional result.
+   *  `DoobieOptionalResultFunction` represents a db function that returns an optional result.
    */
   abstract class DoobieOptionalResultFunction[I, R, F[_]](
     override val toFragmentsSeq: I => Seq[Fragment],
