@@ -93,7 +93,7 @@ jobs:
         with:
           paths: >
             ${{ github.workspace }}/core/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml,
-            ${{ github.workspace }}/slick/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
+            ${{ github.workspace }}/slick/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml,
             ${{ github.workspace }}/doobie/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
           # examples don't need code coverage - at least not now
           token: ${{ secrets.GITHUB_TOKEN }}

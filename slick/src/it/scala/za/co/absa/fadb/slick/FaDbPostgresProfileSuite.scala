@@ -16,18 +16,16 @@
 
 package za.co.absa.fadb.slick
 
-import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits._
-import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
-import slick.jdbc.{GetResult, SQLActionBuilder}
-import za.co.absa.fadb.DBFunction.DBSingleResultFunction
-import za.co.absa.fadb.DBSchema
 import com.github.tminglei.slickpg.{InetString, LTree, MacAddrString, Range}
 import org.scalatest.flatspec.AsyncFlatSpec
+import slick.jdbc.{GetResult, SQLActionBuilder}
+import za.co.absa.fadb.DBSchema
+import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits._
+import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
 import za.co.absa.fadb.slick.SlickFunction.SlickSingleResultFunction
 
-import java.time.{Duration, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, ZonedDateTime}
+import java.time._
 import java.util.UUID
-import scala.concurrent.Future
 
 class FaDbPostgresProfileSuite extends AsyncFlatSpec {
 

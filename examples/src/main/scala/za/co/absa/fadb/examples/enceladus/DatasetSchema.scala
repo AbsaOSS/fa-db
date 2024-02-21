@@ -16,6 +16,7 @@
 
 package za.co.absa.fadb.examples.enceladus
 
+import cats.MonadError
 import slick.jdbc.PostgresProfile.api._
 import slick.jdbc.{GetResult, SQLActionBuilder}
 import za.co.absa.fadb.DBSchema
@@ -26,6 +27,7 @@ import za.co.absa.fadb.slick.SlickPgEngine
 import za.co.absa.fadb.status.handling.implementations.UserDefinedStatusHandling
 
 import java.sql.Timestamp
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /* The Schema doesn't need the dBEngine directly, but it seems cleaner this way to hand it over to schema's functions */
@@ -106,7 +108,7 @@ object DatasetSchema {
  final class List(implicit override val schema: DBSchema,  val dbEngine: SlickPgEngine)
    extends SlickMultipleResultFunction[Boolean, SchemaHeader] {
 
-   override def apply(values: Boolean = false): Future[Seq[SchemaHeader]] = super.apply(values)
+   override def apply(values: Boolean = false)(implicit me: MonadError[Future, Throwable]): Future[Seq[SchemaHeader]] = super.apply(values)
 
    override protected def sql(values: Boolean): SQLActionBuilder = {
      sql"""SELECT A.entity_name, A.entity_latest_version

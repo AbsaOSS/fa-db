@@ -16,24 +16,27 @@
 
 package za.co.absa.fadb.slick
 
+import cats.implicits.catsSyntaxApplicativeError
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuite
 import slick.jdbc.SQLActionBuilder
 import za.co.absa.fadb.DBSchema
-import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
 import za.co.absa.fadb.slick.SlickFunction.SlickMultipleResultFunction
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
+
 
 class SlickMultipleResultFunctionTest extends AnyFunSuite with SlickTest with ScalaFutures {
 
   class GetActors(implicit override val schema: DBSchema, val dbEngine: SlickPgEngine)
-      extends SlickMultipleResultFunction[GetActorsQueryParameters, Actor]
+    extends SlickMultipleResultFunction[GetActorsQueryParameters, Actor]
       with ActorSlickConverter {
 
     override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("actor_id", "first_name", "last_name")
 
-    override protected def sql(values: GetActorsQueryParameters): SQLActionBuilder = {
+    override def sql(values: GetActorsQueryParameters): SQLActionBuilder = {
       sql"""SELECT #$selectEntry FROM #$functionName(${values.firstName},${values.lastName}) #$alias;"""
     }
   }

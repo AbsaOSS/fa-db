@@ -16,23 +16,38 @@
 
 package za.co.absa.fadb.doobie
 
+import cats.Semigroup
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
+import cats.implicits.catsSyntaxSemigroup
+import doobie.Fragment
 import doobie.implicits.toSqlInterpolator
-import doobie.util.Read
-import doobie.util.fragment.Fragment
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.doobie.DoobieFunction.DoobieMultipleResultFunction
 
 class DoobieMultipleResultFunctionTest extends AnyFunSuite with DoobieTest {
 
-  class GetActors(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
-      extends DoobieMultipleResultFunction[GetActorsQueryParameters, Actor, IO] {
-
-    override def sql(values: GetActorsQueryParameters)(implicit read: Read[Actor]): Fragment =
-      sql"SELECT actor_id, first_name, last_name FROM ${Fragment.const(functionName)}(${values.firstName}, ${values.lastName})"
+  implicit def toFragmentsFunctionSemigroup[T]: Semigroup[T => Seq[Fragment]] = {
+    (f1: T => Seq[Fragment], f2: T => Seq[Fragment]) => (params: T) => f1(params) ++ f2(params)
   }
+
+  private val firstNameFragment: GetActorsQueryParameters => Seq[Fragment] = params => Seq(fr"${params.firstName}")
+  private val lastNameFragment: GetActorsQueryParameters => Seq[Fragment] = params => Seq(fr"${params.lastName}")
+
+  private val combinedQueryFragments: GetActorsQueryParameters => Seq[Fragment] =
+    params => firstNameFragment(params) ++ lastNameFragment(params)
+
+  // using Semigroup's combine method, |+| is syntactical sugar for combine method
+  private val combinedUsingSemigroup = firstNameFragment |+| lastNameFragment
+
+  // not combined, defined as one function
+  private val getActorsQueryFragments: GetActorsQueryParameters => Seq[Fragment] = {
+    values => Seq(fr"${values.firstName}", fr"${values.lastName}")
+  }
+
+  class GetActors(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
+      extends DoobieMultipleResultFunction[GetActorsQueryParameters, Actor, IO](combinedUsingSemigroup)
 
   private val getActors = new GetActors()(Runs, new DoobieEngine(transactor))
 

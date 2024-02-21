@@ -16,6 +16,8 @@
 
 package za.co.absa.fadb
 
+import cats.MonadError
+import cats.implicits.toFlatMapOps
 import za.co.absa.fadb.exceptions.StatusException
 import za.co.absa.fadb.status.handling.StatusHandling
 
@@ -31,8 +33,8 @@ import scala.language.higherKinds
  *  @tparam E - The type of the [[DBEngine]] engine.
  *  @tparam F - The type of the context in which the database function is executed.
  */
-abstract class DBFunction[I, R, E <: DBEngine[F], F[_]](functionNameOverride: Option[String] = None)(
-  implicit override val schema: DBSchema,
+abstract class DBFunction[I, R, E <: DBEngine[F], F[_]](functionNameOverride: Option[String] = None)(implicit
+  override val schema: DBSchema,
   val dBEngine: E
 ) extends DBFunctionFabric(functionNameOverride) {
 
@@ -47,21 +49,25 @@ abstract class DBFunction[I, R, E <: DBEngine[F], F[_]](functionNameOverride: Op
    *  @param values - The values to pass over to the database function.
    *  @return - A sequence of results from the database function.
    */
-  protected def multipleResults(values: I): F[Seq[R]] = dBEngine.fetchAll(query(values))
+  protected def multipleResults(values: I)(implicit me: MonadError[F, Throwable]): F[Seq[R]] =
+    query(values).flatMap(q => dBEngine.fetchAll(q))
 
   /**
    *  Executes the database function and returns a single result.
    *  @param values - The values to pass over to the database function.
    *  @return - A single result from the database function.
    */
-  protected def singleResult(values: I): F[R] = dBEngine.fetchHead(query(values))
+  protected def singleResult(values: I)(implicit me: MonadError[F, Throwable]): F[R] =
+    query(values).flatMap(q => dBEngine.fetchHead(q))
 
   /**
    *  Executes the database function and returns an optional result.
    *  @param values - The values to pass over to the database function.
    *  @return - An optional result from the database function.
    */
-  protected def optionalResult(values: I): F[Option[R]] = dBEngine.fetchHeadOption(query(values))
+  protected def optionalResult(values: I)(implicit me: MonadError[F, Throwable]): F[Option[R]] = {
+    query(values).flatMap(q => dBEngine.fetchHeadOption(q))
+  }
 
   /**
    *  Function to create the DB function call specific to the provided [[DBEngine]].
@@ -69,7 +75,7 @@ abstract class DBFunction[I, R, E <: DBEngine[F], F[_]](functionNameOverride: Op
    *  @param values - The values to pass over to the database function.
    *  @return - The SQL query in the format specific to the provided [[DBEngine]].
    */
-  protected def query(values: I): dBEngine.QueryType[R]
+  protected def query(values: I)(implicit me: MonadError[F, Throwable]): F[dBEngine.QueryType[R]]
 }
 
 /**
@@ -83,8 +89,8 @@ abstract class DBFunction[I, R, E <: DBEngine[F], F[_]](functionNameOverride: Op
  *  @tparam E - The type of the [[DBEngine]] engine.
  *  @tparam F - The type of the context in which the database function is executed.
  */
-abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOverride: Option[String] = None)(
-  implicit override val schema: DBSchema,
+abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOverride: Option[String] = None)(implicit
+  override val schema: DBSchema,
   val dBEngine: E
 ) extends DBFunctionFabric(functionNameOverride)
     with StatusHandling {
@@ -100,10 +106,12 @@ abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOv
 
   /**
    *  Executes the database function and returns multiple results.
-   *  @param values
+   *  @param values The values to pass over to the database function.
    *  @return A sequence of results from the database function.
    */
-  def apply(values: I): F[Either[StatusException, R]] = dBEngine.runWithStatus(query(values))
+  def apply(values: I)(implicit me: MonadError[F, Throwable]): F[Either[StatusException, R]] = {
+    query(values).flatMap(q => dBEngine.runWithStatus(q))
+  }
 
   /**
    *  The fields to select from the database function call
@@ -117,12 +125,11 @@ abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOv
   }
 
   /**
-   *  Function to create the DB function call specific to the provided [[DBEngine]]. Expected to be implemented by the
-   *  DBEngine specific mix-in.
+   *  Function to create the DB function call specific to the provided [[DBEngine]].
    *  @param values the values to pass over to the database function
    *  @return       the SQL query in the format specific to the provided [[DBEngine]]
    */
-  protected def query(values: I): dBEngine.QueryWithStatusType[R]
+  protected def query(values: I)(implicit me: MonadError[F, Throwable]): F[dBEngine.QueryWithStatusType[R]]
 
   // To be provided by an implementation of QueryStatusHandling
   override def checkStatus[A](statusWithData: FunctionStatusWithData[A]): Either[StatusException, A]
@@ -151,7 +158,7 @@ object DBFunction {
      *  @return       - a sequence of values, each coming from a row returned from the DB function transformed to scala
      *               type `R`
      */
-    def apply(values: I): F[Seq[R]] = multipleResults(values)
+    def apply(values: I)(implicit me: MonadError[F, Throwable]): F[Seq[R]] = multipleResults(values)
   }
 
   /**
@@ -174,7 +181,7 @@ object DBFunction {
      *  @param values - the values to pass over to the database function
      *  @return       - the value returned from the DB function transformed to scala type `R`
      */
-    def apply(values: I): F[R] = singleResult(values)
+    def apply(values: I)(implicit me: MonadError[F, Throwable]): F[R] = singleResult(values)
   }
 
   /**
@@ -197,6 +204,6 @@ object DBFunction {
      *  @param values - the values to pass over to the database function
      *  @return       - the value returned from the DB function transformed to scala type `R` if a row is returned, otherwise `None`
      */
-    def apply(values: I): F[Option[R]] = optionalResult(values)
+    def apply(values: I)(implicit me: MonadError[F, Throwable]): F[Option[R]] = optionalResult(values)
   }
 }

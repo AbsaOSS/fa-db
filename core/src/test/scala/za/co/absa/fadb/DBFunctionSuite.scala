@@ -16,6 +16,7 @@
 
 package za.co.absa.fadb
 
+import cats.MonadError
 import cats.implicits._
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBFunction.DBSingleResultFunction
@@ -44,7 +45,9 @@ class DBFunctionSuite extends AnyFunSuite {
     class MyFunction(implicit override val schema: DBSchema, val dbEngine: EngineThrow)
       extends DBSingleResultFunction[Unit, Unit, EngineThrow, Future](None) {
 
-      override protected def query(values: Unit): dBEngine.QueryType[Unit] = neverHappens
+      override protected def query(values: Unit)
+                                  (implicit me: MonadError[Future, Throwable]
+                                  ): Future[dBEngine.QueryType[Unit]] = neverHappens
     }
 
     val fnc1 = new MyFunction()(FooNamed, new EngineThrow)
@@ -58,7 +61,8 @@ class DBFunctionSuite extends AnyFunSuite {
     class MyFunction(implicit override val schema: DBSchema, val dbEngine: EngineThrow)
       extends DBSingleResultFunction[Unit, Unit, EngineThrow, Future](Some("bar")) {
 
-      override protected def query(values: Unit): dBEngine.QueryType[Unit] = neverHappens
+      override protected def query(values: Unit)(implicit me: MonadError[Future, Throwable]
+      ): Future[dBEngine.QueryType[Unit]] = neverHappens
     }
 
     val fnc1 = new MyFunction()(FooNamed, new EngineThrow)

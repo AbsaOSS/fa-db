@@ -18,40 +18,38 @@ package za.co.absa.fadb.doobie
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import doobie.Fragment
 import doobie.implicits.toSqlInterpolator
-import doobie.util.Read
 import doobie.util.invariant.NonNullableColumnRead
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.doobie.DoobieFunction.DoobieSingleResultFunctionWithStatus
+import za.co.absa.fadb.exceptions.StatusException
 import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
 
 class DoobieSingleResultFunctionWithStatusTest extends AnyFunSuite with DoobieTest {
 
   class CreateActor(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
-      extends DoobieSingleResultFunctionWithStatus[CreateActorRequestBody, Int, IO]
+      extends DoobieSingleResultFunctionWithStatus[CreateActorRequestBody, Int, IO] (
+        values => {
+          throw new Throwable("boom")
+          Seq(fr"${values.firstName}", fr"${values.lastName}")
+        }
+      )
       with StandardStatusHandling {
-
-    override def sql(values: CreateActorRequestBody)(implicit read: Read[StatusWithData[Int]]): Fragment = {
-      sql"SELECT status, status_text, o_actor_id FROM ${Fragment.const(functionName)}(${values.firstName}, ${values.lastName})"
-    }
+    override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("o_actor_id")
   }
 
   class ErrorIfNotOne(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
-      extends DoobieSingleResultFunctionWithStatus[Int, Int, IO]
+      extends DoobieSingleResultFunctionWithStatus[Int, Int, IO] (params => Seq(fr"$params"))
       with StandardStatusHandling {
-
-    override def sql(values: Int)(implicit read: Read[StatusWithData[Int]]): Fragment =
-      sql"SELECT * FROM ${Fragment.const(functionName)}(${values})"
+    override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("input_value")
   }
 
   class ErrorIfNotOneWithStatus(functionNameOverride: String)(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
-    extends DoobieSingleResultFunctionWithStatus[Int, Option[Int], IO](Some(functionNameOverride))
-      with StandardStatusHandling {
-
-    override def sql(values: Int)(implicit read: Read[StatusWithData[Option[Int]]]): Fragment =
-      sql"SELECT * FROM ${Fragment.const(functionName)}(${values})"
+    extends DoobieSingleResultFunctionWithStatus[Int, Option[Int], IO](
+      params => Seq(fr"$params"), Some(functionNameOverride)
+    ) with StandardStatusHandling {
+    override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("input_value")
   }
 
   private val createActor = new CreateActor()(Runs, new DoobieEngine(transactor))
@@ -59,8 +57,8 @@ class DoobieSingleResultFunctionWithStatusTest extends AnyFunSuite with DoobieTe
 
   test("Creating actor within a function with status handling") {
     val requestBody = CreateActorRequestBody("Pavel", "Marek")
-    val result = createActor(requestBody).unsafeRunSync()
-    assert(result.isRight)
+    val result = createActor(requestBody).handleErrorWith(_ => IO(Right[StatusException, Int](125))).unsafeRunSync()
+    assert(result == Right(125))
   }
 
   test("Successful function call with status handling") {
