@@ -35,7 +35,7 @@ class DoobieSingleResultFunctionTest extends AnyFunSuite with DoobieTest {
      override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("o_actor_id")
   }
 
-  private val createActor = new CreateActor()(Runs, new DoobieEngine(transactor))
+  private val createActor = new CreateActor()(Integration, new DoobieEngine(transactor))
 
   test("Inserting an actor into database & handling an error") {
     val result = createActor(CreateActorRequestBody("Pavel", "Marek")).handleErrorWith(_ => IO(Int.MaxValue)).unsafeRunSync()

@@ -171,11 +171,11 @@ Code coverage will be generated on path:
 
 ### Integration tests
 
-There are now integration tests as part of the project (at the time of writing they are in the _Slick_ module).
+There are now integration tests as part of the project (at the time of writing they are in 
+the _Slick_ and _Doobie_ modules).
 
-For the tests to work properly a running Postgres instance is needed. And then the following setup:
-* execute (content of) all `*.sql` files within `it/resources/sql/` folder within a posgres query tool
-* modify `it/resources/application.conf` to point to the database used in the previous point
+For the tests to work properly a running Postgres instance is needed as well as all DB objects must be placed on the DB.
+We automated this process, see `database/README.md` for more details.
 
 How to execute the tests:
 

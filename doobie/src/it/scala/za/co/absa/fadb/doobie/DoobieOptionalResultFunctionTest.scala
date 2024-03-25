@@ -28,11 +28,11 @@ class DoobieOptionalResultFunctionTest extends AnyFunSuite with DoobieTest {
   class GetActorById(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
     extends DoobieOptionalResultFunction[Int, Actor, IO](id => Seq(fr"$id"))
 
-  private val createActor = new GetActorById()(Runs, new DoobieEngine(transactor))
+  private val getActorById = new GetActorById()(Integration, new DoobieEngine(transactor))
 
   test("Retrieve actor by id from database") {
     val expectedResult = Some(Actor(49, "Pavel", "Marek"))
-    val result = createActor(49).unsafeRunSync()
+    val result = getActorById(49).unsafeRunSync()
     assert(expectedResult == result)
   }
 

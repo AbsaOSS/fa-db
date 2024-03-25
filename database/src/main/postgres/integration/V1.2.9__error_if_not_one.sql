@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.slick
-
-import slick.jdbc.JdbcBackend.Database
-import za.co.absa.fadb.DBSchema
-
-trait SlickTest {
-  case class CreateActorRequestBody(firstName: String, lastName: String)
-  case class GetActorsQueryParameters(firstName: Option[String], lastName: Option[String])
-
-  import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits._
-  object Integration extends DBSchema
-
-  val db = Database.forConfig("postgrestestdb")
-}
+CREATE OR REPLACE FUNCTION integration.error_if_not_one(p_input INT)
+RETURNS TABLE(
+  status INT,
+  status_text TEXT,
+  input_value INT
+) AS $$
+BEGIN
+  IF p_input != 1 THEN
+    RETURN QUERY SELECT 99 AS status, 'error' AS status_text, NULL::INT AS input_value;
+  ELSE
+    RETURN QUERY SELECT 11 AS status, 'success' AS status_text, p_input AS input_value;
+  END IF;
+END;
+$$ LANGUAGE plpgsql;

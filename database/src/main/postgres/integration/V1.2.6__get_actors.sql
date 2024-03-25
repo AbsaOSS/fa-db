@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION runs.get_actors(
+CREATE OR REPLACE FUNCTION integration.get_actors(
     i_first_name             TEXT,
     i_last_name              TEXT
 ) RETURNS TABLE (
@@ -25,7 +25,7 @@ CREATE OR REPLACE FUNCTION runs.get_actors(
 $$
 BEGIN
 RETURN QUERY SELECT A.actor_id, A.first_name, A.last_name
-                 FROM runs.actors A
+                 FROM integration.actors A
                  WHERE
                      (i_first_name IS NULL OR A.first_name = i_first_name)
                    AND

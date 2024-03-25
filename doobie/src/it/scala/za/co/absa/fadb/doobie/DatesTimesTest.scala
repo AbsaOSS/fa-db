@@ -64,8 +64,8 @@ class DatesTimesTest extends AnyFunSuite with DoobieTest {
     override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("o_id")
   }
 
-  private val getAllDateTimeTypes = new GetAllDateTimeTypes()(Runs, new DoobieEngine(transactor))
-  private val insertDatesTimes = new InsertDatesTimes()(Runs, new DoobieEngine(transactor))
+  private val getAllDateTimeTypes = new GetAllDateTimeTypes()(Integration, new DoobieEngine(transactor))
+  private val insertDatesTimes = new InsertDatesTimes()(Integration, new DoobieEngine(transactor))
 
   test("Reading different date/time types from the database") {
     val offsetDateTime = java.time.OffsetDateTime.parse("2004-10-19T08:23:54Z")

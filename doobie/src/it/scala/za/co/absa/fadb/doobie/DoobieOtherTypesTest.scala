@@ -68,8 +68,8 @@ class DoobieOtherTypesTest extends AnyFunSuite with DoobieTest {
     override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("o_id")
   }
 
-  private val readOtherTypes = new ReadOtherTypes()(Runs, new DoobieEngine(transactor))
-  private val insertOtherTypes = new InsertOtherTypes()(Runs, new DoobieEngine(transactor))
+  private val readOtherTypes = new ReadOtherTypes()(Integration, new DoobieEngine(transactor))
+  private val insertOtherTypes = new InsertOtherTypes()(Integration, new DoobieEngine(transactor))
 
   test("Reading other common data types from database") {
     val expectedData = OtherTypesData(
@@ -101,7 +101,7 @@ class DoobieOtherTypesTest extends AnyFunSuite with DoobieTest {
 
   test("Writing other common data types to database") {
     val data = OtherTypesData(
-      id = 3,
+      id = 1,
       ltreeCol = "Top.Science.Astronomy",
       inetCol = InetAddress.getByName("192.168.1.1"),
       macaddrCol = "08:00:2b:01:02:03",
