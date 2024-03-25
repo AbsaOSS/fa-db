@@ -261,6 +261,19 @@ object DoobieFunction {
       with DoobieFunction[I, R, F]
 
   /**
+    *  `DoobieMultipleResultFunctionWithStatus` represents a db function that returns multiple results with statuses.
+    */
+  abstract class DoobieMultipleResultFunctionWithStatus[I, R, F[_]](
+   override val toFragmentsSeq: I => Seq[Fragment],
+   functionNameOverride: Option[String] = None
+  )(implicit
+   override val schema: DBSchema,
+   val dbEngine: DoobieEngine[F],
+   val readR: Read[R]
+  ) extends DBFunctionWithStatus[I, R, DoobieEngine[F], F](functionNameOverride)
+  with DoobieFunctionWithStatus[I, R, F]
+
+  /**
    *  `DoobieOptionalResultFunction` represents a db function that returns an optional result.
    */
   abstract class DoobieOptionalResultFunction[I, R, F[_]](
