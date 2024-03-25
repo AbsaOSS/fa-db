@@ -55,7 +55,7 @@ jobs:
         run: sbt flywayMigrate
 
       - name: Build and run IT tests for Doobie
-        run: sbt "project faDBDoobie" ++${{matrix.scala}} IntegrationTest/test
+        run: sbt "project faDBDoobie" ++${{matrix.scala}} it:test
 
       - name: Build and run  IT tests for Slick
-        run: sbt "project faDBSlick" ++${{matrix.scala}} IntegrationTest/test
+        run: sbt "project faDBSlick" ++${{matrix.scala}} it:test
