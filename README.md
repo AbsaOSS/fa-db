@@ -152,6 +152,7 @@ It brings:
 * `class DoobieMultipleResultFunction` - abstract class for DB functions returning sequence of results
 * `class DoobieOptionalResultFunction` - abstract class for DB functions returning optional result
 * `class DoobieSingleResultFunctionWithStatus` - abstract class for DB functions with status handling; it requires an implementation of `StatusHandling` to be mixed-in (`StandardStatusHandling` available out-of-the-box)
+* `class DoobieMultipleResultFunctionWithStatus` - as `DoobieSingleResultFunctionWithStatus` but for multiple record retrieval
 
 Since Doobie also interoperates with ZIO, there is an example of how a database connection can be properly established within a ZIO application. Please see [this file](doobie/zio-setup.md) for more details.
 

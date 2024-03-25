@@ -34,7 +34,7 @@ class DBFunctionSuite extends AnyFunSuite {
 
   class EngineThrow extends DBEngine[Future] {
     override def run[R](query: QueryType[R]): Future[Seq[R]] = neverHappens
-    override def runWithStatus[R](query: QueryWithStatusType[R]): Future[Either[StatusException, R]] = neverHappens
+    override def runWithStatus[R](query: QueryWithStatusType[R]): Future[Either[StatusException, Seq[R]]] = neverHappens
   }
 
   private object FooNamed extends DBSchema

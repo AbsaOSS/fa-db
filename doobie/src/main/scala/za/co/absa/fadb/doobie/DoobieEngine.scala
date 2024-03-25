@@ -53,18 +53,16 @@ class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[
   }
 
   /**
-   *  Executes a Doobie query and returns the result as an `F[Either[StatusException, R]]`.
+   *  Executes a Doobie query and returns the result as an `F[Either[StatusException, Seq[R]]]`.
    *
    *  @param query the Doobie query to execute
    *  @param readStatusWithDataR the `Read[StatusWithData[R]]` instance used to read the query result into `StatusWithData[R]`
-   *  @return the query result as an `F[Either[StatusException, R]]`
+   *  @return the query result
    */
   private def executeQueryWithStatus[R](
     query: QueryWithStatusType[R]
-  )(implicit readStatusWithDataR: Read[StatusWithData[R]]): F[Either[StatusException, R]] = {
-    // .unique returns a single value, raising an exception if there is not exactly one row returned
-    // https://tpolecat.github.io/doobie/docs/04-Selecting.html
-    query.fragment.query[StatusWithData[R]].unique.transact(transactor).map(query.getResultOrException)
+  )(implicit readStatusWithDataR: Read[StatusWithData[R]]): F[Either[StatusException, Seq[R]]] = {
+      query.fragment.query[StatusWithData[R]].to[Seq].transact(transactor).map(query.getResultOrException)
   }
 
   /**
@@ -82,7 +80,7 @@ class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[
    *  @param query the Doobie query to run
    *  @return the query result as an `F[Either[StatusException, R]]`
    */
-  override def runWithStatus[R](query: QueryWithStatusType[R]): F[Either[StatusException, R]] = {
+  override def runWithStatus[R](query: QueryWithStatusType[R]): F[Either[StatusException, Seq[R]]] = {
     executeQueryWithStatus(query)(query.readStatusWithDataR)
   }
 }

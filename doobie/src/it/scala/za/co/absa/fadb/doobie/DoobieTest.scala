@@ -24,6 +24,7 @@ import za.co.absa.fadb.DBSchema
 trait DoobieTest {
   case class Actor(actorId: Int, firstName: String, lastName: String)
   case class GetActorsQueryParameters(firstName: Option[String], lastName: Option[String])
+  case class GetActorsByLastnameQueryParameters(lastName: String, firstName: Option[String] = None)
   case class CreateActorRequestBody(firstName: String, lastName: String)
 
   import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits._
