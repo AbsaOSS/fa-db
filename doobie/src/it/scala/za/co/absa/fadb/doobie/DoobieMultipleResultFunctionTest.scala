@@ -49,7 +49,7 @@ class DoobieMultipleResultFunctionTest extends AnyFunSuite with DoobieTest {
   class GetActors(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
       extends DoobieMultipleResultFunction[GetActorsQueryParameters, Actor, IO](combinedUsingSemigroup)
 
-  private val getActors = new GetActors()(Runs, new DoobieEngine(transactor))
+  private val getActors = new GetActors()(Integration, new DoobieEngine(transactor))
 
   test("Retrieving actor from database") {
     val expectedResultElem = Actor(49, "Pavel", "Marek")

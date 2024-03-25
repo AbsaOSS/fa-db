@@ -89,7 +89,7 @@ class FaDbPostgresProfileSuite extends AsyncFlatSpec {
       }
     }
 
-    class TestSchema(implicit dBEngine: SlickPgEngine) extends DBSchema("public") {
+    class TestSchema(implicit dBEngine: SlickPgEngine) extends DBSchema("integration") {
 
       val testFunction = new TestFunction
     }
@@ -171,7 +171,7 @@ class FaDbPostgresProfileSuite extends AsyncFlatSpec {
       }
     }
 
-    class TestSchema(implicit dBEngine: SlickPgEngine) extends DBSchema("public") {
+    class TestSchema(implicit dBEngine: SlickPgEngine) extends DBSchema("integration") {
 
       val testFunction = new TestFunction
     }

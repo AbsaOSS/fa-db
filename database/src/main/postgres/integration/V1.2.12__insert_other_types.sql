@@ -14,51 +14,7 @@
  * limitations under the License.
  */
 
-CREATE TABLE runs.other_types (
-  id INT PRIMARY KEY,
-  ltree_col LTREE,
-  inet_col INET,
-  macaddr_col MACADDR,
-  hstore_col HSTORE,
-  cidr_col CIDR,
-  json_col JSON,
-  jsonb_col JSONB,
-  uuid_col UUID,
-  array_col INT[]
-);
-
-INSERT INTO runs.other_types VALUES (
-  1,
-  'Top.Science.Astronomy',
-  '192.168.1.1',
-  '08:00:2b:01:02:03',
-  'key=>value',
-  '192.168.1/24',
-  '{"key": "value"}',
-  '{"key": "value"}',
-  uuid_generate_v4(),
-  ARRAY[1,2,3]
-);
-
-CREATE OR REPLACE FUNCTION runs.read_other_types(p_id INT)
-RETURNS TABLE(
-  id INT,
-  ltree_col LTREE,
-  inet_col INET,
-  macaddr_col MACADDR,
-  hstore_col HSTORE,
-  cidr_col CIDR,
-  json_col JSON,
-  jsonb_col JSONB,
-  uuid_col UUID,
-  array_col INT[]
-) AS $$
-BEGIN
-  RETURN QUERY SELECT * FROM runs.other_types T WHERE T.id = p_id;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION runs.insert_other_types(
+CREATE OR REPLACE FUNCTION integration.insert_other_types(
   p_id INT,
   p_ltree_col LTREE,
   p_inet_col INET,
@@ -76,7 +32,7 @@ CREATE OR REPLACE FUNCTION runs.insert_other_types(
 ) AS $$
 BEGIN
   BEGIN
-    INSERT INTO runs.other_types VALUES (
+    INSERT INTO integration.other_types VALUES (
       p_id,
       p_ltree_col,
       p_inet_col,

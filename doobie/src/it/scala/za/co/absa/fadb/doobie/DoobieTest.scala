@@ -27,7 +27,7 @@ trait DoobieTest {
   case class CreateActorRequestBody(firstName: String, lastName: String)
 
   import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits._
-  object Runs extends DBSchema
+  object Integration extends DBSchema
 
   protected val transactor: Aux[IO, Unit] = Transactor.fromDriverManager[IO](
     "org.postgresql.Driver",
