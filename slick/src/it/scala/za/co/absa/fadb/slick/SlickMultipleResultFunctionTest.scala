@@ -16,7 +16,6 @@
 
 package za.co.absa.fadb.slick
 
-import cats.implicits.catsSyntaxApplicativeError
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuite
 import slick.jdbc.SQLActionBuilder
@@ -24,7 +23,6 @@ import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.slick.SlickFunction.SlickMultipleResultFunction
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
 
 

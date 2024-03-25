@@ -50,35 +50,46 @@ abstract class DBEngine[F[_]: Monad] {
    *  @tparam R     - return type of the query
    *  @return       - result of database query with status
    */
-  def runWithStatus[R](query: QueryWithStatusType[R]): F[Either[StatusException, R]]
+  protected def runWithStatus[R](query: QueryWithStatusType[R]): F[Either[StatusException, Seq[R]]]
 
   /**
    *  Public method to execute when query is expected to return multiple results
+   *
+   *  Two methods provided, one for dealing with query of type with no status, and the other for status-provided queries.
+   *
    *  @param query  - the query to execute
    *  @tparam R     - return type of the query
    *  @return       - sequence of the results of database query
    */
-  def fetchAll[R](query: QueryType[R]): F[Seq[R]] = {
-    run(query)
-  }
+  def fetchAll[R](query: QueryType[R]): F[Seq[R]] = run(query)
+  def fetchAllWithStatus[R](query: QueryWithStatusType[R]): F[Either[StatusException, Seq[R]]] = runWithStatus(query)
 
   /**
    *  Public method to execute when query is expected to return exactly one row
+   *
+   *  Two methods provided, one for dealing with query of type with no status, and the other for status-provided queries.
+   *
    *  @param query  - the query to execute
    *  @tparam R     - return type of the query
    *  @return       - sequence of the results of database query
    */
-  def fetchHead[R](query: QueryType[R]): F[R] = {
-    run(query).map(_.head)
-  }
+  def fetchHead[R](query: QueryType[R]): F[R] = run(query).map(_.head)
+  def fetchHeadWithStatus[R](query: QueryWithStatusType[R]): F[Either[StatusException, R]] =
+    runWithStatus(query)
+      .map(resSeq => resSeq.right.map(_.head))
 
   /**
    *  Public method to execute when query is expected to return one or no results
+   *
+   *  Two methods provided, one for dealing with query of type with no status, and the other for status-provided queries.
+   *
    *  @param query  - the query to execute
    *  @tparam R     - return type of the query
    *  @return       - sequence of the results of database query
    */
-  def fetchHeadOption[R](query: QueryType[R]): F[Option[R]] = {
-    run(query).map(_.headOption)
-  }
+  def fetchHeadOption[R](query: QueryType[R]): F[Option[R]] = run(query).map(_.headOption)
+  def fetchHeadOptionWithStatus[R](query: QueryWithStatusType[R]): F[Either[StatusException, Option[R]]] =
+    runWithStatus(query)
+      .map(resSeq => resSeq.right.map(_.headOption))
+
 }

@@ -22,7 +22,7 @@ import doobie.util.Read
 import doobie.util.fragment.Fragment
 import za.co.absa.fadb.DBFunction._
 import za.co.absa.fadb.exceptions.StatusException
-import za.co.absa.fadb.{DBFunctionWithStatus, DBSchema, FunctionStatusWithData}
+import za.co.absa.fadb.{DBSchema, FunctionStatusWithData}
 
 import scala.language.higherKinds
 
@@ -206,28 +206,6 @@ trait DoobieFunctionWithStatus[I, R, F[_]] extends DoobieFunctionBase[R] {
 object DoobieFunction {
 
   /**
-   *  `DoobieSingleResultFunctionWithStatus` represents a db function that returns a single result with status.
-   *
-   *  @param toFragmentsSeq a function that generates a sequence of `Fragment`s
-   *  @param functionNameOverride the optional override for the function name
-   *  @param schema the database schema
-   *  @param dbEngine the `DoobieEngine` instance used to execute SQL queries
-   *  @param readR Read instance for `R`
-   *  @param readSelectWithStatus Read instance for `StatusWithData[R]`
-   *  @tparam F the effect type, which must have an `Async` and a `Monad` instance
-   */
-  abstract class DoobieSingleResultFunctionWithStatus[I, R, F[_]](
-    override val toFragmentsSeq: I => Seq[Fragment],
-    functionNameOverride: Option[String] = None
-  )(implicit
-    override val schema: DBSchema,
-    val dbEngine: DoobieEngine[F],
-    val readR: Read[R],
-    val readSelectWithStatus: Read[StatusWithData[R]]
-  ) extends DBFunctionWithStatus[I, R, DoobieEngine[F], F](functionNameOverride)
-      with DoobieFunctionWithStatus[I, R, F]
-
-  /**
    *  `DoobieSingleResultFunction` represents a db function that returns a single result.
    *
    *  @param toFragmentsSeq a function that generates a sequence of `Fragment`s
@@ -246,6 +224,28 @@ object DoobieFunction {
     val readR: Read[R]
   ) extends DBSingleResultFunction[I, R, DoobieEngine[F], F](functionNameOverride)
       with DoobieFunction[I, R, F]
+
+  /**
+    *  `DoobieSingleResultFunctionWithStatus` represents a db function that returns a single result with status.
+    *
+    *  @param toFragmentsSeq a function that generates a sequence of `Fragment`s
+    *  @param functionNameOverride the optional override for the function name
+    *  @param schema the database schema
+    *  @param dbEngine the `DoobieEngine` instance used to execute SQL queries
+    *  @param readR Read instance for `R`
+    *  @param readSelectWithStatus Read instance for `StatusWithData[R]`
+    *  @tparam F the effect type, which must have an `Async` and a `Monad` instance
+    */
+  abstract class DoobieSingleResultFunctionWithStatus[I, R, F[_]](
+    override val toFragmentsSeq: I => Seq[Fragment],
+    functionNameOverride: Option[String] = None
+  )(implicit
+    override val schema: DBSchema,
+    val dbEngine: DoobieEngine[F],
+    val readR: Read[R],
+    val readSelectWithStatus: Read[StatusWithData[R]]
+  ) extends DBSingleResultFunctionWithStatus[I, R, DoobieEngine[F], F](functionNameOverride)
+      with DoobieFunctionWithStatus[I, R, F]
 
   /**
    *  `DoobieMultipleResultFunction` represents a db function that returns multiple results.
@@ -270,7 +270,7 @@ object DoobieFunction {
    override val schema: DBSchema,
    val dbEngine: DoobieEngine[F],
    val readR: Read[R]
-  ) extends DBFunctionWithStatus[I, R, DoobieEngine[F], F](functionNameOverride)
+  ) extends DBMultipleResultFunctionWithStatus[I, R, DoobieEngine[F], F](functionNameOverride)
   with DoobieFunctionWithStatus[I, R, F]
 
   /**
@@ -285,4 +285,17 @@ object DoobieFunction {
     val readR: Read[R]
   ) extends DBOptionalResultFunction[I, R, DoobieEngine[F], F](functionNameOverride)
       with DoobieFunction[I, R, F]
+
+  /**
+    *  `DoobieOptionalResultFunctionWithStatus` represents a db function that returns an optional result.
+    */
+  abstract class DoobieOptionalResultFunctionWithStatus[I, R, F[_]](
+    override val toFragmentsSeq: I => Seq[Fragment],
+    functionNameOverride: Option[String] = None
+  )(implicit
+    override val schema: DBSchema,
+    val dbEngine: DoobieEngine[F],
+    val readR: Read[R]
+  ) extends DBOptionalResultFunctionWithStatus[I, R, DoobieEngine[F], F](functionNameOverride)
+      with DoobieFunctionWithStatus[I, R, F]
 }
