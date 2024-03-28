@@ -54,7 +54,7 @@ class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[
   }
 
   /**
-   *  Executes a Doobie query and returns the result as an `F[Either[StatusException, Seq[R]]]`.
+   *  Executes a Doobie query and returns the result.
    *
    * Note: `StatusWithData` is needed here because it is more 'flat' in comparison to `FunctionStatusWithData`
    *   and Doobie's `Read` wasn't able to work with it.
@@ -73,16 +73,16 @@ class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[
    *  Runs a Doobie query and returns the result as an `F[Seq[R]]`.
    *
    *  @param query the Doobie query to run
-   *  @return the query result as an `F[Seq[R]]`
+   *  @return the query result
    */
   override def run[R](query: QueryType[R]): F[Seq[R]] =
     executeQuery(query)(query.readR)
 
   /**
-   *  Runs a Doobie query and returns the result as an `F[Either[StatusException, R]]`.
+   *  Runs a Doobie query and returns the result.
    *
    *  @param query the Doobie query to run
-   *  @return the query result as an `F[Either[StatusException, R]]`
+   *  @return the query result
    */
   override def runWithStatus[R](query: QueryWithStatusType[R]): F[Seq[DBEngine.ExceptionOrStatusWithData[R]]] = {
     executeQueryWithStatus(query)(query.readStatusWithDataR)

@@ -16,7 +16,7 @@
 
 package za.co.absa.fadb.status.handling
 
-import za.co.absa.fadb.exceptions.StatusException
+import za.co.absa.fadb.DBEngine
 import za.co.absa.fadb.status.FunctionStatusWithData
 
 /**
@@ -31,5 +31,5 @@ trait StatusHandling {
    *  @return Either a `StatusException` if the status code indicates an error, or the data (along with the status
     *          information so that it's retrievable) if the status code is successful.
    */
-  def checkStatus[A](statusWithData: FunctionStatusWithData[A]): Either[StatusException, FunctionStatusWithData[A]]
+  def checkStatus[A](statusWithData: FunctionStatusWithData[A]): DBEngine.ExceptionOrStatusWithData[A]
 }
