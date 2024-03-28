@@ -32,7 +32,8 @@ class DoobieMultipleResultFunctionWithStatusTest extends AnyFunSuite with Doobie
   }
 
   class GetActorsByLastname(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
-      extends DoobieMultipleResultFunctionWithStatus[GetActorsByLastnameQueryParameters, Actor, IO](getActorsByLastnameQueryFragments)
+      // Option[Actor] because: Actor might not exist, and the function would return only status info without actor data
+      extends DoobieMultipleResultFunctionWithStatus[GetActorsByLastnameQueryParameters, Option[Actor], IO](getActorsByLastnameQueryFragments)
         with StandardStatusHandling {
     override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("actor_id", "first_name", "last_name")
   }
@@ -64,7 +65,7 @@ class DoobieMultipleResultFunctionWithStatusTest extends AnyFunSuite with Doobie
     }
 
     assert(actualData.length == 1)
-    assert(actualData.head == expectedResultElem)
+    assert(actualData.head.get == expectedResultElem)
   }
 
   test("Retrieving single actor from database, lastname match") {
@@ -77,12 +78,11 @@ class DoobieMultipleResultFunctionWithStatusTest extends AnyFunSuite with Doobie
     }
 
     assert(actualData.length == 1)
-    assert(actualData.head == expectedResultElem)
+    assert(actualData.head.get == expectedResultElem)
   }
 
   test("Retrieving non-existing actor from database, no match") {
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("TotallyNonExisting!")).unsafeRunSync()
-    // TODO SQL `NULL` read at column 3 (JDBC type Integer) but mapping is to a non-Option type;  !
     results.map {
       case Left(err) =>
         assert(err.status.statusText == "No actor found")
