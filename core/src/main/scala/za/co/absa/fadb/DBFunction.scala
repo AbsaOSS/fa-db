@@ -109,7 +109,7 @@ abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOv
     *  @param values - The values to pass over to the database function.
     *  @return - A sequence of results from the database function.
     */
-  protected def multipleResults(values: I)(implicit me: MonadError[F, Throwable]): F[Either[StatusException, Seq[R]]] =
+  protected def multipleResults(values: I)(implicit me: MonadError[F, Throwable]): F[Seq[Either[StatusException, R]]] =
     query(values).flatMap(q => dBEngine.fetchAllWithStatus(q))
 
   /**
@@ -125,7 +125,7 @@ abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOv
     *  @param values - The values to pass over to the database function.
     *  @return - An optional result from the database function.
     */
-  protected def optionalResult(values: I)(implicit me: MonadError[F, Throwable]): F[Either[StatusException, Option[R]]] = {
+  protected def optionalResult(values: I)(implicit me: MonadError[F, Throwable]): F[Option[Either[StatusException, R]]] = {
     query(values).flatMap(q => dBEngine.fetchHeadOptionWithStatus(q))
   }
 
@@ -245,7 +245,7 @@ object DBFunction {
       *  @return       - a sequence of values, each coming from a row returned from the DB function transformed to scala
       *               type `R` wrapped around with Either, providing StatusException if raised
       */
-    def apply(values: I)(implicit me: MonadError[F, Throwable]): F[Either[StatusException, Seq[R]]] =
+    def apply(values: I)(implicit me: MonadError[F, Throwable]): F[Seq[Either[StatusException, R]]] =
       multipleResults(values)
   }
 
@@ -296,7 +296,7 @@ object DBFunction {
       *  @return       - the value returned from the DB function transformed to scala type `R` if a row is returned,
       *                  otherwise `None`, wrapped around with Either, providing StatusException if raised
       */
-    def apply(values: I)(implicit me: MonadError[F, Throwable]): F[Either[StatusException, Option[R]]] =
+    def apply(values: I)(implicit me: MonadError[F, Throwable]): F[Option[Either[StatusException, R]]] =
       optionalResult(values)
   }
 

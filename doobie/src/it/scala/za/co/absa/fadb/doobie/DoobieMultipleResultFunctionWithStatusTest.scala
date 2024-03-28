@@ -32,42 +32,61 @@ class DoobieMultipleResultFunctionWithStatusTest extends AnyFunSuite with Doobie
   }
 
   class GetActorsByLastname(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
-      extends DoobieMultipleResultFunctionWithStatus[GetActorsByLastnameQueryParameters, Option[Actor], IO](getActorsByLastnameQueryFragments)
+      extends DoobieMultipleResultFunctionWithStatus[GetActorsByLastnameQueryParameters, Actor, IO](getActorsByLastnameQueryFragments)
         with StandardStatusHandling {
-    override def fieldsToSelect: Seq[String] =  super.fieldsToSelect ++ Seq("actor_id", "first_name", "last_name")
+    override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("actor_id", "first_name", "last_name")
   }
 
   private val getActorsByLastname = new GetActorsByLastname()(Integration, new DoobieEngine(transactor))
 
-  test("Retrieving actor from database, full match") {
+  test("Retrieving multiple actors from database, lastName match") {
+    val expectedResultElem = Set(
+      Actor(51, "Fred", "Weasley"),
+      Actor(52, "George", "Weasley"),
+    )
+
+    val results = getActorsByLastname(GetActorsByLastnameQueryParameters("Weasley")).unsafeRunSync()
+    val actualData = results.map {
+      case Left(_) => fail("should not be left")
+      case Right(value) => value
+    }
+    assert(actualData.length == expectedResultElem.size)
+    assert(actualData.toSet == expectedResultElem)
+  }
+
+  test("Retrieving single actor from database, full match") {
     val expectedResultElem = Actor(50, "Liza", "Simpson")
+
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("Simpson", Some("Liza"))).unsafeRunSync()
-
-    results match {
+    val actualData = results.map {
       case Left(_) => fail("should not be left")
-      case Right(value) =>
-        assert(value.contains(expectedResultElem))
+      case Right(value) => value
     }
+
+    assert(actualData.length == 1)
+    assert(actualData.head == expectedResultElem)
   }
 
-  test("Retrieving actor from database, lastname match") {
+  test("Retrieving single actor from database, lastname match") {
     val expectedResultElem = Actor(50, "Liza", "Simpson")
-    val results = getActorsByLastname(GetActorsByLastnameQueryParameters("Simpson")).unsafeRunSync()
 
-    results match {
+    val results = getActorsByLastname(GetActorsByLastnameQueryParameters("Simpson")).unsafeRunSync()
+    val actualData = results.map {
       case Left(_) => fail("should not be left")
-      case Right(value) =>
-        assert(value.contains(expectedResultElem))
+      case Right(value) => value
     }
+
+    assert(actualData.length == 1)
+    assert(actualData.head == expectedResultElem)
   }
 
-  test("Retrieving actor from database, no match") {
+  test("Retrieving non-existing actor from database, no match") {
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("TotallyNonExisting!")).unsafeRunSync()
-
-    results match {
-      case Left(value) =>
-        assert(value.status.statusText == "No actor found")
-        assert(value.status.statusCode == 41)
+    // TODO SQL `NULL` read at column 3 (JDBC type Integer) but mapping is to a non-Option type;  !
+    results.map {
+      case Left(err) =>
+        assert(err.status.statusText == "No actor found")
+        assert(err.status.statusCode == 41)
       case Right(_) => fail("should not be right")
     }
   }

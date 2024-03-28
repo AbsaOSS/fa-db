@@ -55,8 +55,8 @@ class SlickPgEngine(val db: Database)(implicit val executor: ExecutionContext) e
    *  @tparam R     - return the of the query
    *  @return       - either status exception or result of database query
    */
-  override def runWithStatus[R](query: QueryWithStatusType[R]): Future[Either[StatusException, R]] = {
-    val slickAction = query.sql.as[Either[StatusException, R]](query.getStatusExceptionOrData).head
+  override def runWithStatus[R](query: QueryWithStatusType[R]): Future[Seq[Either[StatusException, R]]] = {
+    val slickAction = query.sql.as[Either[StatusException, R]](query.getStatusExceptionOrData)
     db.run(slickAction)
   }
 }
