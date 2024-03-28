@@ -23,6 +23,7 @@ import doobie.implicits.toSqlInterpolator
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.doobie.DoobieFunction.DoobieMultipleResultFunctionWithStatus
+import za.co.absa.fadb.status.{FunctionStatus, FunctionStatusWithData}
 import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
 
 class DoobieMultipleResultFunctionWithStatusTest extends AnyFunSuite with DoobieTest {
@@ -42,8 +43,8 @@ class DoobieMultipleResultFunctionWithStatusTest extends AnyFunSuite with Doobie
 
   test("Retrieving multiple actors from database, lastName match") {
     val expectedResultElem = Set(
-      Actor(51, "Fred", "Weasley"),
-      Actor(52, "George", "Weasley"),
+      FunctionStatusWithData(FunctionStatus(11, "OK, match on last name only"), Some(Actor(51, "Fred", "Weasley"))),
+      FunctionStatusWithData(FunctionStatus(11, "OK, match on last name only"), Some(Actor(52, "George", "Weasley"))),
     )
 
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("Weasley")).unsafeRunSync()
