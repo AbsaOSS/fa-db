@@ -70,6 +70,9 @@ class SlickQueryWithStatus[R](
 
   /**
    *  Combines the processing of the status and the conversion of the status with data to either a status exception or the data
+   *
+   *  Note: GetResult processes data row by row.
+   *
    *  @return the GetResult, that combines the processing of the status and the conversion of the status with data
    *  to either a status exception or the data
    */

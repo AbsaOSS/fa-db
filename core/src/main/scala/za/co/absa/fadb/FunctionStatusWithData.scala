@@ -21,7 +21,7 @@ import za.co.absa.fadb.status.FunctionStatus
 /**
  *  Represents a function status with data.
  *  @param functionStatus the function status
- *  @param data the data
+ *  @param data the data of one row (barring the status fields)
  *  @tparam A the type of the data
  */
 case class FunctionStatusWithData[A](functionStatus: FunctionStatus, data: A)
