@@ -84,7 +84,7 @@ class DoobieSingleResultFunctionWithStatusTest extends AnyFunSuite with DoobieTe
     val result = errorIfNotOne(1).unsafeRunSync()
     result match {
       case Left(_) => fail("should not be left")
-      case Right(value) => assert(value.contains(1))
+      case Right(value) => assert(value.data.contains(1))
     }
   }
 }

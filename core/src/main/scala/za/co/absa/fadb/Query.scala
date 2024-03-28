@@ -16,7 +16,7 @@
 
 package za.co.absa.fadb
 
-import za.co.absa.fadb.exceptions.StatusException
+import za.co.absa.fadb.status.FunctionStatusWithData
 
 /**
  *  The basis for all query types of [[DBEngine]] implementations
@@ -44,14 +44,15 @@ trait QueryWithStatus[A, B, R] {
    *  @param statusWithData - the status with data
    *  @return either a status exception or the data
    */
-  def toStatusExceptionOrData(statusWithData: FunctionStatusWithData[B]): Either[StatusException, R]
+  def toStatusExceptionOrData(statusWithData: FunctionStatusWithData[B]): DBEngine.ExceptionOrStatusWithData[R]
 
   /**
    *  Returns the result of the query or a status exception
    *  @param initialResult - the initial result of the query
    *  @return the result of the query or a status exception
    */
-  def getResultOrException(initialResult: A): Either[StatusException, R] = toStatusExceptionOrData(
-    processStatus(initialResult)
-  )
+  def getResultOrException(initialResult: A): DBEngine.ExceptionOrStatusWithData[R] =
+    toStatusExceptionOrData(
+      processStatus(initialResult)
+    )
 }

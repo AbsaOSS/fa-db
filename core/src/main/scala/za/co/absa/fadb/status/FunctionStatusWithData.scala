@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb
-
-import za.co.absa.fadb.status.FunctionStatus
+package za.co.absa.fadb.status
 
 /**
  *  Represents a function status with data.

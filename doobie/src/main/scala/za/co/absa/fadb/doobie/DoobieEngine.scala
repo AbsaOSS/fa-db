@@ -23,6 +23,7 @@ import doobie.implicits._
 import doobie.util.Read
 import za.co.absa.fadb.DBEngine
 import za.co.absa.fadb.exceptions.StatusException
+import za.co.absa.fadb.status.FunctionStatusWithData
 
 import scala.language.higherKinds
 
@@ -55,13 +56,16 @@ class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[
   /**
    *  Executes a Doobie query and returns the result as an `F[Either[StatusException, Seq[R]]]`.
    *
+   * Note: `StatusWithData` is needed here because it is more 'flat' in comparison to `FunctionStatusWithData`
+   *   and Doobie's `Read` wasn't able to work with it.
+   *
    *  @param query the Doobie query to execute
    *  @param readStatusWithDataR the `Read[StatusWithData[R]]` instance used to read the query result into `StatusWithData[R]`
    *  @return the query result
    */
   private def executeQueryWithStatus[R](
     query: QueryWithStatusType[R]
-  )(implicit readStatusWithDataR: Read[StatusWithData[R]]): F[Seq[Either[StatusException, R]]] = {
+  )(implicit readStatusWithDataR: Read[StatusWithData[R]]): F[Seq[DBEngine.ExceptionOrStatusWithData[R]]] = {
       query.fragment.query[StatusWithData[R]].to[Seq].transact(transactor).map(_.map(query.getResultOrException))
   }
 
@@ -80,7 +84,7 @@ class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[
    *  @param query the Doobie query to run
    *  @return the query result as an `F[Either[StatusException, R]]`
    */
-  override def runWithStatus[R](query: QueryWithStatusType[R]): F[Seq[Either[StatusException, R]]] = {
+  override def runWithStatus[R](query: QueryWithStatusType[R]): F[Seq[DBEngine.ExceptionOrStatusWithData[R]]] = {
     executeQueryWithStatus(query)(query.readStatusWithDataR)
   }
 }

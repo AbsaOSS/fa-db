@@ -18,9 +18,8 @@ package za.co.absa.fadb.status.handling.implementations
 
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
-import za.co.absa.fadb.FunctionStatusWithData
 import za.co.absa.fadb.exceptions._
-import za.co.absa.fadb.status.FunctionStatus
+import za.co.absa.fadb.status.{FunctionStatus, FunctionStatusWithData}
 
 class StandardStatusHandlingTest extends AnyFunSuiteLike {
 
@@ -31,7 +30,7 @@ class StandardStatusHandlingTest extends AnyFunSuiteLike {
       val functionStatus = FunctionStatus(statusCode, "Success")
       val statusWithData = FunctionStatusWithData(functionStatus, "Data")
       val result = standardQueryStatusHandling.checkStatus(statusWithData)
-      result shouldBe Right("Data")
+      result shouldBe Right(statusWithData)
     }
   }
 

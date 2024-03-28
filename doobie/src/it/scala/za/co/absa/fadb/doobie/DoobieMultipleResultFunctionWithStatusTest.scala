@@ -61,7 +61,7 @@ class DoobieMultipleResultFunctionWithStatusTest extends AnyFunSuite with Doobie
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("Simpson", Some("Liza"))).unsafeRunSync()
     val actualData = results.map {
       case Left(_) => fail("should not be left")
-      case Right(value) => value
+      case Right(value) => value.data
     }
 
     assert(actualData.length == 1)
@@ -74,7 +74,7 @@ class DoobieMultipleResultFunctionWithStatusTest extends AnyFunSuite with Doobie
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("Simpson")).unsafeRunSync()
     val actualData = results.map {
       case Left(_) => fail("should not be left")
-      case Right(value) => value
+      case Right(value) => value.data
     }
 
     assert(actualData.length == 1)

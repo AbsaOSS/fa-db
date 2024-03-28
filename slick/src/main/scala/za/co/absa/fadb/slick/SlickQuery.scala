@@ -18,8 +18,8 @@ package za.co.absa.fadb.slick
 
 import slick.jdbc.{GetResult, PositionedResult, SQLActionBuilder}
 import za.co.absa.fadb.exceptions.StatusException
-import za.co.absa.fadb.status.FunctionStatus
-import za.co.absa.fadb.{FunctionStatusWithData, Query, QueryWithStatus}
+import za.co.absa.fadb.status.{FunctionStatus, FunctionStatusWithData}
+import za.co.absa.fadb.{DBEngine, Query, QueryWithStatus}
 
 /**
  *  SQL query representation for Slick
@@ -40,7 +40,7 @@ class SlickQuery[R](val sql: SQLActionBuilder, val getResult: GetResult[R]) exte
 class SlickQueryWithStatus[R](
   val sql: SQLActionBuilder,
   val getResult: GetResult[R],
-  checkStatus: FunctionStatusWithData[PositionedResult] => Either[StatusException, PositionedResult]
+  checkStatus: FunctionStatusWithData[PositionedResult] => DBEngine.ExceptionOrStatusWithData[PositionedResult]
 ) extends QueryWithStatus[PositionedResult, PositionedResult, R] {
 
   /**
@@ -61,10 +61,14 @@ class SlickQueryWithStatus[R](
    */
   override def toStatusExceptionOrData(
     statusWithData: FunctionStatusWithData[PositionedResult]
-  ): Either[StatusException, R] = {
-    checkStatus(statusWithData) match {
-      case Left(statusException) => Left(statusException)
-      case Right(value)          => Right(getResult(value))
+  ): DBEngine.ExceptionOrStatusWithData[R] = {
+    val o = checkStatus(statusWithData)
+    o match {
+      case Left(statusException)  => Left(statusException)
+      case Right(value) =>
+        val s = value.functionStatus
+        val d = getResult(value.data)
+        Right(FunctionStatusWithData(s, d))
     }
   }
 
@@ -76,7 +80,7 @@ class SlickQueryWithStatus[R](
    *  @return the GetResult, that combines the processing of the status and the conversion of the status with data
    *  to either a status exception or the data
    */
-  def getStatusExceptionOrData: GetResult[Either[StatusException, R]] = {
+  def getStatusExceptionOrData: GetResult[DBEngine.ExceptionOrStatusWithData[R]] = {
     GetResult(pr => processStatus(pr)).andThen(fs => toStatusExceptionOrData(fs))
   }
 }

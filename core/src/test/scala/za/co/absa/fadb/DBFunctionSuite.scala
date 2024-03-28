@@ -20,7 +20,6 @@ import cats.MonadError
 import cats.implicits._
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBFunction.DBSingleResultFunction
-import za.co.absa.fadb.exceptions.StatusException
 import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits.namingConvention
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -34,7 +33,7 @@ class DBFunctionSuite extends AnyFunSuite {
 
   class EngineThrow extends DBEngine[Future] {
     override def run[R](query: QueryType[R]): Future[Seq[R]] = neverHappens
-    override def runWithStatus[R](query: QueryWithStatusType[R]): Future[Seq[Either[StatusException, R]]] = neverHappens
+    override def runWithStatus[R](query: QueryWithStatusType[R]): Future[Seq[DBEngine.ExceptionOrStatusWithData[R]]] = neverHappens
   }
 
   private object FooNamed extends DBSchema
