@@ -32,8 +32,15 @@ trait ByMajorityErrorsStatusAggregator extends StatusAggregator {
     } else {
       val grouped = inputData.groupBy(identity)
       val maxCount = grouped.values.map(_.size).max
-      val mostOccurred = grouped.filter(_._2.size == maxCount).keys.toList
-      Some(mostOccurred.head)
+
+      // list of most frequent one (or ones if maxCount is the same for multiple records)
+      val mostOccurredAll = grouped.filter(_._2.size == maxCount).keys.toList
+
+      // find stops on first occurrence - so it returns the first it found from `mostOccurredAll` - in case that there
+      // are more 'majorityWinners', only the first one from `inputData` will be returned
+      val mostOccurredFirst = inputData.find(mostOccurredAll.contains(_))
+
+      mostOccurredFirst
     }
   }
 
