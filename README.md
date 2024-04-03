@@ -125,8 +125,9 @@ It brings:
 * `class SlickSingleResultFunctionWithStatus` - abstract class for DB functions with status handling; it requires an 
   implementation of `StatusHandling` to be mixed-in (`StandardStatusHandling` available out-of-the-box)
 * `class SlickMultipleResultFunctionWithStatus` - as `SlickSingleResultFunctionWithStatus` but for multiple record 
-  retrieval, it requires an implementation of `StatusAggregation` to be mixed-in 
-  (`AggregateByFirstError`, `AggregateByFirstRow`, and `AggregateByMajorityErrors` available out of the box)
+  retrieval, it requires an implementation of `StatusAggregator` to be mixed-in 
+  (`ByFirstErrorStatusAggregator`, `ByFirstRowStatusAggregator`, and `ByMajorityErrorsStatusAggregator` available 
+  out of the box)
 * `class SlickOptionalResultFunctionWithStatus` - as `SlickSingleResultFunctionWithStatus` but the returning record 
   is optional
 * `trait FaDbPostgresProfile` - to bring support for Postgres and its extended data types in one class 
@@ -166,8 +167,9 @@ It brings:
 * `class DoobieSingleResultFunctionWithStatus` - abstract class for DB functions with status handling; it requires 
   an implementation of `StatusHandling` to be mixed-in (`StandardStatusHandling` available out-of-the-box)
 * `class DoobieMultipleResultFunctionWithStatus` - as `DoobieSingleResultFunctionWithStatus` but for multiple record 
-  retrieval, it requires an implementation of `StatusAggregation` to be mixed-in
-  (`AggregateByFirstError`, `AggregateByFirstRow`, and `AggregateByMajorityErrors` available out of the box)
+  retrieval, it requires an implementation of `StatusAggregator` to be mixed-in
+  (`ByFirstErrorStatusAggregator`, `ByFirstRowStatusAggregator`, and `ByMajorityErrorsStatusAggregator` available
+  out of the box)
 * `class DoobieOptionalResultFunctionWithStatus` - as `DoobieSingleResultFunctionWithStatus` but the returning record 
   is optional
 
