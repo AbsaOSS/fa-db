@@ -31,7 +31,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class SlickMultipleResultFunctionWithStatusTest extends AnyFunSuite with SlickTest with ScalaFutures {
 
-  class GetActorsByLastnameStatusAggregator(implicit override val schema: DBSchema, val dbEngine: SlickPgEngine)
+  class GetActorsByLastname(implicit override val schema: DBSchema, val dbEngine: SlickPgEngine)
     extends SlickMultipleResultFunctionWithStatus[GetActorsByLastnameQueryParameters, Option[Actor]]
       with StandardStatusHandling
       with ByFirstErrorStatusAggregator
@@ -44,7 +44,7 @@ class SlickMultipleResultFunctionWithStatusTest extends AnyFunSuite with SlickTe
     }
   }
 
-  private val getActorsByLastname = new GetActorsByLastnameStatusAggregator()(Integration, new SlickPgEngine(db))
+  private val getActorsByLastname = new GetActorsByLastname()(Integration, new SlickPgEngine(db))
 
   test("Retrieving actors from database") {
     val expectedResultElem = Set(

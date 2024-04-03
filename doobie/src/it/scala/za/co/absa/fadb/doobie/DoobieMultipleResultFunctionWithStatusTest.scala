@@ -33,7 +33,7 @@ class DoobieMultipleResultFunctionWithStatusTest extends AnyFunSuite with Doobie
     values => Seq(fr"${values.lastName}", fr"${values.firstName}")
   }
 
-  class GetActorsByLastnameStatusAggregator(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
+  class GetActorsByLastname(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
       // Option[Actor] because: Actor might not exist, and the function would return only status info without actor data
       extends DoobieMultipleResultFunctionWithStatus[GetActorsByLastnameQueryParameters, Option[Actor], IO](getActorsByLastnameQueryFragments)
         with StandardStatusHandling
@@ -41,7 +41,7 @@ class DoobieMultipleResultFunctionWithStatusTest extends AnyFunSuite with Doobie
     override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("actor_id", "first_name", "last_name")
   }
 
-  private val getActorsByLastname = new GetActorsByLastnameStatusAggregator()(Integration, new DoobieEngine(transactor))
+  private val getActorsByLastname = new GetActorsByLastname()(Integration, new DoobieEngine(transactor))
 
   test("Retrieving multiple actors from database, lastName match") {
     val expectedResultElem = Set(
