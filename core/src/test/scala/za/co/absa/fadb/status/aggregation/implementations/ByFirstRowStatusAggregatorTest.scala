@@ -20,9 +20,9 @@ import org.scalatest.funsuite.AnyFunSuiteLike
 import za.co.absa.fadb.exceptions._
 import za.co.absa.fadb.status.{FunctionStatus, FunctionStatusWithData}
 
-class AggregateByFirstRowTest extends AnyFunSuiteLike {
+class ByFirstRowStatusAggregatorTest extends AnyFunSuiteLike {
 
-  private val aggregateByFirstRowUnderTest = new AggregateByFirstRow {}
+  private val aggregateByFirstRowUnderTest = new ByFirstRowStatusAggregator {}
 
   test("aggregate should return Empty Seq in Right for an empty Sequence") {
     val testData = Seq.empty

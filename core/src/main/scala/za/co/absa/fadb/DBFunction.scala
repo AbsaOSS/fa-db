@@ -18,7 +18,7 @@ package za.co.absa.fadb
 
 import cats.MonadError
 import cats.implicits.toFlatMapOps
-import za.co.absa.fadb.status.aggregation.StatusAggregation
+import za.co.absa.fadb.status.aggregation.StatusAggregator
 import za.co.absa.fadb.status.handling.StatusHandling
 import za.co.absa.fadb.status.{ExceptionOrStatusWithDataResultAgg, ExceptionOrStatusWithDataRow, FunctionStatusWithData}
 
@@ -232,7 +232,7 @@ object DBFunction {
     functionNameOverride: Option[String] = None
   )(implicit schema: DBSchema, dBEngine: E)
     extends DBFunctionWithStatus[I, R, E, F](functionNameOverride)
-      with StatusAggregation {
+      with StatusAggregator {
 
     // A constructor that takes only the mandatory parameters and uses default values for the optional ones
     def this()(implicit schema: DBSchema, dBEngine: E) = this(None)

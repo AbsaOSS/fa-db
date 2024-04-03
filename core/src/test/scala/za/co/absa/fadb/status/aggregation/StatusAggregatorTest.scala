@@ -20,9 +20,9 @@ import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.exceptions._
 import za.co.absa.fadb.status.{ExceptionOrStatusWithDataResultAgg, ExceptionOrStatusWithDataRow, FunctionStatus, FunctionStatusWithData}
 
-class StatusAggregationTest extends AnyFunSuite {
+class StatusAggregatorTest extends AnyFunSuite {
 
-  private val aggregateByFirstRowUnderTest: StatusAggregation = new StatusAggregation {
+  private val aggregateByFirstRowUnderTest: StatusAggregator = new StatusAggregator {
     override def aggregate[R](statusesWithData: Seq[ExceptionOrStatusWithDataRow[R]]):
     ExceptionOrStatusWithDataResultAgg[R] = Right(Seq.empty)
   }

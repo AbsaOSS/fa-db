@@ -16,16 +16,16 @@
 
 package za.co.absa.fadb.status.aggregation.implementations
 
-import za.co.absa.fadb.status.aggregation.StatusAggregation
+import za.co.absa.fadb.status.aggregation.StatusAggregator
 import za.co.absa.fadb.status.{ExceptionOrStatusWithDataResultAgg, ExceptionOrStatusWithDataRow}
 
 /**
-  *  `AggregateByFirstRow` is a trait that extends the `StatusAggregation` interface.
+  *  `ByFirstRowStatusAggregator` is a trait that extends the `StatusAggregator` interface.
   *  It provides an implementation for aggregating error statuses of a function invocation into a single error
   *  by choosing the first row that was returned to be the representative one
   *  (i.e. if there is an error on row two or later, it would be ignored).
   */
-trait AggregateByFirstRow extends StatusAggregation {
+trait ByFirstRowStatusAggregator extends StatusAggregator {
 
   override def aggregate[R](statusesWithData: Seq[ExceptionOrStatusWithDataRow[R]]): ExceptionOrStatusWithDataResultAgg[R] = {
     val firstRow = statusesWithData.headOption

@@ -20,49 +20,15 @@ import org.scalatest.funsuite.AnyFunSuiteLike
 import za.co.absa.fadb.exceptions._
 import za.co.absa.fadb.status.{FunctionStatus, FunctionStatusWithData}
 
-class AggregateByMajorityErrorsTest extends AnyFunSuiteLike {
+class ByFirstErrorStatusAggregatorTest extends AnyFunSuiteLike {
 
-  private val aggregateByMajorityErrorsUnderTest = new AggregateByMajorityErrors {}
-
-  test("gimmeMajorityWinner should return None for an empty Sequence") {
-    val testData = Seq.empty
-    val expectedError = None
-
-    val actualError = aggregateByMajorityErrorsUnderTest.gimmeMajorityWinner(testData)
-    assert(actualError == expectedError)
-  }
-
-  test("gimmeMajorityWinner should return error that occurred the most (one error has biggest distribution)") {
-    val testData: Seq[StatusException] = Seq(
-      DataNotFoundException(FunctionStatus(42, "Data not found")),
-      OtherStatusException(FunctionStatus(91, "Non classified error")),
-      ErrorInDataException(FunctionStatus(51, "Data not found another")),
-      DataNotFoundException(FunctionStatus(42, "Data not found")),
-    )
-    val expectedError = DataNotFoundException(FunctionStatus(42, "Data not found"))
-
-    val actualError = aggregateByMajorityErrorsUnderTest.gimmeMajorityWinner(testData)
-    assert(actualError.get == expectedError)
-  }
-
-  test("gimmeMajorityWinner should return error that occurred the most (uniform distribution of errors, first wins)") {
-    val testData: Seq[StatusException] = Seq(
-      DataNotFoundException(FunctionStatus(42, "Data not found")),
-      OtherStatusException(FunctionStatus(91, "Non classified error")),
-      OtherStatusException(FunctionStatus(91, "Non classified error")),
-      DataNotFoundException(FunctionStatus(42, "Data not found")),
-    )
-    val expectedError = DataNotFoundException(FunctionStatus(42, "Data not found"))
-
-    val actualError = aggregateByMajorityErrorsUnderTest.gimmeMajorityWinner(testData)
-    assert(actualError.get == expectedError)
-  }
+  private val aggregateByFirstErrorUnderTest = new ByFirstErrorStatusAggregator {}
 
   test("aggregate should return Empty Seq in Right for an empty Sequence") {
     val testData = Seq.empty
     val expectedAggData = Right(Seq.empty)
 
-    val actualAggData = aggregateByMajorityErrorsUnderTest.aggregate(testData)
+    val actualAggData = aggregateByFirstErrorUnderTest.aggregate(testData)
     assert(actualAggData == expectedAggData)
   }
 
@@ -75,7 +41,7 @@ class AggregateByMajorityErrorsTest extends AnyFunSuiteLike {
     val testData = rawTestData.map(Right(_)) // wrap so that it's Seq of Eithers with data
     val expectedAggData = Right(rawTestData) // wrap so that it's Either of Seq with data
 
-    val actualAggData = aggregateByMajorityErrorsUnderTest.aggregate(testData)
+    val actualAggData = aggregateByFirstErrorUnderTest.aggregate(testData)
     assert(actualAggData == expectedAggData)
   }
 
@@ -85,24 +51,22 @@ class AggregateByMajorityErrorsTest extends AnyFunSuiteLike {
     )
     val expectedAggData = Left(DataNotFoundException(FunctionStatus(42, "Data not found")))
 
-    val actualAggData = aggregateByMajorityErrorsUnderTest.aggregate(testData)
+    val actualAggData = aggregateByFirstErrorUnderTest.aggregate(testData)
     assert(actualAggData == expectedAggData)
   }
 
-  test("aggregate should return a single Left only, when there are multiple error status codes, uniform distribution, no data") {
+  test("aggregate should return a single Left only, when there are multiple error status codes, no data") {
     val testData = Seq(
       Left(DataNotFoundException(FunctionStatus(42, "Data not found"))),
-      Left(DataNotFoundException(FunctionStatus(42, "Data not found"))),
-      Left(DataNotFoundException(FunctionStatus(43, "Data not found another"))),
       Left(DataNotFoundException(FunctionStatus(43, "Data not found another"))),
     )
     val expectedAggData = Left(DataNotFoundException(FunctionStatus(42, "Data not found")))
 
-    val actualAggData = aggregateByMajorityErrorsUnderTest.aggregate(testData)
+    val actualAggData = aggregateByFirstErrorUnderTest.aggregate(testData)
     assert(actualAggData == expectedAggData)
   }
 
-  test("aggregate should return a single Left only, when there is an error status as the first row, along with data") {
+  test("aggregate should return a single Left only, when there is a single error status code along with data") {
     val testData = Seq(
       Left(DataNotFoundException(FunctionStatus(42, "Data not found"))),
       Right(FunctionStatusWithData(FunctionStatus(10, "Ok"), ("FirstName1", "SecondName1"))),
@@ -111,22 +75,21 @@ class AggregateByMajorityErrorsTest extends AnyFunSuiteLike {
     )
     val expectedAggData = Left(DataNotFoundException(FunctionStatus(42, "Data not found")))
 
-    val actualAggData = aggregateByMajorityErrorsUnderTest.aggregate(testData)
+    val actualAggData = aggregateByFirstErrorUnderTest.aggregate(testData)
     assert(actualAggData == expectedAggData)
   }
 
-  test("aggregate should return a single Left only, when there are multiple error status codes with majority on err 42, along with data") {
+  test("aggregate should return a single Left only, when there are multiple error status codes along with data") {
     val testData = Seq(
       Right(FunctionStatusWithData(FunctionStatus(10, "Ok"), ("FirstName1", "SecondName1"))),
       Left(DataNotFoundException(FunctionStatus(42, "Data not found"))),
       Right(FunctionStatusWithData(FunctionStatus(10, "Ok"), ("FirstName2", "SecondName2"))),
       Left(DataNotFoundException(FunctionStatus(43, "Data not found another"))),
       Right(FunctionStatusWithData(FunctionStatus(10, "Ok"), ("FirstName3", "SecondName3"))),
-      Left(DataNotFoundException(FunctionStatus(42, "Data not found"))),
     )
     val expectedAggData = Left(DataNotFoundException(FunctionStatus(42, "Data not found")))
 
-    val actualAggData = aggregateByMajorityErrorsUnderTest.aggregate(testData)
+    val actualAggData = aggregateByFirstErrorUnderTest.aggregate(testData)
     assert(actualAggData == expectedAggData)
   }
 

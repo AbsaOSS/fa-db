@@ -20,11 +20,11 @@ import za.co.absa.fadb.exceptions.StatusException
 import za.co.absa.fadb.status.{ExceptionOrStatusWithDataResultAgg, ExceptionOrStatusWithDataRow, FunctionStatusWithData}
 
 /**
- *  `StatusAggregation` is a base trait that defines the interface for aggregating the statuses of a function invocation.
- *  It provides a method to aggregate the error statuses into a single status information - this is typically needed
- *  for database functions that retrieve multiple records.
- */
-trait StatusAggregation {
+  *  `StatusAggregator` is a base trait that defines the interface for aggregating the error statuses of a function
+  *  invocation. It provides methods to aggregate the error statuses into a single status information - this is
+  *  typically needed for database functions that retrieve multiple records.
+  */
+trait StatusAggregator {
 
   private [aggregation] def gatherExceptions[R](
     eithersWithException: Seq[ExceptionOrStatusWithDataRow[R]]
@@ -46,11 +46,11 @@ trait StatusAggregation {
   }
 
   /**
-   *  Aggregates the error status information into a single error.
-   *
-   *  @param statusesWithData - The status of the function invocation with data.
-   *  @return Either a `StatusException` if the status code indicates an error, or the data (along with the status
-   *          information so that it's retrievable) if the status being returned doesn't indicate an error.
-   */
+    *  Aggregates the error status information into a single error.
+    *
+    *  @param statusesWithData - The status of the function invocation with data.
+    *  @return Either a `StatusException` if the status code indicates an error, or the data (along with the status
+    *          information so that it's retrievable) if the status being returned doesn't indicate an error.
+    */
   def aggregate[R](statusesWithData: Seq[ExceptionOrStatusWithDataRow[R]]): ExceptionOrStatusWithDataResultAgg[R]
 }

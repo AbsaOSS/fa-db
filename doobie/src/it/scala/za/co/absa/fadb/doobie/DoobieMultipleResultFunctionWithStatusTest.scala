@@ -23,7 +23,7 @@ import doobie.implicits.toSqlInterpolator
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.doobie.DoobieFunction.DoobieMultipleResultFunctionWithStatus
-import za.co.absa.fadb.status.aggregation.implementations.AggregateByMajorityErrors
+import za.co.absa.fadb.status.aggregation.implementations.ByMajorityErrorsStatusAggregator
 import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
 import za.co.absa.fadb.status.{FunctionStatus, FunctionStatusWithData}
 
@@ -33,15 +33,15 @@ class DoobieMultipleResultFunctionWithStatusTest extends AnyFunSuite with Doobie
     values => Seq(fr"${values.lastName}", fr"${values.firstName}")
   }
 
-  class GetActorsByLastname(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
+  class GetActorsByLastnameStatusAggregator(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
       // Option[Actor] because: Actor might not exist, and the function would return only status info without actor data
       extends DoobieMultipleResultFunctionWithStatus[GetActorsByLastnameQueryParameters, Option[Actor], IO](getActorsByLastnameQueryFragments)
         with StandardStatusHandling
-        with AggregateByMajorityErrors {
+        with ByMajorityErrorsStatusAggregator {
     override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("actor_id", "first_name", "last_name")
   }
 
-  private val getActorsByLastname = new GetActorsByLastname()(Integration, new DoobieEngine(transactor))
+  private val getActorsByLastname = new GetActorsByLastnameStatusAggregator()(Integration, new DoobieEngine(transactor))
 
   test("Retrieving multiple actors from database, lastName match") {
     val expectedResultElem = Set(

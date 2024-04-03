@@ -16,23 +16,33 @@
 
 package za.co.absa.fadb.status.aggregation.implementations
 
-import za.co.absa.fadb.status.aggregation.StatusAggregation
+import za.co.absa.fadb.status.aggregation.StatusAggregator
 import za.co.absa.fadb.status.{ExceptionOrStatusWithDataResultAgg, ExceptionOrStatusWithDataRow}
 
 /**
-  *  `AggregateByFirstError` is a trait that extends the `StatusAggregation` interface.
+  *  `ByMajorityErrorsStatusAggregator` is a trait that extends the `StatusAggregator` interface.
   *  It provides an implementation for aggregating error statuses of a function invocation into a single error
-  *  by choosing the first error encountered to be the representative one (i.e. if there are multiple errors of other
-  *  types being returned, only the first one would be chosen and the rest would be ignored).
+  *  by choosing the error that occurred the most.
   */
-trait AggregateByFirstError extends StatusAggregation {
+trait ByMajorityErrorsStatusAggregator extends StatusAggregator {
+
+  private[aggregation] def gimmeMajorityWinner[T](inputData: Seq[T]): Option[T] = {
+    if (inputData.isEmpty) {
+      None
+    } else {
+      val grouped = inputData.groupBy(identity)
+      val maxCount = grouped.values.map(_.size).max
+      val mostOccurred = grouped.filter(_._2.size == maxCount).keys.toList
+      Some(mostOccurred.head)
+    }
+  }
 
   override def aggregate[R](statusesWithData: Seq[ExceptionOrStatusWithDataRow[R]]): ExceptionOrStatusWithDataResultAgg[R] = {
-    val firstError = gatherExceptions(statusesWithData).headOption
-
+    val allErrors = gatherExceptions(statusesWithData)
+    val majorityError = gimmeMajorityWinner(allErrors)
     val dataFinal = gatherDataWithStatuses(statusesWithData)
 
-    firstError match {
+    majorityError match {
       case Some(statusException) => Left(statusException)
       case None => Right(dataFinal)
     }

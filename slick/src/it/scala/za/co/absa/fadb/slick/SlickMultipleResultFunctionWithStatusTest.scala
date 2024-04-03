@@ -23,7 +23,7 @@ import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
 import za.co.absa.fadb.slick.SlickFunction.SlickMultipleResultFunctionWithStatus
 import za.co.absa.fadb.status.{FunctionStatus, FunctionStatusWithData}
-import za.co.absa.fadb.status.aggregation.implementations.AggregateByFirstError
+import za.co.absa.fadb.status.aggregation.implementations.ByFirstErrorStatusAggregator
 import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -31,10 +31,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class SlickMultipleResultFunctionWithStatusTest extends AnyFunSuite with SlickTest with ScalaFutures {
 
-  class GetActorsByLastname(implicit override val schema: DBSchema, val dbEngine: SlickPgEngine)
+  class GetActorsByLastnameStatusAggregator(implicit override val schema: DBSchema, val dbEngine: SlickPgEngine)
     extends SlickMultipleResultFunctionWithStatus[GetActorsByLastnameQueryParameters, Option[Actor]]
       with StandardStatusHandling
-      with AggregateByFirstError
+      with ByFirstErrorStatusAggregator
       with OptionalActorSlickConverter {
 
     override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("actor_id", "first_name", "last_name")
@@ -44,7 +44,7 @@ class SlickMultipleResultFunctionWithStatusTest extends AnyFunSuite with SlickTe
     }
   }
 
-  private val getActorsByLastname = new GetActorsByLastname()(Integration, new SlickPgEngine(db))
+  private val getActorsByLastname = new GetActorsByLastnameStatusAggregator()(Integration, new SlickPgEngine(db))
 
   test("Retrieving actors from database") {
     val expectedResultElem = Set(
