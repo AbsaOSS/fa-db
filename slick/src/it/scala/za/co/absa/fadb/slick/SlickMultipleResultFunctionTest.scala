@@ -42,8 +42,11 @@ class SlickMultipleResultFunctionTest extends AnyFunSuite with SlickTest with Sc
   private val getActors = new GetActors()(Integration, new SlickPgEngine(db))
 
   test("Retrieving actors from database") {
-    val expectedResultElem = Actor(49, "Pavel", "Marek")
-    val results = getActors(GetActorsQueryParameters(Some("Pavel"), Some("Marek")))
-    assert(results.futureValue.contains(expectedResultElem))
+    val expectedResultElem = Set(
+      Actor(51, "Fred", "Weasley"),
+      Actor(52, "George", "Weasley"),
+    )
+    val results = getActors(GetActorsQueryParameters(lastName=Some("Weasley"), firstName=None)).futureValue
+    assert(results.toSet == expectedResultElem)
   }
 }

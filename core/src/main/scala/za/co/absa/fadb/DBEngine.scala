@@ -18,8 +18,7 @@ package za.co.absa.fadb
 
 import cats.Monad
 import cats.implicits.toFunctorOps
-import za.co.absa.fadb.exceptions.StatusException
-import za.co.absa.fadb.status.FunctionStatusWithData
+import za.co.absa.fadb.status.ExceptionOrStatusWithDataRow
 
 import scala.language.higherKinds
 
@@ -39,19 +38,15 @@ abstract class DBEngine[F[_]: Monad] {
 
   /**
    *  The actual query executioner of the queries of the engine
+   *
+   *  Two methods provided, one for dealing with query of type with no status, and the other for status-provided queries.
+   *
    *  @param query  - the query to execute
    *  @tparam R     - return type of the query
    *  @return       - sequence of the results of database query
    */
   protected def run[R](query: QueryType[R]): F[Seq[R]]
-
-  /**
-   *  The actual query executioner of the queries of the engine with status
-   *  @param query  - the query to execute
-   *  @tparam R     - return type of the query
-   *  @return       - result of database query with status
-   */
-  protected def runWithStatus[R](query: QueryWithStatusType[R]): F[Seq[DBEngine.ExceptionOrStatusWithData[R]]]
+  protected def runWithStatus[R](query: QueryWithStatusType[R]): F[Seq[ExceptionOrStatusWithDataRow[R]]]
 
   /**
    *  Public method to execute when query is expected to return multiple results
@@ -63,7 +58,7 @@ abstract class DBEngine[F[_]: Monad] {
    *  @return       - sequence of the results of database query
    */
   def fetchAll[R](query: QueryType[R]): F[Seq[R]] = run(query)
-  def fetchAllWithStatus[R](query: QueryWithStatusType[R]): F[Seq[DBEngine.ExceptionOrStatusWithData[R]]] =
+  def fetchAllWithStatus[R](query: QueryWithStatusType[R]): F[Seq[ExceptionOrStatusWithDataRow[R]]] =
     runWithStatus(query)
 
   /**
@@ -76,7 +71,7 @@ abstract class DBEngine[F[_]: Monad] {
    *  @return       - sequence of the results of database query
    */
   def fetchHead[R](query: QueryType[R]): F[R] = run(query).map(_.head)
-  def fetchHeadWithStatus[R](query: QueryWithStatusType[R]): F[DBEngine.ExceptionOrStatusWithData[R]] =
+  def fetchHeadWithStatus[R](query: QueryWithStatusType[R]): F[ExceptionOrStatusWithDataRow[R]] =
     runWithStatus(query).map(_.head)
 
   /**
@@ -89,12 +84,6 @@ abstract class DBEngine[F[_]: Monad] {
    *  @return       - sequence of the results of database query
    */
   def fetchHeadOption[R](query: QueryType[R]): F[Option[R]] = run(query).map(_.headOption)
-  def fetchHeadOptionWithStatus[R](query: QueryWithStatusType[R]): F[Option[DBEngine.ExceptionOrStatusWithData[R]]] =
+  def fetchHeadOptionWithStatus[R](query: QueryWithStatusType[R]): F[Option[ExceptionOrStatusWithDataRow[R]]] =
     runWithStatus(query).map(_.headOption)
-}
-
-case object DBEngine {
-
-  type ExceptionOrStatusWithData[R] = Either[StatusException, FunctionStatusWithData[R]]
-
 }

@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.status
+package za.co.absa.fadb.slick
+
+import slick.jdbc.{GetResult, PositionedResult}
 
 /**
- *  Represents a function status with data.
- *  @param functionStatus the function status
- *  @param data the data of one row (barring the status fields)
- *  @tparam A the type of the data
+ *  A trait representing a converter from a Slick PositionedResult to an Actor.
+ *  The trait is to be mixed into a SlickFunction returning an Actor.
  */
-case class FunctionStatusWithData[A](functionStatus: FunctionStatus, data: A)
+trait OptionalActorSlickConverter {
+
+  protected def slickConverter: GetResult[Option[Actor]] = {
+    def converter(r: PositionedResult): Option[Actor] = {
+      Some(Actor(r.<<, r.<<, r.<<))
+    }
+    GetResult(converter)
+  }
+}

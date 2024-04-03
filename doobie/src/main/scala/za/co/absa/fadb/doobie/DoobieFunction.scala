@@ -21,8 +21,8 @@ import doobie.implicits.toSqlInterpolator
 import doobie.util.Read
 import doobie.util.fragment.Fragment
 import za.co.absa.fadb.DBFunction._
-import za.co.absa.fadb.{DBEngine, DBSchema}
-import za.co.absa.fadb.status.FunctionStatusWithData
+import za.co.absa.fadb.DBSchema
+import za.co.absa.fadb.status.{ExceptionOrStatusWithDataRow, FunctionStatusWithData}
 
 import scala.language.higherKinds
 
@@ -196,7 +196,7 @@ trait DoobieFunctionWithStatus[I, R, F[_]] extends DoobieFunctionBase[R] {
   }
 
   // This is to be mixed in by an implementation of StatusHandling
-  def checkStatus[A](statusWithData: FunctionStatusWithData[A]): DBEngine.ExceptionOrStatusWithData[A]
+  def checkStatus[A](statusWithData: FunctionStatusWithData[A]): ExceptionOrStatusWithDataRow[A]
 }
 
 /**
@@ -271,7 +271,7 @@ object DoobieFunction {
    val dbEngine: DoobieEngine[F],
    val readR: Read[R]
   ) extends DBMultipleResultFunctionWithStatus[I, R, DoobieEngine[F], F](functionNameOverride)
-  with DoobieFunctionWithStatus[I, R, F]
+      with DoobieFunctionWithStatus[I, R, F]
 
   /**
    *  `DoobieOptionalResultFunction` represents a db function that returns an optional result.

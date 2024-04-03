@@ -17,9 +17,8 @@
 package za.co.absa.fadb.slick
 
 import slick.jdbc.{GetResult, PositionedResult, SQLActionBuilder}
-import za.co.absa.fadb.exceptions.StatusException
-import za.co.absa.fadb.status.{FunctionStatus, FunctionStatusWithData}
-import za.co.absa.fadb.{DBEngine, Query, QueryWithStatus}
+import za.co.absa.fadb.status.{ExceptionOrStatusWithDataRow, FunctionStatus, FunctionStatusWithData}
+import za.co.absa.fadb.{Query, QueryWithStatus}
 
 /**
  *  SQL query representation for Slick
@@ -40,7 +39,7 @@ class SlickQuery[R](val sql: SQLActionBuilder, val getResult: GetResult[R]) exte
 class SlickQueryWithStatus[R](
   val sql: SQLActionBuilder,
   val getResult: GetResult[R],
-  checkStatus: FunctionStatusWithData[PositionedResult] => DBEngine.ExceptionOrStatusWithData[PositionedResult]
+  checkStatus: FunctionStatusWithData[PositionedResult] => ExceptionOrStatusWithDataRow[PositionedResult]
 ) extends QueryWithStatus[PositionedResult, PositionedResult, R] {
 
   /**
@@ -61,7 +60,7 @@ class SlickQueryWithStatus[R](
    */
   override def toStatusExceptionOrData(
     statusWithData: FunctionStatusWithData[PositionedResult]
-  ): DBEngine.ExceptionOrStatusWithData[R] = {
+  ): ExceptionOrStatusWithDataRow[R] = {
     val o = checkStatus(statusWithData)
     o match {
       case Left(statusException)  => Left(statusException)
@@ -80,7 +79,7 @@ class SlickQueryWithStatus[R](
    *  @return the GetResult, that combines the processing of the status and the conversion of the status with data
    *  to either a status exception or the data
    */
-  def getStatusExceptionOrData: GetResult[DBEngine.ExceptionOrStatusWithData[R]] = {
+  def getStatusExceptionOrData: GetResult[ExceptionOrStatusWithDataRow[R]] = {
     GetResult(pr => processStatus(pr)).andThen(fs => toStatusExceptionOrData(fs))
   }
 }

@@ -23,8 +23,9 @@ import doobie.implicits.toSqlInterpolator
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.doobie.DoobieFunction.DoobieMultipleResultFunctionWithStatus
-import za.co.absa.fadb.status.{FunctionStatus, FunctionStatusWithData}
+import za.co.absa.fadb.status.aggregation.implementations.AggregateByMajorityErrors
 import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
+import za.co.absa.fadb.status.{FunctionStatus, FunctionStatusWithData}
 
 class DoobieMultipleResultFunctionWithStatusTest extends AnyFunSuite with DoobieTest {
 
@@ -35,7 +36,8 @@ class DoobieMultipleResultFunctionWithStatusTest extends AnyFunSuite with Doobie
   class GetActorsByLastname(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
       // Option[Actor] because: Actor might not exist, and the function would return only status info without actor data
       extends DoobieMultipleResultFunctionWithStatus[GetActorsByLastnameQueryParameters, Option[Actor], IO](getActorsByLastnameQueryFragments)
-        with StandardStatusHandling {
+        with StandardStatusHandling
+        with AggregateByMajorityErrors {
     override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("actor_id", "first_name", "last_name")
   }
 
@@ -48,43 +50,47 @@ class DoobieMultipleResultFunctionWithStatusTest extends AnyFunSuite with Doobie
     )
 
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("Weasley")).unsafeRunSync()
-    val actualData = results.map {
+    val actualData = results match {
       case Left(_) => fail("should not be left")
-      case Right(value) => value
+      case Right(dataWithStatuses) => dataWithStatuses
     }
     assert(actualData.length == expectedResultElem.size)
     assert(actualData.toSet == expectedResultElem)
   }
 
   test("Retrieving single actor from database, full match") {
-    val expectedResultElem = Actor(50, "Liza", "Simpson")
+    val expectedResultElem = FunctionStatusWithData(
+      FunctionStatus(12, "OK, full match"), Some(Actor(50, "Liza", "Simpson"))
+    )
 
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("Simpson", Some("Liza"))).unsafeRunSync()
-    val actualData = results.map {
+    val actualData = results match {
       case Left(_) => fail("should not be left")
-      case Right(value) => value.data
+      case Right(dataWithStatuses) => dataWithStatuses
     }
 
     assert(actualData.length == 1)
-    assert(actualData.head.get == expectedResultElem)
+    assert(actualData.head == expectedResultElem)
   }
 
   test("Retrieving single actor from database, lastname match") {
-    val expectedResultElem = Actor(50, "Liza", "Simpson")
+    val expectedResultElem = FunctionStatusWithData(
+      FunctionStatus(11, "OK, match on last name only"), Some(Actor(50, "Liza", "Simpson"))
+    )
 
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("Simpson")).unsafeRunSync()
-    val actualData = results.map {
+    val actualData = results match {
       case Left(_) => fail("should not be left")
-      case Right(value) => value.data
+      case Right(dataWithStatuses) => dataWithStatuses
     }
 
     assert(actualData.length == 1)
-    assert(actualData.head.get == expectedResultElem)
+    assert(actualData.head == expectedResultElem)
   }
 
   test("Retrieving non-existing actor from database, no match") {
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("TotallyNonExisting!")).unsafeRunSync()
-    results.map {
+    results match {
       case Left(err) =>
         assert(err.status.statusText == "No actor found")
         assert(err.status.statusCode == 41)
