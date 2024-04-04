@@ -47,11 +47,10 @@ trait ByMajorityErrorsStatusAggregator extends StatusAggregator {
   override def aggregate[R](statusesWithData: Seq[ExceptionOrStatusWithDataRow[R]]): ExceptionOrStatusWithDataResultAgg[R] = {
     val allErrors = gatherExceptions(statusesWithData)
     val majorityError = gimmeMajorityWinner(allErrors)
-    val dataFinal = gatherDataWithStatuses(statusesWithData)
 
     majorityError match {
-      case Some(statusException) => Left(statusException)
-      case None => Right(dataFinal)
+      case Some(statusException)  => Left(statusException)
+      case None                   => Right(gatherDataWithStatuses(statusesWithData))
     }
   }
 

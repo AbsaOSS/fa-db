@@ -28,13 +28,11 @@ import za.co.absa.fadb.status.{ExceptionOrStatusWithDataResultAgg, ExceptionOrSt
 trait ByFirstErrorStatusAggregator extends StatusAggregator {
 
   override def aggregate[R](statusesWithData: Seq[ExceptionOrStatusWithDataRow[R]]): ExceptionOrStatusWithDataResultAgg[R] = {
-    val firstError = gatherExceptions(statusesWithData).headOption
-
-    val dataFinal = gatherDataWithStatuses(statusesWithData)
+    val firstError = statusesWithData.find(_.isLeft)
 
     firstError match {
-      case Some(statusException) => Left(statusException)
-      case None => Right(dataFinal)
+        case Some(errRowFound)    => Left(errRowFound.left.toOption.get)
+        case None                 => Right(gatherDataWithStatuses(statusesWithData))
     }
   }
 

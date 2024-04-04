@@ -61,8 +61,7 @@ class SlickQueryWithStatus[R](
   override def toStatusExceptionOrData(
     statusWithData: FunctionStatusWithData[PositionedResult]
   ): ExceptionOrStatusWithDataRow[R] = {
-    val o = checkStatus(statusWithData)
-    o match {
+    checkStatus(statusWithData) match {
       case Left(statusException)  => Left(statusException)
       case Right(value) =>
         val s = value.functionStatus

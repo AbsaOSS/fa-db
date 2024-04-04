@@ -30,12 +30,10 @@ trait ByFirstRowStatusAggregator extends StatusAggregator {
   override def aggregate[R](statusesWithData: Seq[ExceptionOrStatusWithDataRow[R]]): ExceptionOrStatusWithDataResultAgg[R] = {
     val firstRow = statusesWithData.headOption
 
-    val dataFinal = gatherDataWithStatuses(statusesWithData)
-
     firstRow match {
       case Some(exceptionOrDataWithStatuses) => exceptionOrDataWithStatuses match {
-        case Left(statusException) => Left(statusException)
-        case Right(_) => Right(dataFinal)
+        case Left(statusException)  => Left(statusException)
+        case Right(_)               => Right(gatherDataWithStatuses(statusesWithData))
       }
       case None => Right(Seq.empty)
     }
