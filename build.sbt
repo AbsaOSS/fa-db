@@ -96,19 +96,29 @@ lazy val faDBSlick = (project in file("slick"))
     jacocoExcludes := commonJacocoExcludes
   )
 
+lazy val jacocoITReport = taskKey[Unit]("Generates JaCoCo report for IT tests in faDBDoobie")
+
 lazy val faDBDoobie = (project in file("doobie"))
+  .enablePlugins(JacocoPlugin)
   .configs(IntegrationTest)
   .settings(
     name := "doobie",
     libraryDependencies ++= doobieDependencies(scalaVersion.value),
     javacOptions ++= commonJavacOptions,
     scalacOptions ++= commonScalacOptions,
-    Defaults.itSettings,
+    Defaults.itSettings, // Apply default settings for integration tests
+    // IntegrationTest-specific settings
+    IntegrationTest / fork := true,
+    IntegrationTest / parallelExecution := false,
+    IntegrationTest / javaOptions ++= Seq(
+      "-javaagent:/Users/ab024ll/.m2/repository/org/jacoco/org.jacoco.agent/0.8.10/org.jacoco.agent-0.8.10-runtime.jar=destfile=target/scala-2.12/jacoco/data/jacoco.exec,includes=*,append=true"
+    ),
+    // Define the custom task within the IntegrationTest configuration
+    jacocoITReport := (Def.taskDyn {
+      (IntegrationTest / test).value
+      Def.task { (Test / jacocoReport).value }
+    }).value
   ).dependsOn(faDbCore)
-  .settings(
-    jacocoReportSettings := commonJacocoReportSettings.withTitle(s"fa-db:doobie Jacoco Report - scala:${scalaVersion.value}"),
-    jacocoExcludes := commonJacocoExcludes
-  )
 
 lazy val faDBExamples = (project in file("examples"))
   .configs(IntegrationTest)
