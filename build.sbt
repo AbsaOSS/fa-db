@@ -37,7 +37,14 @@ ThisBuild / printScalaVersion := {
   log.info(s"Local maven ${Resolver.mavenLocal}")
 }
 
-ThisBuild / Test / testOptions := Seq(Tests.Argument("-l", "za.co.absa.fadb.IntegrationTestTag"))
+ThisBuild / Test / testOptions := {
+  val defaultOptions = Seq.empty[Tests.Argument]
+  val runIntegrationTests = sys.props.getOrElse("runIntegrationTests", "false").toBoolean
+  if (runIntegrationTests)
+    Seq(Tests.Argument("-n", "za.co.absa.fadb.IntegrationTestTag"))
+  else
+    Seq(Tests.Argument("-l", "za.co.absa.fadb.IntegrationTestTag"))
+}
 
 lazy val commonJacocoReportSettings: JacocoReportSettings = JacocoReportSettings(
   formats = Seq(JacocoReportFormats.HTML, JacocoReportFormats.XML)
