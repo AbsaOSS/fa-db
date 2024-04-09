@@ -40,7 +40,10 @@ ThisBuild / printScalaVersion := {
 ThisBuild / Test / testOptions := {
   val defaultOptions = Seq.empty[Tests.Argument]
   val runIntegrationTests = sys.props.getOrElse("runIntegrationTests", "false").toBoolean
-  if (runIntegrationTests)
+  val runAllTests = sys.props.getOrElse("runAllTests", "false").toBoolean
+  if (runAllTests)
+    defaultOptions
+  else if (runIntegrationTests)
     Seq(Tests.Argument("-n", "za.co.absa.fadb.IntegrationTestTag"))
   else
     Seq(Tests.Argument("-l", "za.co.absa.fadb.IntegrationTestTag"))
