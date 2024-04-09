@@ -21,9 +21,9 @@ object Dependencies {
   private def commonDependencies(scalaVersion: String): Seq[ModuleID] = Seq(
     "org.typelevel"      %% "cats-core" % "2.9.0",
     "org.typelevel"      %% "cats-effect" % "3.5.0",
-    "org.scalatest"      %% "scalatest" % "3.1.0"           % "test,it",
-    "org.scalatest"      %% "scalatest-flatspec" % "3.2.0"  % "test,it",
-    "org.scalatestplus"  %% "mockito-1-10" % "3.1.0.0"      % "test,it"
+    "org.scalatest"      %% "scalatest" % "3.1.0"           % "test",
+    "org.scalatest"      %% "scalatest-flatspec" % "3.2.0"  % "test",
+    "org.scalatestplus"  %% "mockito-1-10" % "3.1.0.0"      % "test"
   )
 
   def rootDependencies(scalaVersion: String): Seq[ModuleID] = Seq()

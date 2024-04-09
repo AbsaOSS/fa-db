@@ -22,6 +22,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import slick.jdbc.SQLActionBuilder
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.slick.SlickFunction.SlickMultipleResultFunction
+import za.co.absa.fadb.tags.IntegrationTestTag
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -43,7 +44,7 @@ class SlickMultipleResultFunctionTest extends AnyFunSuite with SlickTest with Sc
 
   private val getActors = new GetActors()(Integration, new SlickPgEngine(db))
 
-  test("Retrieving actors from database") {
+  test("Retrieving actors from database", IntegrationTestTag) {
     val expectedResultElem = Actor(49, "Pavel", "Marek")
     val results = getActors(GetActorsQueryParameters(Some("Pavel"), Some("Marek")))
     assert(results.futureValue.contains(expectedResultElem))

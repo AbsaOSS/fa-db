@@ -23,6 +23,7 @@ import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
 import za.co.absa.fadb.slick.SlickFunction.SlickSingleResultFunctionWithStatus
 import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
+import za.co.absa.fadb.tags.IntegrationTestTag
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -41,7 +42,7 @@ class SlickSingleResultFunctionWithStatusTest extends AnyFunSuite with SlickTest
 
   private val createActor = new CreateActor()(Integration, new SlickPgEngine(db))
 
-  test("Creating actor with status handling") {
+  test("Creating actor with status handling", IntegrationTestTag) {
     val requestBody = CreateActorRequestBody("Separated", "TestUser")
     val result = createActor(requestBody).futureValue
     assert(result.isRight)

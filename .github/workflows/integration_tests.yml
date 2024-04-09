@@ -54,8 +54,5 @@ jobs:
       - name: Prepare testing database
         run: sbt flywayMigrate
 
-      - name: Build and run IT tests for Doobie
-        run: sbt "project faDBDoobie" ++${{matrix.scala}} it:test
-
-      - name: Build and run  IT tests for Slick
-        run: sbt "project faDBSlick" ++${{matrix.scala}} it:test
+      - name: Build and run IT tests for all modules (tests with Tag 'IntegrationTestTag')
+        run: sbt ++${{matrix.scala}} "testOnly -- -n za.co.absa.fadb.IntegrationTestTag"

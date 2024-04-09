@@ -22,6 +22,7 @@ import slick.jdbc.SQLActionBuilder
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
 import za.co.absa.fadb.slick.SlickFunction.SlickOptionalResultFunction
+import za.co.absa.fadb.tags.IntegrationTestTag
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -40,7 +41,7 @@ class SlickOptionalResultFunctionTest extends AnyFunSuite with SlickTest with Sc
 
   private val getActorById = new GetActorById()(Integration, new SlickPgEngine(db))
 
-  test("Retrieving an actor by id from database") {
+  test("Retrieving an actor by id from database", IntegrationTestTag) {
     val expectedResultElem = Some(Actor(49, "Pavel", "Marek"))
     val results = getActorById(49)
     assert(results.futureValue == expectedResultElem)

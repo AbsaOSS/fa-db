@@ -25,6 +25,7 @@ import doobie.implicits.toSqlInterpolator
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.doobie.DoobieFunction.DoobieMultipleResultFunction
+import za.co.absa.fadb.tags.IntegrationTestTag
 
 class DoobieMultipleResultFunctionTest extends AnyFunSuite with DoobieTest {
 
@@ -51,7 +52,7 @@ class DoobieMultipleResultFunctionTest extends AnyFunSuite with DoobieTest {
 
   private val getActors = new GetActors()(Integration, new DoobieEngine(transactor))
 
-  test("Retrieving actor from database") {
+  test("Retrieving actor from database", IntegrationTestTag) {
     val expectedResultElem = Actor(49, "Pavel", "Marek")
     val results = getActors(GetActorsQueryParameters(Some("Pavel"), Some("Marek"))).unsafeRunSync()
     assert(results.contains(expectedResultElem))

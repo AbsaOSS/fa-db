@@ -23,6 +23,7 @@ import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits._
 import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
 import za.co.absa.fadb.slick.SlickFunction.SlickSingleResultFunction
+import za.co.absa.fadb.tags.IntegrationTestTag
 
 import java.time._
 import java.util.UUID
@@ -33,7 +34,7 @@ class FaDbPostgresProfileSuite extends AsyncFlatSpec {
   private val testDBEngine: SlickPgEngine = new SlickPgEngine(database)
 
   behavior of "FaDbPostgresProfile"
-  it should "be able to pass through and extract extended Postgres types" in {
+  it should "be able to pass through and extract extended Postgres types" taggedAs(IntegrationTestTag) in {
 
     case class InputOutput(
       uuid1: UUID, // uuid
@@ -108,14 +109,14 @@ class FaDbPostgresProfileSuite extends AsyncFlatSpec {
       InetString("168.0.0.1"),
       MacAddrString("12:34:56:78:90:ab")
     )
-    // because postgres does not fully support time zone as Java, so we need to clear it for later successful assert
+    // because postgres does not fully support time zone as Java, so we need to clear test for later successful assert
     val expected = input.copy(dateTime5 = input.dateTime5.toOffsetDateTime.toZonedDateTime)
 
     new TestSchema()(testDBEngine).testFunction(input).map(result => assert(result == expected))
 
   }
 
-  it should "be able to pass through and extract extended Postgres types as Options" in {
+  it should "be able to pass through and extract extended Postgres types as Options" taggedAs(IntegrationTestTag) in {
 
     case class InputOutput(
       uuid1: Option[UUID], // uuid

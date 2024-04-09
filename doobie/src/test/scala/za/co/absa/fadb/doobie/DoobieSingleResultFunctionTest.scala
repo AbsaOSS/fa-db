@@ -22,6 +22,7 @@ import doobie.implicits.toSqlInterpolator
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.doobie.DoobieFunction.DoobieSingleResultFunction
+import za.co.absa.fadb.tags.IntegrationTestTag
 
 class DoobieSingleResultFunctionTest extends AnyFunSuite with DoobieTest {
 
@@ -37,7 +38,7 @@ class DoobieSingleResultFunctionTest extends AnyFunSuite with DoobieTest {
 
   private val createActor = new CreateActor()(Integration, new DoobieEngine(transactor))
 
-  test("Inserting an actor into database & handling an error") {
+  test("Inserting an actor into database & handling an error", IntegrationTestTag) {
     val result = createActor(CreateActorRequestBody("Pavel", "Marek")).handleErrorWith(_ => IO(Int.MaxValue)).unsafeRunSync()
     assert(result == Int.MaxValue)
   }
