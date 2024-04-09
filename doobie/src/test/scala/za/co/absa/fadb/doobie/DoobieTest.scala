@@ -33,6 +33,6 @@ trait DoobieTest {
     "org.postgresql.Driver",
     "jdbc:postgresql://localhost:5432/movies",
     "postgres",
-    "changeme",
+    "postgres",
   )
 }
