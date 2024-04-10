@@ -55,9 +55,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Setup Scala
-        uses: olafurpg/setup-scala@v10
+        uses: olafurpg/setup-scala@v14
         with:
           java-version: "adopt@1.8"
+      - name: Prepare testing database
+        run: sbt flywayMigrate
       - name: Build and run tests
         run: sbt ++${{matrix.scala}} jacoco doc # We will need JaCoCo report in second job
       - uses: actions/cache/save@v3
