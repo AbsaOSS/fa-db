@@ -1,4 +1,4 @@
 # Test run control
-alias test=; clean ; testOnly -- -l za.co.absa.fadb.IntegrationTestTag
-alias testIT=; clean ; testOnly -- -n za.co.absa.fadb.IntegrationTestTag
-alias testAll=; clean ; testOnly
+alias test=; testOnly -- -l za.co.absa.fadb.IntegrationTestTag
+alias testIT=; testOnly -- -n za.co.absa.fadb.IntegrationTestTag
+alias testAll=; testOnly
