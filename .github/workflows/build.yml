@@ -25,6 +25,19 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: movies
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     strategy:
       fail-fast: false
       matrix:
@@ -105,10 +118,9 @@ jobs:
         run: |
           echo "Total coverage ${{ steps.jacoco.outputs.coverage-overall }}"
           echo "Changed Files coverage ${{ steps.jacoco.outputs.coverage-changed-files }}"
-# temporarily disabled until we have a better way how to test against a database
-#      - name: Fail PR if changed files coverage is less than ${{ matrix.changed }}%
-#        if: ${{ steps.jacoco.outputs.coverage-changed-files < 80.0 }}
-#        uses: actions/github-script@v6
-#        with:
-#          script: |
-#            core.setFailed('Changed files coverage is less than ${{ matrix.changed }}%!')
+      - name: Fail PR if changed files coverage is less than ${{ matrix.changed }}%
+        if: ${{ steps.jacoco.outputs.coverage-changed-files < 80.0 }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.setFailed('Changed files coverage is less than ${{ matrix.changed }}%!')

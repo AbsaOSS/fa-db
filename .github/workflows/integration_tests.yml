@@ -55,4 +55,4 @@ jobs:
         run: sbt flywayMigrate
 
       - name: Build and run IT tests for all modules (tests with Tag 'IntegrationTestTag')
-        run: sbt ++${{matrix.scala}} -DrunIntegrationTests=true test
+        run: sbt ++${{matrix.scala}} testIT
