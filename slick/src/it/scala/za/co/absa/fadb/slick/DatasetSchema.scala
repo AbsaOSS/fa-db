@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.examples.enceladus
+package za.co.absa.fadb.slick
 
 import cats.MonadError
 import slick.jdbc.PostgresProfile.api._
 import slick.jdbc.{GetResult, SQLActionBuilder}
 import za.co.absa.fadb.DBSchema
-import za.co.absa.fadb.examples.enceladus.DatasetSchema._
 import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits.namingConvention
+import za.co.absa.fadb.slick.DatasetSchema._
 import za.co.absa.fadb.slick.SlickFunction.{SlickMultipleResultFunction, SlickSingleResultFunctionWithStatus}
-import za.co.absa.fadb.slick.SlickPgEngine
 import za.co.absa.fadb.status.handling.implementations.UserDefinedStatusHandling
 
 import java.sql.Timestamp
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /* The Schema doesn't need the dBEngine directly, but it seems cleaner this way to hand it over to schema's functions */

@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.examples.enceladus
+package za.co.absa.fadb.slick
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import za.co.absa.fadb.examples.enceladus.DatasetSchema._
 import slick.jdbc.PostgresProfile.api._
 import za.co.absa.fadb.exceptions.StatusException
-import za.co.absa.fadb.slick.SlickPgEngine
+import za.co.absa.fadb.slick.DatasetSchema._
 
 import scala.concurrent.Await
-import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
 
 class DatasetSchemaSuite extends AnyWordSpec with Matchers {
   private val db = Database.forConfig("menasdb")
