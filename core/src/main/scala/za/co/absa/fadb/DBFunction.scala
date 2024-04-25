@@ -20,7 +20,7 @@ import cats.MonadError
 import cats.implicits.toFlatMapOps
 import za.co.absa.fadb.status.aggregation.StatusAggregator
 import za.co.absa.fadb.status.handling.StatusHandling
-import za.co.absa.fadb.status.{ExceptionOrStatusWithDataResultAgg, ExceptionOrStatusWithDataRow, FunctionStatusWithData}
+import za.co.absa.fadb.status.{FailedOrRowSet, FailedOrRow, Row}
 
 import scala.language.higherKinds
 
@@ -110,7 +110,7 @@ abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOv
     *  @param values - The values to pass over to the database function.
     *  @return - A sequence of results from the database function.
     */
-  protected def multipleResults(values: I)(implicit me: MonadError[F, Throwable]): F[Seq[ExceptionOrStatusWithDataRow[R]]] =
+  protected def multipleResults(values: I)(implicit me: MonadError[F, Throwable]): F[Seq[FailedOrRow[R]]] =
     query(values).flatMap(q => dBEngine.fetchAllWithStatus(q))
 
   /**
@@ -118,7 +118,7 @@ abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOv
     *  @param values - The values to pass over to the database function.
     *  @return - A single result from the database function.
     */
-  protected def singleResult(values: I)(implicit me: MonadError[F, Throwable]): F[ExceptionOrStatusWithDataRow[R]] =
+  protected def singleResult(values: I)(implicit me: MonadError[F, Throwable]): F[FailedOrRow[R]] =
     query(values).flatMap(q => dBEngine.fetchHeadWithStatus(q))
 
   /**
@@ -126,7 +126,7 @@ abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOv
     *  @param values - The values to pass over to the database function.
     *  @return - An optional result from the database function.
     */
-  protected def optionalResult(values: I)(implicit me: MonadError[F, Throwable]): F[Option[ExceptionOrStatusWithDataRow[R]]] =
+  protected def optionalResult(values: I)(implicit me: MonadError[F, Throwable]): F[Option[FailedOrRow[R]]] =
     query(values).flatMap(q => dBEngine.fetchHeadOptionWithStatus(q))
 
   /**
@@ -148,7 +148,7 @@ abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOv
   protected def query(values: I)(implicit me: MonadError[F, Throwable]): F[dBEngine.QueryWithStatusType[R]]
 
   // To be provided by an implementation of QueryStatusHandling
-  override def checkStatus[A](statusWithData: FunctionStatusWithData[A]): ExceptionOrStatusWithDataRow[A]
+  override def checkStatus[A](statusWithData: Row[A]): FailedOrRow[A]
 }
 
 object DBFunction {
@@ -247,7 +247,7 @@ object DBFunction {
       *               type `R` wrapped around with Either, providing StatusException if raised
       */
     def apply(values: I)
-             (implicit me: MonadError[F, Throwable]): F[ExceptionOrStatusWithDataResultAgg[R]] =
+             (implicit me: MonadError[F, Throwable]): F[FailedOrRowSet[R]] =
       multipleResults(values).flatMap(data => me.pure(aggregate(data)))
   }
 
@@ -273,7 +273,7 @@ object DBFunction {
       *  @return       - the value returned from the DB function transformed to scala type `R`
       *                  wrapped around with Either, providing StatusException if raised
       */
-    def apply(values: I)(implicit me: MonadError[F, Throwable]): F[ExceptionOrStatusWithDataRow[R]] =
+    def apply(values: I)(implicit me: MonadError[F, Throwable]): F[FailedOrRow[R]] =
       singleResult(values)
   }
 
@@ -299,7 +299,7 @@ object DBFunction {
       *  @return       - the value returned from the DB function transformed to scala type `R` if a row is returned,
       *                  otherwise `None`, wrapped around with Either, providing StatusException if raised
       */
-    def apply(values: I)(implicit me: MonadError[F, Throwable]): F[Option[ExceptionOrStatusWithDataRow[R]]] =
+    def apply(values: I)(implicit me: MonadError[F, Throwable]): F[Option[FailedOrRow[R]]] =
       optionalResult(values)
   }
 

@@ -22,7 +22,7 @@ import doobie._
 import doobie.implicits._
 import doobie.util.Read
 import za.co.absa.fadb.DBEngine
-import za.co.absa.fadb.status.ExceptionOrStatusWithDataRow
+import za.co.absa.fadb.status.FailedOrRow
 
 import scala.language.higherKinds
 
@@ -64,7 +64,7 @@ class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[
    */
   private def executeQueryWithStatus[R](
     query: QueryWithStatusType[R]
-  )(implicit readStatusWithDataR: Read[StatusWithData[R]]): F[Seq[ExceptionOrStatusWithDataRow[R]]] = {
+  )(implicit readStatusWithDataR: Read[StatusWithData[R]]): F[Seq[FailedOrRow[R]]] = {
       query.fragment.query[StatusWithData[R]].to[Seq].transact(transactor).map(_.map(query.getResultOrException))
   }
 
@@ -83,7 +83,7 @@ class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[
    *  @param query the Doobie query to run
    *  @return the query result
    */
-  override def runWithStatus[R](query: QueryWithStatusType[R]): F[Seq[ExceptionOrStatusWithDataRow[R]]] = {
+  override def runWithStatus[R](query: QueryWithStatusType[R]): F[Seq[FailedOrRow[R]]] = {
     executeQueryWithStatus(query)(query.readStatusWithDataR)
   }
 }

@@ -19,7 +19,7 @@ package za.co.absa.fadb.slick
 import cats.implicits._
 import slick.jdbc.PostgresProfile.api._
 import za.co.absa.fadb.DBEngine
-import za.co.absa.fadb.status.ExceptionOrStatusWithDataRow
+import za.co.absa.fadb.status.FailedOrRow
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.higherKinds
@@ -55,8 +55,8 @@ class SlickPgEngine(val db: Database)(implicit val executor: ExecutionContext) e
    *  @tparam R     - return the of the query
    *  @return       - either status exception or result of database query
    */
-  override def runWithStatus[R](query: QueryWithStatusType[R]): Future[Seq[ExceptionOrStatusWithDataRow[R]]] = {
-    val slickAction = query.sql.as[ExceptionOrStatusWithDataRow[R]](query.getStatusExceptionOrData)
+  override def runWithStatus[R](query: QueryWithStatusType[R]): Future[Seq[FailedOrRow[R]]] = {
+    val slickAction = query.sql.as[FailedOrRow[R]](query.getStatusExceptionOrData)
     db.run(slickAction)
   }
 }

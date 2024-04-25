@@ -17,7 +17,7 @@
 package za.co.absa.fadb.slick
 
 import slick.jdbc.{GetResult, PositionedResult, SQLActionBuilder}
-import za.co.absa.fadb.status.{ExceptionOrStatusWithDataRow, FunctionStatus, FunctionStatusWithData}
+import za.co.absa.fadb.status.{FailedOrRow, FunctionStatus, Row}
 import za.co.absa.fadb.{Query, QueryWithStatus}
 
 /**
@@ -39,7 +39,7 @@ class SlickQuery[R](val sql: SQLActionBuilder, val getResult: GetResult[R]) exte
 class SlickQueryWithStatus[R](
   val sql: SQLActionBuilder,
   val getResult: GetResult[R],
-  checkStatus: FunctionStatusWithData[PositionedResult] => ExceptionOrStatusWithDataRow[PositionedResult]
+  checkStatus: Row[PositionedResult] => FailedOrRow[PositionedResult]
 ) extends QueryWithStatus[PositionedResult, PositionedResult, R] {
 
   /**
@@ -47,10 +47,10 @@ class SlickQueryWithStatus[R](
    *  @param initialResult - the initial result of the query
    *  @return the status with data
    */
-  override def processStatus(initialResult: PositionedResult): FunctionStatusWithData[PositionedResult] = {
+  override def processStatus(initialResult: PositionedResult): Row[PositionedResult] = {
     val status: Int = initialResult.<<
     val statusText: String = initialResult.<<
-    FunctionStatusWithData(FunctionStatus(status, statusText), initialResult)
+    Row(FunctionStatus(status, statusText), initialResult)
   }
 
   /**
@@ -59,14 +59,14 @@ class SlickQueryWithStatus[R](
    *  @return either a status exception or the data
    */
   override def toStatusExceptionOrData(
-    statusWithData: FunctionStatusWithData[PositionedResult]
-  ): ExceptionOrStatusWithDataRow[R] = {
+    statusWithData: Row[PositionedResult]
+  ): FailedOrRow[R] = {
     checkStatus(statusWithData) match {
       case Left(statusException)  => Left(statusException)
       case Right(value) =>
         val s = value.functionStatus
         val d = getResult(value.data)
-        Right(FunctionStatusWithData(s, d))
+        Right(Row(s, d))
     }
   }
 
@@ -78,7 +78,7 @@ class SlickQueryWithStatus[R](
    *  @return the GetResult, that combines the processing of the status and the conversion of the status with data
    *  to either a status exception or the data
    */
-  def getStatusExceptionOrData: GetResult[ExceptionOrStatusWithDataRow[R]] = {
+  def getStatusExceptionOrData: GetResult[FailedOrRow[R]] = {
     GetResult(pr => processStatus(pr)).andThen(fs => toStatusExceptionOrData(fs))
   }
 }

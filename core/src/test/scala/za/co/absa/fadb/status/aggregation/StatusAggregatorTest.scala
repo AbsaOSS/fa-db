@@ -18,13 +18,13 @@ package za.co.absa.fadb.status.aggregation
 
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.exceptions._
-import za.co.absa.fadb.status.{ExceptionOrStatusWithDataResultAgg, ExceptionOrStatusWithDataRow, FunctionStatus, FunctionStatusWithData}
+import za.co.absa.fadb.status.{FailedOrRowSet, FailedOrRow, FunctionStatus, Row}
 
 class StatusAggregatorTest extends AnyFunSuite {
 
   private val aggregateByFirstRowUnderTest: StatusAggregator = new StatusAggregator {
-    override def aggregate[R](statusesWithData: Seq[ExceptionOrStatusWithDataRow[R]]):
-    ExceptionOrStatusWithDataResultAgg[R] = Right(Seq.empty)
+    override def aggregate[R](statusesWithData: Seq[FailedOrRow[R]]):
+    FailedOrRowSet[R] = Right(Seq.empty)
   }
 
   test("gatherExceptions should return empty Seq on empty input") {
@@ -38,10 +38,10 @@ class StatusAggregatorTest extends AnyFunSuite {
   test("gatherExceptions should gather exceptions") {
     val testData = Seq(
       Left(DataNotFoundException(FunctionStatus(42, "Data not found"))),
-      Right(FunctionStatusWithData(FunctionStatus(10, "Ok"), ("FirstName1", "SecondName1"))),
-      Right(FunctionStatusWithData(FunctionStatus(10, "Ok"), ("FirstName2", "SecondName2"))),
+      Right(Row(FunctionStatus(10, "Ok"), ("FirstName1", "SecondName1"))),
+      Right(Row(FunctionStatus(10, "Ok"), ("FirstName2", "SecondName2"))),
       Left(ErrorInDataException(FunctionStatus(50, "Some data error"))),
-      Right(FunctionStatusWithData(FunctionStatus(10, "Ok"), ("FirstName3", "SecondName3"))),
+      Right(Row(FunctionStatus(10, "Ok"), ("FirstName3", "SecondName3"))),
     )
     val expectedGatheredExceptions = Seq(
       DataNotFoundException(FunctionStatus(42, "Data not found")),
@@ -63,15 +63,15 @@ class StatusAggregatorTest extends AnyFunSuite {
   test("gatherDataWithStatuses should gather exceptions") {
     val testData = Seq(
       Left(DataNotFoundException(FunctionStatus(42, "Data not found"))),
-      Right(FunctionStatusWithData(FunctionStatus(10, "Ok"), ("FirstName1", "SecondName1"))),
-      Right(FunctionStatusWithData(FunctionStatus(10, "Ok"), ("FirstName2", "SecondName2"))),
+      Right(Row(FunctionStatus(10, "Ok"), ("FirstName1", "SecondName1"))),
+      Right(Row(FunctionStatus(10, "Ok"), ("FirstName2", "SecondName2"))),
       Left(ErrorInDataException(FunctionStatus(50, "Some data error"))),
-      Right(FunctionStatusWithData(FunctionStatus(10, "Ok"), ("FirstName3", "SecondName3"))),
+      Right(Row(FunctionStatus(10, "Ok"), ("FirstName3", "SecondName3"))),
     )
     val expectedGatheredData = Seq(
-      FunctionStatusWithData(FunctionStatus(10, "Ok"), ("FirstName1", "SecondName1")),
-      FunctionStatusWithData(FunctionStatus(10, "Ok"), ("FirstName2", "SecondName2")),
-      FunctionStatusWithData(FunctionStatus(10, "Ok"), ("FirstName3", "SecondName3")),
+      Row(FunctionStatus(10, "Ok"), ("FirstName1", "SecondName1")),
+      Row(FunctionStatus(10, "Ok"), ("FirstName2", "SecondName2")),
+      Row(FunctionStatus(10, "Ok"), ("FirstName3", "SecondName3")),
     )
 
     val actualGatheredData = aggregateByFirstRowUnderTest.gatherDataWithStatuses(testData)

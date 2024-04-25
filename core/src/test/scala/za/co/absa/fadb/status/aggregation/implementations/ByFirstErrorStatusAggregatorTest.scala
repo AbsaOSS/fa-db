@@ -18,7 +18,7 @@ package za.co.absa.fadb.status.aggregation.implementations
 
 import org.scalatest.funsuite.AnyFunSuiteLike
 import za.co.absa.fadb.exceptions._
-import za.co.absa.fadb.status.{FunctionStatus, FunctionStatusWithData}
+import za.co.absa.fadb.status.{FunctionStatus, Row}
 
 class ByFirstErrorStatusAggregatorTest extends AnyFunSuiteLike {
 
@@ -34,9 +34,9 @@ class ByFirstErrorStatusAggregatorTest extends AnyFunSuiteLike {
 
   test("aggregate should return Seq with data in Right for a Sequence with data (no errors") {
     val rawTestData = Seq(
-      FunctionStatusWithData(FunctionStatus(10, "Ok"), ("FirstName1", "SecondName1")),
-      FunctionStatusWithData(FunctionStatus(10, "Ok"), ("FirstName2", "SecondName2")),
-      FunctionStatusWithData(FunctionStatus(10, "Ok"), ("FirstName3", "SecondName3")),
+      Row(FunctionStatus(10, "Ok"), ("FirstName1", "SecondName1")),
+      Row(FunctionStatus(10, "Ok"), ("FirstName2", "SecondName2")),
+      Row(FunctionStatus(10, "Ok"), ("FirstName3", "SecondName3")),
     )
     val testData = rawTestData.map(Right(_)) // wrap so that it's Seq of Eithers with data
     val expectedAggData = Right(rawTestData) // wrap so that it's Either of Seq with data
@@ -69,9 +69,9 @@ class ByFirstErrorStatusAggregatorTest extends AnyFunSuiteLike {
   test("aggregate should return a single Left only, when there is a single error status code along with data") {
     val testData = Seq(
       Left(DataNotFoundException(FunctionStatus(42, "Data not found"))),
-      Right(FunctionStatusWithData(FunctionStatus(10, "Ok"), ("FirstName1", "SecondName1"))),
-      Right(FunctionStatusWithData(FunctionStatus(10, "Ok"), ("FirstName2", "SecondName2"))),
-      Right(FunctionStatusWithData(FunctionStatus(10, "Ok"), ("FirstName3", "SecondName3"))),
+      Right(Row(FunctionStatus(10, "Ok"), ("FirstName1", "SecondName1"))),
+      Right(Row(FunctionStatus(10, "Ok"), ("FirstName2", "SecondName2"))),
+      Right(Row(FunctionStatus(10, "Ok"), ("FirstName3", "SecondName3"))),
     )
     val expectedAggData = Left(DataNotFoundException(FunctionStatus(42, "Data not found")))
 
@@ -81,11 +81,11 @@ class ByFirstErrorStatusAggregatorTest extends AnyFunSuiteLike {
 
   test("aggregate should return a single Left only, when there are multiple error status codes along with data") {
     val testData = Seq(
-      Right(FunctionStatusWithData(FunctionStatus(10, "Ok"), ("FirstName1", "SecondName1"))),
+      Right(Row(FunctionStatus(10, "Ok"), ("FirstName1", "SecondName1"))),
       Left(DataNotFoundException(FunctionStatus(42, "Data not found"))),
-      Right(FunctionStatusWithData(FunctionStatus(10, "Ok"), ("FirstName2", "SecondName2"))),
+      Right(Row(FunctionStatus(10, "Ok"), ("FirstName2", "SecondName2"))),
       Left(DataNotFoundException(FunctionStatus(43, "Data not found another"))),
-      Right(FunctionStatusWithData(FunctionStatus(10, "Ok"), ("FirstName3", "SecondName3"))),
+      Right(Row(FunctionStatus(10, "Ok"), ("FirstName3", "SecondName3"))),
     )
     val expectedAggData = Left(DataNotFoundException(FunctionStatus(42, "Data not found")))
 

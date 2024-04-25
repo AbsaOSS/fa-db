@@ -16,7 +16,7 @@
 
 package za.co.absa.fadb
 
-import za.co.absa.fadb.status.{ExceptionOrStatusWithDataRow, FunctionStatusWithData}
+import za.co.absa.fadb.status.{FailedOrRow, Row}
 
 /**
  *  The basis for all query types of [[DBEngine]] implementations
@@ -28,7 +28,7 @@ trait Query[R]
  *  The basis for all query types of [[DBEngine]] implementations with status
  *  @tparam A - the initial result type of the query (a row basically, having status-related columns as well)
  *  @tparam B - the intermediate result type of the query (a row without status columns, i.e. data only)
- *  @tparam R - the final return type of the query (final version of B, depending on the needs, might be the same as B)
+ *  @tparam R - the final return type of the query (final version of result, depending on the needs, might be the same as B)
  */
 trait QueryWithStatus[A, B, R] {
 
@@ -37,21 +37,21 @@ trait QueryWithStatus[A, B, R] {
    *  @param initialResult - the initial result of the query
    *  @return the status with data
    */
-  def processStatus(initialResult: A): FunctionStatusWithData[B]
+  def processStatus(initialResult: A): Row[B]
 
   /**
    *  Converts the status with data to either a status exception or the data
    *  @param statusWithData - the status with data
    *  @return either a status exception or the data
    */
-  def toStatusExceptionOrData(statusWithData: FunctionStatusWithData[B]): ExceptionOrStatusWithDataRow[R]
+  def toStatusExceptionOrData(statusWithData: Row[B]): FailedOrRow[R]
 
   /**
    *  Returns the result of the query or a status exception
    *  @param initialResult - the initial result of the query
    *  @return the result of the query or a status exception
    */
-  def getResultOrException(initialResult: A): ExceptionOrStatusWithDataRow[R] =
+  def getResultOrException(initialResult: A): FailedOrRow[R] =
     toStatusExceptionOrData(
       processStatus(initialResult)
     )

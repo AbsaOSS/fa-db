@@ -22,7 +22,7 @@ import slick.jdbc.SQLActionBuilder
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
 import za.co.absa.fadb.slick.SlickFunction.SlickMultipleResultFunctionWithStatus
-import za.co.absa.fadb.status.{FunctionStatus, FunctionStatusWithData}
+import za.co.absa.fadb.status.{FunctionStatus, Row}
 import za.co.absa.fadb.status.aggregation.implementations.ByFirstErrorStatusAggregator
 import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
 
@@ -48,8 +48,8 @@ class SlickMultipleResultFunctionWithStatusTest extends AnyFunSuite with SlickTe
 
   test("Retrieving actors from database") {
     val expectedResultElem = Set(
-      FunctionStatusWithData(FunctionStatus(11, "OK, match on last name only"), Some(Actor(51, "Fred", "Weasley"))),
-      FunctionStatusWithData(FunctionStatus(11, "OK, match on last name only"), Some(Actor(52, "George", "Weasley")))
+      Row(FunctionStatus(11, "OK, match on last name only"), Some(Actor(51, "Fred", "Weasley"))),
+      Row(FunctionStatus(11, "OK, match on last name only"), Some(Actor(52, "George", "Weasley")))
     )
 
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("Weasley")).futureValue

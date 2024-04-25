@@ -16,7 +16,7 @@
 
 package za.co.absa.fadb.status.handling
 
-import za.co.absa.fadb.status.{ExceptionOrStatusWithDataRow, FunctionStatusWithData}
+import za.co.absa.fadb.status.{FailedOrRow, Row}
 
 /**
  *  `StatusHandling` is a base trait that defines the interface for handling the status of a function invocation.
@@ -30,5 +30,5 @@ trait StatusHandling {
    *  @return Either a `StatusException` if the status code indicates an error, or the data (along with the status
     *          information so that it's retrievable) if the status code is successful.
    */
-  def checkStatus[A](statusWithData: FunctionStatusWithData[A]): ExceptionOrStatusWithDataRow[A]
+  def checkStatus[A](statusWithData: Row[A]): FailedOrRow[A]
 }

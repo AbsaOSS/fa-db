@@ -22,7 +22,7 @@ import doobie.util.Read
 import doobie.util.fragment.Fragment
 import za.co.absa.fadb.DBFunction._
 import za.co.absa.fadb.DBSchema
-import za.co.absa.fadb.status.{ExceptionOrStatusWithDataRow, FunctionStatusWithData}
+import za.co.absa.fadb.status.{FailedOrRow, Row}
 
 import scala.language.higherKinds
 
@@ -196,7 +196,7 @@ trait DoobieFunctionWithStatus[I, R, F[_]] extends DoobieFunctionBase[R] {
   }
 
   // This is to be mixed in by an implementation of StatusHandling
-  def checkStatus[A](statusWithData: FunctionStatusWithData[A]): ExceptionOrStatusWithDataRow[A]
+  def checkStatus[A](statusWithData: Row[A]): FailedOrRow[A]
 }
 
 /**

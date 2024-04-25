@@ -21,7 +21,7 @@ import cats.implicits._
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBFunction.DBSingleResultFunction
 import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits.namingConvention
-import za.co.absa.fadb.status.ExceptionOrStatusWithDataRow
+import za.co.absa.fadb.status.FailedOrRow
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -34,7 +34,7 @@ class DBFunctionSuite extends AnyFunSuite {
 
   class EngineThrow extends DBEngine[Future] {
     override def run[R](query: QueryType[R]): Future[Seq[R]] = neverHappens
-    override def runWithStatus[R](query: QueryWithStatusType[R]): Future[Seq[ExceptionOrStatusWithDataRow[R]]] = neverHappens
+    override def runWithStatus[R](query: QueryWithStatusType[R]): Future[Seq[FailedOrRow[R]]] = neverHappens
   }
 
   private object FooNamed extends DBSchema

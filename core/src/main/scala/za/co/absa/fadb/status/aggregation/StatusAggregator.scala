@@ -17,7 +17,7 @@
 package za.co.absa.fadb.status.aggregation
 
 import za.co.absa.fadb.exceptions.StatusException
-import za.co.absa.fadb.status.{ExceptionOrStatusWithDataResultAgg, ExceptionOrStatusWithDataRow, FunctionStatusWithData}
+import za.co.absa.fadb.status.{FailedOrRowSet, FailedOrRow, Row}
 
 /**
   *  `StatusAggregator` is a base trait that defines the interface for aggregating the error statuses of a function
@@ -27,7 +27,7 @@ import za.co.absa.fadb.status.{ExceptionOrStatusWithDataResultAgg, ExceptionOrSt
 trait StatusAggregator {
 
   private [aggregation] def gatherExceptions[R](
-    eithersWithException: Seq[ExceptionOrStatusWithDataRow[R]]
+    eithersWithException: Seq[FailedOrRow[R]]
   ): Seq[StatusException] = {
 
     eithersWithException.flatMap {
@@ -37,8 +37,8 @@ trait StatusAggregator {
   }
 
   private [aggregation] def gatherDataWithStatuses[R](
-    eithersWithData: Seq[ExceptionOrStatusWithDataRow[R]]
-  ): Seq[FunctionStatusWithData[R]] = {
+    eithersWithData: Seq[FailedOrRow[R]]
+  ): Seq[Row[R]] = {
     eithersWithData.flatMap {
       case Left(_) => None
       case Right(dataWithStatuses) => Some(dataWithStatuses)
@@ -52,5 +52,5 @@ trait StatusAggregator {
     *  @return Either a `StatusException` if the status code indicates an error, or the data (along with the status
     *          information so that it's retrievable) if the status being returned doesn't indicate an error.
     */
-  def aggregate[R](statusesWithData: Seq[ExceptionOrStatusWithDataRow[R]]): ExceptionOrStatusWithDataResultAgg[R]
+  def aggregate[R](statusesWithData: Seq[FailedOrRow[R]]): FailedOrRowSet[R]
 }

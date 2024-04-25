@@ -20,7 +20,7 @@ import cats.MonadError
 import slick.jdbc.{GetResult, SQLActionBuilder}
 import za.co.absa.fadb.DBFunction._
 import za.co.absa.fadb.DBSchema
-import za.co.absa.fadb.status.{ExceptionOrStatusWithDataRow, FunctionStatusWithData}
+import za.co.absa.fadb.status.{FailedOrRow, Row}
 
 import scala.concurrent.Future
 import scala.language.higherKinds
@@ -89,7 +89,7 @@ private[slick] trait SlickFunctionWithStatus[I, R] extends SlickFunctionBase[I, 
   }
 
   // Expected to be mixed in by an implementation of StatusHandling
-  def checkStatus[A](statusWithData: FunctionStatusWithData[A]): ExceptionOrStatusWithDataRow[A]
+  def checkStatus[A](statusWithData: Row[A]): FailedOrRow[A]
 }
 
 object SlickFunction {

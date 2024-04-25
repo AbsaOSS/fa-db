@@ -17,7 +17,7 @@
 package za.co.absa.fadb.status.aggregation.implementations
 
 import za.co.absa.fadb.status.aggregation.StatusAggregator
-import za.co.absa.fadb.status.{ExceptionOrStatusWithDataResultAgg, ExceptionOrStatusWithDataRow}
+import za.co.absa.fadb.status.{FailedOrRowSet, FailedOrRow}
 
 /**
   *  `ByMajorityErrorsStatusAggregator` is a trait that extends the `StatusAggregator` interface.
@@ -44,7 +44,7 @@ trait ByMajorityErrorsStatusAggregator extends StatusAggregator {
     }
   }
 
-  override def aggregate[R](statusesWithData: Seq[ExceptionOrStatusWithDataRow[R]]): ExceptionOrStatusWithDataResultAgg[R] = {
+  override def aggregate[R](statusesWithData: Seq[FailedOrRow[R]]): FailedOrRowSet[R] = {
     val allErrors = gatherExceptions(statusesWithData)
     val majorityError = gimmeMajorityWinner(allErrors)
 
