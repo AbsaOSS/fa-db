@@ -39,10 +39,10 @@ class SlickSingleResultFunctionWithStatusTest extends AnyFunSuite with SlickTest
     override protected def slickConverter: GetResult[Int] = GetResult(r => r.<<)
   }
 
-  private val createActor = new CreateActor()(Runs, new SlickPgEngine(db))
+  private val createActor = new CreateActor()(Integration, new SlickPgEngine(db))
 
   test("Creating actor with status handling") {
-    val requestBody = CreateActorRequestBody("Pavel", "Marek")
+    val requestBody = CreateActorRequestBody("Separated", "TestUser")
     val result = createActor(requestBody).futureValue
     assert(result.isRight)
   }

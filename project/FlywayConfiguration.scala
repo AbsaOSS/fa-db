@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 ABSA Group Limited
+ * Copyright 2021 ABSA Group Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.slick
+object FlywayConfiguration {
 
-import slick.jdbc.JdbcBackend.Database
-import za.co.absa.fadb.DBSchema
+  private val port = 5432
+  private val host = "localhost"
+  private val database = "movies"
+  val flywayUrl = s"jdbc:postgresql://$host:$port/$database"
+  val flywayUser = "postgres"
+  val flywayPassword = "postgres"
+  val flywayLocations: Seq[String] = Seq("filesystem:demo_database/src/main/postgres")
+  val flywaySqlMigrationSuffixes: Seq[String] = Seq(".sql",".ddl")
 
-trait SlickTest {
-  case class CreateActorRequestBody(firstName: String, lastName: String)
-  case class GetActorsQueryParameters(firstName: Option[String], lastName: Option[String])
-
-  import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits._
-  object Integration extends DBSchema
-
-  val db = Database.forConfig("postgrestestdb")
 }

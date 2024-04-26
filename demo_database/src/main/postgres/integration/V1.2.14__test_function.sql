@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 
-
-CREATE EXTENSION IF NOT EXISTS hstore;
-
-CREATE EXTENSION IF NOT EXISTS ltree;
-
-CREATE OR REPLACE FUNCTION public.test_function(
+CREATE OR REPLACE FUNCTION integration.test_function(
     IN  i_uuid1             UUID,
     IN  i_dateTime1         DATE,
     IN  i_dateTime2         TIME,
@@ -46,7 +41,7 @@ CREATE OR REPLACE FUNCTION public.test_function(
     OUT macaddr1            MACADDR
 ) RETURNS record AS
 $$
--------------------------------------------------------------------------------
+    -------------------------------------------------------------------------------
 --
 -- Function: test_function(12)
 --      A function to test Fa-Db Slick Posgres special time enhancement. Function works as a mirror. Returns what came in.
@@ -74,19 +69,4 @@ BEGIN
     RETURN;
 END;
 $$
-LANGUAGE plpgsql VOLATILE SECURITY DEFINER;
-
-GRANT EXECUTE ON FUNCTION test_function(
-    UUID,
-    DATE,
-    TIME,
-    TIMESTAMP WITHOUT TIME ZONE,
-    INTERVAL,
-    TIMESTAMP WITH TIME ZONE,
-    TIMESTAMP WITH TIME ZONE,
-    INT4RANGE,
-    LTREE,
-    HSTORE,
-    INET,
-    MACADDR
-    ) TO postgres;
+    LANGUAGE plpgsql VOLATILE SECURITY DEFINER;

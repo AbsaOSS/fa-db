@@ -48,8 +48,16 @@ lazy val commonJacocoReportSettings: JacocoReportSettings = JacocoReportSettings
 lazy val commonJacocoExcludes: Seq[String] = Seq(
 )
 
+enablePlugins(FlywayPlugin)
+flywayUrl := FlywayConfiguration.flywayUrl
+flywayUser := FlywayConfiguration.flywayUser
+flywayPassword := FlywayConfiguration.flywayPassword
+flywayLocations := FlywayConfiguration.flywayLocations
+flywaySqlMigrationSuffixes := FlywayConfiguration.flywaySqlMigrationSuffixes
+libraryDependencies ++= flywayDependencies
+
 lazy val parent = (project in file("."))
-  .aggregate(faDbCore, faDBSlick, faDBDoobie, faDBExamples)
+  .aggregate(faDbCore, faDBSlick, faDBDoobie)
   .settings(
     name := "root",
     libraryDependencies ++= rootDependencies(scalaVersion.value),
@@ -99,20 +107,6 @@ lazy val faDBDoobie = (project in file("doobie"))
   ).dependsOn(faDbCore)
   .settings(
     jacocoReportSettings := commonJacocoReportSettings.withTitle(s"fa-db:doobie Jacoco Report - scala:${scalaVersion.value}"),
-    jacocoExcludes := commonJacocoExcludes
-  )
-
-lazy val faDBExamples = (project in file("examples"))
-  .configs(IntegrationTest)
-  .settings(
-    name := "examples",
-    libraryDependencies ++= examplesDependencies(scalaVersion.value),
-    Test / parallelExecution := false,
-    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value, // printScalaVersion is run with compile
-    publish / skip := true
-  ).dependsOn(faDbCore, faDBSlick)
-  .settings(
-    jacocoReportSettings := commonJacocoReportSettings.withTitle(s"fa-db:examples Jacoco Report - scala:${scalaVersion.value}"),
     jacocoExcludes := commonJacocoExcludes
   )
 

@@ -38,7 +38,7 @@ class SlickOptionalResultFunctionTest extends AnyFunSuite with SlickTest with Sc
     }
   }
 
-  private val getActorById = new GetActorById()(Runs, new SlickPgEngine(db))
+  private val getActorById = new GetActorById()(Integration, new SlickPgEngine(db))
 
   test("Retrieving an actor by id from database") {
     val expectedResultElem = Some(Actor(49, "Pavel", "Marek"))
