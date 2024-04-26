@@ -148,7 +148,7 @@ abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOv
   protected def query(values: I)(implicit me: MonadError[F, Throwable]): F[dBEngine.QueryWithStatusType[R]]
 
   // To be provided by an implementation of QueryStatusHandling
-  override def checkStatus[A](statusWithData: Row[A]): FailedOrRow[A]
+  override def checkStatus[D](statusWithData: Row[D]): FailedOrRow[D]
 }
 
 object DBFunction {

@@ -29,7 +29,7 @@ trait StandardStatusHandling extends StatusHandling {
   /**
    *  Checks the status of a function invocation.
    */
-  override def checkStatus[A](statusWithData: Row[A]): FailedOrRow[A] = {
+  override def checkStatus[D](statusWithData: Row[D]): FailedOrRow[D] = {
     val functionStatus = statusWithData.functionStatus
     functionStatus.statusCode / 10 match {
       case 1             => Right(statusWithData)

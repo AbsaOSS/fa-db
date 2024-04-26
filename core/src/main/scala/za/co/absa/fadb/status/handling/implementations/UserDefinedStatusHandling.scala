@@ -26,7 +26,7 @@ import za.co.absa.fadb.status.{FailedOrRow, Row}
 trait UserDefinedStatusHandling extends StatusHandling {
   def OKStatuses: Set[Integer]
 
-  override def checkStatus[A](statusWithData: Row[A]): FailedOrRow[A] =
+  override def checkStatus[D](statusWithData: Row[D]): FailedOrRow[D] =
     if (OKStatuses.contains(statusWithData.functionStatus.statusCode)) {
       Right(statusWithData)
     } else {

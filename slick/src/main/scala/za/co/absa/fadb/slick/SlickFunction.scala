@@ -89,7 +89,7 @@ private[slick] trait SlickFunctionWithStatus[I, R] extends SlickFunctionBase[I, 
   }
 
   // Expected to be mixed in by an implementation of StatusHandling
-  def checkStatus[A](statusWithData: Row[A]): FailedOrRow[A]
+  def checkStatus[D](statusWithData: Row[D]): FailedOrRow[D]
 }
 
 object SlickFunction {

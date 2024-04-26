@@ -196,7 +196,7 @@ trait DoobieFunctionWithStatus[I, R, F[_]] extends DoobieFunctionBase[R] {
   }
 
   // This is to be mixed in by an implementation of StatusHandling
-  def checkStatus[A](statusWithData: Row[A]): FailedOrRow[A]
+  def checkStatus[D](statusWithData: Row[D]): FailedOrRow[D]
 }
 
 /**

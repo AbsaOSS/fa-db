@@ -30,5 +30,5 @@ trait StatusHandling {
    *  @return Either a `StatusException` if the status code indicates an error, or the data (along with the status
     *          information so that it's retrievable) if the status code is successful.
    */
-  def checkStatus[A](statusWithData: Row[A]): FailedOrRow[A]
+  def checkStatus[D](statusWithData: Row[D]): FailedOrRow[D]
 }
