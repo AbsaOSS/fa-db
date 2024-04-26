@@ -52,7 +52,5 @@ trait QueryWithStatus[A, B, R] {
    *  @return the result of the query or a status exception
    */
   def getResultOrException(initialResult: A): FailedOrRow[R] =
-    toStatusExceptionOrData(
-      processStatus(initialResult)
-    )
+    toStatusExceptionOrData(processStatus(initialResult))
 }
