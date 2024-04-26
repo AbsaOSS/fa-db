@@ -48,14 +48,6 @@ lazy val commonJacocoReportSettings: JacocoReportSettings = JacocoReportSettings
 lazy val commonJacocoExcludes: Seq[String] = Seq(
 )
 
-enablePlugins(FlywayPlugin)
-flywayUrl := FlywayConfiguration.flywayUrl
-flywayUser := FlywayConfiguration.flywayUser
-flywayPassword := FlywayConfiguration.flywayPassword
-flywayLocations := FlywayConfiguration.flywayLocations
-flywaySqlMigrationSuffixes := FlywayConfiguration.flywaySqlMigrationSuffixes
-libraryDependencies ++= flywayDependencies
-
 lazy val parent = (project in file("."))
   .aggregate(faDbCore, faDBSlick, faDBDoobie)
   .settings(
@@ -110,4 +102,14 @@ lazy val faDBDoobie = (project in file("doobie"))
     jacocoExcludes := commonJacocoExcludes
   )
 
-sonatypeProfileName := "za.co.absa"
+lazy val flywaySettings = project
+  .enablePlugins(FlywayPlugin)
+  .settings(
+    flywayUrl := FlywayConfiguration.flywayUrl,
+    flywayUser := FlywayConfiguration.flywayUser,
+    flywayPassword := FlywayConfiguration.flywayPassword,
+    flywayLocations := FlywayConfiguration.flywayLocations,
+    flywaySqlMigrationSuffixes := FlywayConfiguration.flywaySqlMigrationSuffixes,
+    libraryDependencies ++= flywayDependencies
+  )
+addCommandAlias("flywayMigrate", "flywaySettings/flywayMigrate")
