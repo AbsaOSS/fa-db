@@ -22,7 +22,7 @@ object FlywayConfiguration {
   val flywayUrl = s"jdbc:postgresql://$host:$port/$database"
   val flywayUser = "postgres"
   val flywayPassword = "postgres"
-  val flywayLocations: Seq[String] = Seq("filesystem:database/src/main/postgres")
+  val flywayLocations: Seq[String] = Seq("filesystem:demo_database/src/main/postgres")
   val flywaySqlMigrationSuffixes: Seq[String] = Seq(".sql",".ddl")
 
 }

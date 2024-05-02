@@ -51,10 +51,6 @@ object Dependencies {
     )
   }
 
-  def examplesDependencies(scalaVersion: String): Seq[ModuleID] = {
-    slickDependencies(scalaVersion)
-  }
-
   def flywayDependencies: Seq[ModuleID] = {
     val postgresql = "org.postgresql" % "postgresql" % "42.6.0"
 
