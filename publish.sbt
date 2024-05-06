@@ -15,6 +15,9 @@
  */
 
 ThisBuild / organizationHomepage := Some(url("https://www.absa.africa"))
+
+sonatypeProfileName := "za.co.absa"
+
 ThisBuild / scmInfo := Some(
   ScmInfo(
     browseUrl = url("https://github.com/AbsaOSS/fa-db/tree/master"),
