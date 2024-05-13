@@ -108,7 +108,7 @@ class FaDbPostgresProfileIntegrationTest extends AsyncFlatSpec {
       InetString("168.0.0.1"),
       MacAddrString("12:34:56:78:90:ab")
     )
-    // because postgres does not fully support time zone as Java, so we need to clear test for later successful assert
+    // because postgres does not fully support time zone as Java, so we need to clear it for later successful assert
     val expected = input.copy(dateTime5 = input.dateTime5.toOffsetDateTime.toZonedDateTime)
 
     new TestSchema()(testDBEngine).testFunction(input).map(result => assert(result == expected))
