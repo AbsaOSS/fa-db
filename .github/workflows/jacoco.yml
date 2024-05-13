@@ -54,6 +54,8 @@ jobs:
         uses: olafurpg/setup-scala@v14
         with:
           java-version: "adopt@1.8"
+      - name: Prepare testing database
+        run: sbt flywayMigrate
       - name: Build and run all tests for code coverage
         run: sbt ++${{matrix.scala}} jacoco # We will need JaCoCo report in second job
       - name: Add coverage to PR
