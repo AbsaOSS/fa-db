@@ -58,10 +58,14 @@ jobs:
         uses: olafurpg/setup-scala@v14
         with:
           java-version: "adopt@1.8"
+      - name: Build and run unit tests
+        run: sbt ++${{matrix.scala}} test
       - name: Prepare testing database
         run: sbt flywayMigrate
-      - name: Build and run tests
-        run: sbt ++${{matrix.scala}} jacoco doc # We will need JaCoCo report in second job
+      - name: Build and run integration tests
+        run: sbt ++${{matrix.scala}} testIT doc
+      - name: Build and run all tests for code coverage
+        run: sbt ++${{matrix.scala}} jacoco # We will need JaCoCo report in second job
       - uses: actions/cache/save@v3
         with:
           path: |

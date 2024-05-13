@@ -25,9 +25,8 @@ import doobie.implicits.toSqlInterpolator
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.doobie.DoobieFunction.DoobieMultipleResultFunction
-import za.co.absa.fadb.tags.IntegrationTestTag
 
-class DoobieMultipleResultFunctionTest extends AnyFunSuite with DoobieTest {
+class DoobieMultipleResultFunctionIntegrationTest extends AnyFunSuite with DoobieTest {
 
   implicit def toFragmentsFunctionSemigroup[T]: Semigroup[T => Seq[Fragment]] = {
     (f1: T => Seq[Fragment], f2: T => Seq[Fragment]) => (params: T) => f1(params) ++ f2(params)
@@ -52,7 +51,7 @@ class DoobieMultipleResultFunctionTest extends AnyFunSuite with DoobieTest {
 
   private val getActors = new GetActors()(Integration, new DoobieEngine(transactor))
 
-  test("Retrieving actor from database", IntegrationTestTag) {
+  test("Retrieving actor from database") {
     val expectedResultElem = Actor(49, "Pavel", "Marek")
     val results = getActors(GetActorsQueryParameters(Some("Pavel"), Some("Marek"))).unsafeRunSync()
     assert(results.contains(expectedResultElem))

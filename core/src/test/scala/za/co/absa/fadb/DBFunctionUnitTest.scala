@@ -26,7 +26,7 @@ import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits.namingCo
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class DBFunctionSuite extends AnyFunSuite {
+class DBFunctionUnitTest extends AnyFunSuite {
 
   private def neverHappens: Nothing = {
     throw new Exception("Should never get here")

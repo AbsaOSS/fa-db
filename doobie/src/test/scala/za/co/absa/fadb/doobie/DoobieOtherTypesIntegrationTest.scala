@@ -25,13 +25,12 @@ import za.co.absa.fadb.doobie.DoobieFunction.{DoobieSingleResultFunction, Doobie
 import za.co.absa.fadb.exceptions.DataConflictException
 import za.co.absa.fadb.status.FunctionStatus
 import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
-import za.co.absa.fadb.tags.IntegrationTestTag
 
 import java.net.InetAddress
 import java.util.UUID
 
 
-class DoobieOtherTypesTest extends AnyFunSuite with DoobieTest {
+class DoobieOtherTypesIntegrationTest extends AnyFunSuite with DoobieTest {
 
   import doobie.postgres.implicits._
 
@@ -72,7 +71,7 @@ class DoobieOtherTypesTest extends AnyFunSuite with DoobieTest {
   private val readOtherTypes = new ReadOtherTypes()(Integration, new DoobieEngine(transactor))
   private val insertOtherTypes = new InsertOtherTypes()(Integration, new DoobieEngine(transactor))
 
-  test("Reading other common data types from database", IntegrationTestTag) {
+  test("Reading other common data types from database") {
     val expectedData = OtherTypesData(
       id = 1,
       ltreeCol = "Top.Science.Astronomy",
@@ -100,7 +99,7 @@ class DoobieOtherTypesTest extends AnyFunSuite with DoobieTest {
     assert(result.arrayCol sameElements expectedData.arrayCol)
   }
 
-  test("Writing other common data types to database", IntegrationTestTag) {
+  test("Writing other common data types to database") {
     val data = OtherTypesData(
       id = 1,
       ltreeCol = "Top.Science.Astronomy",

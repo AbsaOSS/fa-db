@@ -22,16 +22,15 @@ import doobie.implicits.toSqlInterpolator
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.doobie.DoobieFunction.DoobieOptionalResultFunction
-import za.co.absa.fadb.tags.IntegrationTestTag
 
-class DoobieOptionalResultFunctionTest extends AnyFunSuite with DoobieTest {
+class DoobieOptionalResultFunctionIntegrationTest extends AnyFunSuite with DoobieTest {
 
   class GetActorById(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
     extends DoobieOptionalResultFunction[Int, Actor, IO](id => Seq(fr"$id"))
 
   private val getActorById = new GetActorById()(Integration, new DoobieEngine(transactor))
 
-  test("Retrieve actor by id from database", IntegrationTestTag) {
+  test("Retrieve actor by id from database") {
     val expectedResult = Some(Actor(49, "Pavel", "Marek"))
     val result = getActorById(49).unsafeRunSync()
     assert(expectedResult == result)

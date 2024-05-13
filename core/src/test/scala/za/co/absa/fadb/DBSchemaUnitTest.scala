@@ -19,7 +19,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.naming.NamingConvention
 import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits.namingConvention
 
-class DBSchemaSuite extends AnyFunSuite {
+class DBSchemaUnitTest extends AnyFunSuite {
 
   test("schema name default") {
     class Foo extends DBSchema

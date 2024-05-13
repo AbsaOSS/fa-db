@@ -16,20 +16,17 @@
 
 package za.co.absa.fadb.slick
 
-import cats.implicits.catsSyntaxApplicativeError
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuite
 import slick.jdbc.SQLActionBuilder
 import za.co.absa.fadb.DBSchema
+import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
 import za.co.absa.fadb.slick.SlickFunction.SlickMultipleResultFunction
-import za.co.absa.fadb.tags.IntegrationTestTag
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
 
 
-class SlickMultipleResultFunctionTest extends AnyFunSuite with SlickTest with ScalaFutures {
+class SlickMultipleResultFunctionIntegrationTest extends AnyFunSuite with SlickTest with ScalaFutures {
 
   class GetActors(implicit override val schema: DBSchema, val dbEngine: SlickPgEngine)
     extends SlickMultipleResultFunction[GetActorsQueryParameters, Actor]
@@ -44,7 +41,7 @@ class SlickMultipleResultFunctionTest extends AnyFunSuite with SlickTest with Sc
 
   private val getActors = new GetActors()(Integration, new SlickPgEngine(db))
 
-  test("Retrieving actors from database", IntegrationTestTag) {
+  test("Retrieving actors from database") {
     val expectedResultElem = Actor(49, "Pavel", "Marek")
     val results = getActors(GetActorsQueryParameters(Some("Pavel"), Some("Marek")))
     assert(results.futureValue.contains(expectedResultElem))

@@ -186,10 +186,6 @@ How to execute the `integration` tests only:
 ```sbt
 sbt testIT
 ```
-How to execute the `all` tests:
-```sbt
-sbt testAll
-```
 
 ## How to Release
 

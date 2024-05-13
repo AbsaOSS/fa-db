@@ -22,7 +22,7 @@ import za.co.absa.fadb.FunctionStatusWithData
 import za.co.absa.fadb.exceptions._
 import za.co.absa.fadb.status.FunctionStatus
 
-class StandardStatusHandlingTest extends AnyFunSuiteLike {
+class StandardStatusHandlingUnitTest extends AnyFunSuiteLike {
 
   private val standardQueryStatusHandling = new StandardStatusHandling {}
 

@@ -23,9 +23,8 @@ import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.doobie.DoobieFunction.{DoobieSingleResultFunction, DoobieSingleResultFunctionWithStatus}
 import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
-import za.co.absa.fadb.tags.IntegrationTestTag
 
-class DatesTimesTest extends AnyFunSuite with DoobieTest {
+class DatesTimesIntegrationTest extends AnyFunSuite with DoobieTest {
 
   // these imports are needed
   import doobie.implicits.javasql._
@@ -68,7 +67,7 @@ class DatesTimesTest extends AnyFunSuite with DoobieTest {
   private val getAllDateTimeTypes = new GetAllDateTimeTypes()(Integration, new DoobieEngine(transactor))
   private val insertDatesTimes = new InsertDatesTimes()(Integration, new DoobieEngine(transactor))
 
-  test("Reading different date/time types from the database", IntegrationTestTag) {
+  test("Reading different date/time types from the database") {
     val offsetDateTime = java.time.OffsetDateTime.parse("2004-10-19T08:23:54Z")
     val instant = java.time.Instant.parse("2004-10-19T08:23:54Z")
     val zonedDateTime = java.time.ZonedDateTime.parse("2004-10-19T08:23:54Z")
@@ -106,7 +105,7 @@ class DatesTimesTest extends AnyFunSuite with DoobieTest {
     assert(expectedDatesTimes.utilDate == result.utilDate)
   }
 
-  test("Writing different date/time types to the database", IntegrationTestTag) {
+  test("Writing different date/time types to the database") {
     val offsetDateTime = java.time.OffsetDateTime.parse("2004-10-19T08:23:54Z")
     val instant = java.time.Instant.parse("2004-10-19T08:23:54Z")
     val zonedDateTime = java.time.ZonedDateTime.parse("2004-10-19T10:23:54+02:00[Europe/Prague]")

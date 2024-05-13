@@ -23,18 +23,17 @@ import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits._
 import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
 import za.co.absa.fadb.slick.SlickFunction.SlickSingleResultFunction
-import za.co.absa.fadb.tags.IntegrationTestTag
 
 import java.time._
 import java.util.UUID
 
-class FaDbPostgresProfileSuite extends AsyncFlatSpec {
+class FaDbPostgresProfileIntegrationTest extends AsyncFlatSpec {
 
   private val database = Database.forConfig("postgrestestdb")
   private val testDBEngine: SlickPgEngine = new SlickPgEngine(database)
 
   behavior of "FaDbPostgresProfile"
-  it should "be able to pass through and extract extended Postgres types" taggedAs(IntegrationTestTag) in {
+  it should "be able to pass through and extract extended Postgres types" in {
 
     case class InputOutput(
       uuid1: UUID, // uuid
@@ -116,7 +115,7 @@ class FaDbPostgresProfileSuite extends AsyncFlatSpec {
 
   }
 
-  it should "be able to pass through and extract extended Postgres types as Options" taggedAs(IntegrationTestTag) in {
+  it should "be able to pass through and extract extended Postgres types as Options" in {
 
     case class InputOutput(
       uuid1: Option[UUID], // uuid
