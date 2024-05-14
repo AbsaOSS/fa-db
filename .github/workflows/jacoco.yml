@@ -106,3 +106,9 @@ jobs:
         with:
           script: |
             core.setFailed('Changed files coverage is less than ${{ env.COVERAGE_CHANGED_EXPECTATION }}%!')
+      - name: Fail PR if total files coverage is less than ${{ env.COVERAGE_OVERALL_EXPECTATION }}%
+        if: ${{ steps.jacoco-core.outputs.coverage-overall < 80.0 && steps.jacoco-slick.outputs.coverage-overall < 80.0 && steps.jacoco-doobie.outputs.coverage-overall < 80.0 }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.setFailed('Total files coverage is less than ${{ env.COVERAGE_OVERALL_EXPECTATION }}%!')
