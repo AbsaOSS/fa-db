@@ -41,9 +41,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - scala: 2.12.17
-          - scala: 2.13.12
+        scala: [2.12.17, 2.13.12]
     name: Build and test
     steps:
       - name: Checkout code
