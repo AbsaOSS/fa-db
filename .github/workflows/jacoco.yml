@@ -38,14 +38,11 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - scala: 2.13.12
-            scalaShort: "2.13"
-            overall: 75.0
-            changed: 80.0
+    env:
+      SCALA_VERSION: "2.13.12"
+      SCALA_SHORT_VERSION: "2.13"
+      COVERAGE_OVERALL_EXPECTATION: 75.0
+      COVERAGE_CHANGED_EXPECTATION: 80.0
     name: Build and run JaCoCo
     steps:
       - name: Checkout code
@@ -57,17 +54,17 @@ jobs:
       - name: Prepare testing database
         run: sbt flywayMigrate
       - name: Build and run all tests for code coverage
-        run: sbt ++${{matrix.scala}} jacoco # We will need JaCoCo report in second job
+        run: sbt ++${{env.scala}} jacoco # We will need JaCoCo report in second job
       - name: Add coverage to PR
         id: jacoco-core
         uses: madrapps/jacoco-report@v1.6.1
         with:
           paths: >
-            ${{ github.workspace }}/core/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
+            ${{ github.workspace }}/core/target/scala-${{ env.scalaShort }}/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: ${{ matrix.overall }}
-          min-coverage-changed-files: ${{ matrix.changed }}
-          title: JaCoCo core code coverage report - scala ${{ matrix.scala }}
+          min-coverage-overall: ${{ env.overall }}
+          min-coverage-changed-files: ${{ env.changed }}
+          title: JaCoCo core code coverage report - scala ${{ env.scala }}
           update-comment: true
       - name: Get the Coverage info
         run: |
@@ -78,11 +75,11 @@ jobs:
         uses: madrapps/jacoco-report@v1.6.1
         with:
           paths: >
-            ${{ github.workspace }}/slick/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
+            ${{ github.workspace }}/slick/target/scala-${{ env.scalaShort }}/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: ${{ matrix.overall }}
-          min-coverage-changed-files: ${{ matrix.changed }}
-          title: JaCoCo slick code coverage report - scala ${{ matrix.scala }}
+          min-coverage-overall: ${{ env.overall }}
+          min-coverage-changed-files: ${{ env.changed }}
+          title: JaCoCo slick code coverage report - scala ${{ env.scala }}
           update-comment: true
       - name: Get the Coverage info
         run: |
@@ -93,19 +90,19 @@ jobs:
         uses: madrapps/jacoco-report@v1.6.1
         with:
           paths: >
-            ${{ github.workspace }}/doobie/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
+            ${{ github.workspace }}/doobie/target/scala-${{ env.scalaShort }}/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: ${{ matrix.overall }}
-          min-coverage-changed-files: ${{ matrix.changed }}
-          title: JaCoCo code coverage report - scala ${{ matrix.scala }}
+          min-coverage-overall: ${{ env.overall }}
+          min-coverage-changed-files: ${{ env.changed }}
+          title: JaCoCo code coverage report - scala ${{ env.scala }}
           update-comment: true
       - name: Get the Coverage info
         run: |
           echo "Total doobie coverage ${{ steps.jacoco-doobiw.outputs.coverage-overall }}"
           echo "Changed doobie Files coverage ${{ steps.jacoco-doobie.outputs.coverage-changed-files }}"
-      - name: Fail PR if changed files coverage is less than ${{ matrix.changed }}%
+      - name: Fail PR if changed files coverage is less than ${{ env.changed }}%
         if: ${{ steps.jacoco.outputs-core.coverage-changed-files < 80.0 || steps.jacoco-slick.outputs.coverage-changed-files < 80.0 || steps.jacoco-doobie.outputs.coverage-changed-files < 80.0 }}
         uses: actions/github-script@v6
         with:
           script: |
-            core.setFailed('Changed files coverage is less than ${{ matrix.changed }}%!')
+            core.setFailed('Changed files coverage is less than ${{ env.changed }}%!')
