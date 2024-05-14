@@ -54,17 +54,17 @@ jobs:
       - name: Prepare testing database
         run: sbt flywayMigrate
       - name: Build and run all tests for code coverage
-        run: sbt ++${{env.scala}} jacoco # We will need JaCoCo report in second job
+        run: sbt ++${{env.SCALA_VERSION}} jacoco # We will need JaCoCo report in second job
       - name: Add coverage to PR
         id: jacoco-core
         uses: madrapps/jacoco-report@v1.6.1
         with:
           paths: >
-            ${{ github.workspace }}/core/target/scala-${{ env.scalaShort }}/jacoco/report/jacoco.xml
+            ${{ github.workspace }}/core/target/scala-${{ env.SCALA_SHORT_VERSION }}/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: ${{ env.overall }}
-          min-coverage-changed-files: ${{ env.changed }}
-          title: JaCoCo core code coverage report - scala ${{ env.scala }}
+          min-coverage-overall: ${{ env.COVERAGE_OVERALL_EXPECTATION }}
+          min-coverage-changed-files: ${{ env.COVERAGE_CHANGED_EXPECTATION }}
+          title: JaCoCo core code coverage report - scala ${{ env.SCALA_VERSION }}
           update-comment: true
       - name: Get the Coverage info
         run: |
@@ -75,11 +75,11 @@ jobs:
         uses: madrapps/jacoco-report@v1.6.1
         with:
           paths: >
-            ${{ github.workspace }}/slick/target/scala-${{ env.scalaShort }}/jacoco/report/jacoco.xml
+            ${{ github.workspace }}/slick/target/scala-${{ env.SCALA_SHORT_VERSION }}/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: ${{ env.overall }}
-          min-coverage-changed-files: ${{ env.changed }}
-          title: JaCoCo slick code coverage report - scala ${{ env.scala }}
+          min-coverage-overall: ${{ env.COVERAGE_OVERALL_EXPECTATION }}
+          min-coverage-changed-files: ${{ env.COVERAGE_CHANGED_EXPECTATION }}
+          title: JaCoCo slick code coverage report - scala ${{ env.SCALA_VERSION }}
           update-comment: true
       - name: Get the Coverage info
         run: |
@@ -90,19 +90,19 @@ jobs:
         uses: madrapps/jacoco-report@v1.6.1
         with:
           paths: >
-            ${{ github.workspace }}/doobie/target/scala-${{ env.scalaShort }}/jacoco/report/jacoco.xml
+            ${{ github.workspace }}/doobie/target/scala-${{ env.SCALA_SHORT_VERSION }}/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: ${{ env.overall }}
-          min-coverage-changed-files: ${{ env.changed }}
-          title: JaCoCo code coverage report - scala ${{ env.scala }}
+          min-coverage-overall: ${{ env.COVERAGE_OVERALL_EXPECTATION }}
+          min-coverage-changed-files: ${{ env.COVERAGE_CHANGED_EXPECTATION }}
+          title: JaCoCo code coverage report - scala ${{ env.SCALA_VERSION }}
           update-comment: true
       - name: Get the Coverage info
         run: |
           echo "Total doobie coverage ${{ steps.jacoco-doobiw.outputs.coverage-overall }}"
           echo "Changed doobie Files coverage ${{ steps.jacoco-doobie.outputs.coverage-changed-files }}"
-      - name: Fail PR if changed files coverage is less than ${{ env.changed }}%
+      - name: Fail PR if changed files coverage is less than ${{ env.COVERAGE_CHANGED_EXPECTATION }}%
         if: ${{ steps.jacoco.outputs-core.coverage-changed-files < 80.0 || steps.jacoco-slick.outputs.coverage-changed-files < 80.0 || steps.jacoco-doobie.outputs.coverage-changed-files < 80.0 }}
         uses: actions/github-script@v6
         with:
           script: |
-            core.setFailed('Changed files coverage is less than ${{ env.changed }}%!')
+            core.setFailed('Changed files coverage is less than ${{ env.COVERAGE_CHANGED_EXPECTATION }}%!')
