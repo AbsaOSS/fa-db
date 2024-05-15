@@ -20,7 +20,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import za.co.absa.fadb.naming.LettersCase._
 
-class SnakeCaseNamingUnitTest extends AnyWordSpec with Matchers {
+class SnakeCaseNamingUnitTests extends AnyWordSpec with Matchers {
   private class ThisIsATestClass
   private val testInstance = new ThisIsATestClass()
 

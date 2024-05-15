@@ -27,7 +27,7 @@ import za.co.absa.fadb.slick.SlickFunction.SlickSingleResultFunction
 import java.time._
 import java.util.UUID
 
-class FaDbPostgresProfileIntegrationTest extends AsyncFlatSpec {
+class FaDbPostgresProfileIntegrationTests extends AsyncFlatSpec {
 
   private val database = Database.forConfig("postgrestestdb")
   private val testDBEngine: SlickPgEngine = new SlickPgEngine(database)

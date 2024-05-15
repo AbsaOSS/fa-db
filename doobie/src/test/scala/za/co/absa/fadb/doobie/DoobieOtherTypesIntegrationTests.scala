@@ -30,7 +30,7 @@ import java.net.InetAddress
 import java.util.UUID
 
 
-class DoobieOtherTypesIntegrationTest extends AnyFunSuite with DoobieTest {
+class DoobieOtherTypesIntegrationTests extends AnyFunSuite with DoobieTest {
 
   import doobie.postgres.implicits._
 

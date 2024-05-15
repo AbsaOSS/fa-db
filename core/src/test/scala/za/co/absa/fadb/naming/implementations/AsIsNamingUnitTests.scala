@@ -14,28 +14,23 @@
  * limitations under the License.
  */
 
-package za.co.absa.fadb.naming
+package za.co.absa.fadb.naming.implementations
 
+import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
-import za.co.absa.fadb.exceptions.NamingException
+import za.co.absa.fadb.naming.LettersCase
 
-class ExplicitNamingRequiredPerConventionUnitTest extends AnyWordSpec with Matchers {
-  private val explicitNamingRequired = new ExplicitNamingRequired()
+class AsIsNamingUnitTests extends AnyFunSuiteLike with Matchers {
 
-  "stringPerConvention" should {
-    "fail" in {
-      intercept[NamingException] {
-        explicitNamingRequired.stringPerConvention("")
-      }
-    }
+  val asIsNaming = new AsIsNaming(LettersCase.AsIs)
+
+  test("AsIsNaming should return the same string") {
+    val input = "testString"
+    val expectedOutput = "testString"
+
+    val output = asIsNaming.stringPerConvention(input)
+
+    output shouldEqual expectedOutput
   }
 
-  "fromClassNamePerConvention" should {
-    "fail" in {
-      intercept[NamingException] {
-        explicitNamingRequired.fromClassNamePerConvention(this)
-      }
-    }
-  }
 }

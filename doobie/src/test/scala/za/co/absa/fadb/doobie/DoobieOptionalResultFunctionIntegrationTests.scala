@@ -23,7 +23,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.doobie.DoobieFunction.DoobieOptionalResultFunction
 
-class DoobieOptionalResultFunctionIntegrationTest extends AnyFunSuite with DoobieTest {
+class DoobieOptionalResultFunctionIntegrationTests extends AnyFunSuite with DoobieTest {
 
   class GetActorById(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
     extends DoobieOptionalResultFunction[Int, Actor, IO](id => Seq(fr"$id"))

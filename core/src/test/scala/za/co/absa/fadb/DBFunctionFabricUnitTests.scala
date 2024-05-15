@@ -4,7 +4,7 @@ import org.scalatest.funsuite.AnyFunSuiteLike
 
 import za.co.absa.fadb.naming.implementations.SnakeCaseNaming.Implicits._
 
-class DBFunctionFabricUnitTest extends AnyFunSuiteLike {
+class DBFunctionFabricUnitTests extends AnyFunSuiteLike {
 
   implicit object TestSchema extends DBSchema
 

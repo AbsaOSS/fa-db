@@ -19,7 +19,7 @@ package za.co.absa.fadb.doobie
 import doobie.util.meta.Meta
 import org.scalatest.funsuite.AnyFunSuite
 
-class AvailableMetaInstancesUnitTest extends AnyFunSuite {
+class AvailableMetaInstancesUnitTests extends AnyFunSuite {
 
   test("Meta[java.time.OffsetDateTime] available from doobie.implicits.javatimedrivernative") {
     import doobie.implicits.javatimedrivernative.JavaOffsetDateTimeMeta

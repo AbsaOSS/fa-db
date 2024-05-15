@@ -26,7 +26,7 @@ import za.co.absa.fadb.doobie.DoobieFunction.DoobieSingleResultFunctionWithStatu
 import za.co.absa.fadb.exceptions.StatusException
 import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
 
-class DoobieSingleResultFunctionWithStatusIntegrationTest extends AnyFunSuite with DoobieTest {
+class DoobieSingleResultFunctionWithStatusIntegrationTests extends AnyFunSuite with DoobieTest {
 
   class CreateActor(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
       extends DoobieSingleResultFunctionWithStatus[CreateActorRequestBody, Int, IO] (

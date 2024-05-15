@@ -23,7 +23,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.doobie.DoobieFunction.DoobieSingleResultFunction
 
-class DoobieSingleResultFunctionIntegrationTest extends AnyFunSuite with DoobieTest {
+class DoobieSingleResultFunctionIntegrationTests extends AnyFunSuite with DoobieTest {
 
   class CreateActor(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
       extends DoobieSingleResultFunction[CreateActorRequestBody, Int, IO] (

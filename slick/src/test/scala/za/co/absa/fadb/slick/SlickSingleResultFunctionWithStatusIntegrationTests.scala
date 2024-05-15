@@ -26,7 +26,7 @@ import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class SlickSingleResultFunctionWithStatusIntegrationTest extends AnyFunSuite with SlickTest with ScalaFutures {
+class SlickSingleResultFunctionWithStatusIntegrationTests extends AnyFunSuite with SlickTest with ScalaFutures {
   class CreateActor(implicit schema: DBSchema, dbEngine: SlickPgEngine)
       extends SlickSingleResultFunctionWithStatus[CreateActorRequestBody, Int]
       with StandardStatusHandling {

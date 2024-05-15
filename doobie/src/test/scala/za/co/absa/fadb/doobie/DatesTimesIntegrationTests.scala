@@ -24,7 +24,7 @@ import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.doobie.DoobieFunction.{DoobieSingleResultFunction, DoobieSingleResultFunctionWithStatus}
 import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
 
-class DatesTimesIntegrationTest extends AnyFunSuite with DoobieTest {
+class DatesTimesIntegrationTests extends AnyFunSuite with DoobieTest {
 
   // these imports are needed
   import doobie.implicits.javasql._

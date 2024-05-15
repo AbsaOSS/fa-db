@@ -19,7 +19,7 @@ package za.co.absa.fadb.naming
 import org.scalatest.funsuite.AnyFunSuiteLike
 import za.co.absa.fadb.exceptions.NamingException
 
-class ExplicitNamingRequiredUnitTest extends AnyFunSuiteLike {
+class ExplicitNamingRequiredUnitTests extends AnyFunSuiteLike {
 
   test("ExplicitNamingRequired throws NamingException for any string") {
     val namingConvention = new ExplicitNamingRequired()
