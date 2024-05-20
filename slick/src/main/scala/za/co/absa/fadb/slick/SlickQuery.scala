@@ -64,9 +64,9 @@ class SlickQueryWithStatus[R](
     checkStatus(statusWithData) match {
       case Left(statusException)  => Left(statusException)
       case Right(value) =>
-        val s = value.functionStatus
-        val d = getResult(value.data)
-        Right(Row(s, d))
+        val status = value.functionStatus
+        val data = getResult(value.data)
+        Right(Row(status, data))
     }
   }
 
