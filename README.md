@@ -183,6 +183,7 @@ within a ZIO application. Please see [this file](doobie/zio-setup.md) for more d
 ```sbt
 sbt jacoco
 ```
+Note: this command will start all tests in the project.
 
 Code coverage will be generated on path:
 
@@ -196,12 +197,15 @@ There are now integration tests as part of the project (at the time of writing t
 the _Slick_ and _Doobie_ modules).
 
 For the tests to work properly a running Postgres instance is needed as well as all DB objects must be placed on the DB.
-We automated this process, see `database/README.md` for more details.
+We automated this process, see [demo_database/README.md](https://github.com/AbsaOSS/fa-db/tree/master/demo_database#readme) for more details.
 
-How to execute the tests:
-
+How to execute the `unit` tests only:
 ```sbt
-sbt it:test
+sbt test
+```
+How to execute the `integration` tests only:
+```sbt
+sbt testIT
 ```
 
 ## How to Release

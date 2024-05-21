@@ -25,87 +25,34 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: movies
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - scala: 2.12.17
-            scalaShort: "2.12"
-            overall: 0.0
-            changed: 80.0
-          - scala: 2.13.12
-            scalaShort: "2.13"
-            overall: 0.0
-            changed: 80.0
+        scala: [2.12.17, 2.13.12]
     name: Build and test
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Setup Scala
-        uses: olafurpg/setup-scala@v10
+        uses: olafurpg/setup-scala@v14
         with:
           java-version: "adopt@1.8"
-      - name: Build and run tests
-        run: sbt ++${{matrix.scala}} jacoco doc # We will need JaCoCo report in second job
-      - uses: actions/cache/save@v3
-        with:
-          path: |
-            ${{ github.workspace }}/core/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
-            ${{ github.workspace }}/slick/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
-            ${{ github.workspace }}/doobie/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
-          key: ${{ runner.os }}-${{ matrix.scalaShort }}-${{ hashFiles('**/jacoco.xml') }}
-
-  jacoco:
-    runs-on: ubuntu-latest
-    needs: build
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - scala: 2.12.17
-            scalaShort: "2.12"
-            overall: 0.0
-            changed: 80.0
-          - scala: 2.13.12
-            scalaShort: "2.13"
-            overall: 0.0
-            changed: 80.0
-    name: JaCoCo Code Coverage ${{matrix.scala}}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - uses: actions/cache/restore@v3
-        with:
-          path: |
-            ${{ github.workspace }}/core/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
-            ${{ github.workspace }}/slick/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
-            ${{ github.workspace }}/doobie/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
-          key: ${{ runner.os }}-${{ matrix.scalaShort }}-${{ hashFiles('**/jacoco.xml') }}
-      - name: Setup Scala
-        uses: olafurpg/setup-scala@v10
-        with:
-          java-version: "adopt@1.8"
-      - name: Add coverage to PR
-        id: jacoco
-        uses: madrapps/jacoco-report@v1.5
-        with:
-          paths: >
-            ${{ github.workspace }}/core/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml,
-            ${{ github.workspace }}/slick/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml,
-            ${{ github.workspace }}/doobie/target/scala-${{ matrix.scalaShort }}/jacoco/report/jacoco.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: ${{ matrix.overall }}
-          min-coverage-changed-files: ${{ matrix.changed }}
-          title: JaCoCo code coverage report - scala ${{ matrix.scala }}
-          update-comment: true
-      - name: Get the Coverage info
-        run: |
-          echo "Total coverage ${{ steps.jacoco.outputs.coverage-overall }}"
-          echo "Changed Files coverage ${{ steps.jacoco.outputs.coverage-changed-files }}"
-# temporarily disabled until we have a better way how to test against a database
-#      - name: Fail PR if changed files coverage is less than ${{ matrix.changed }}%
-#        if: ${{ steps.jacoco.outputs.coverage-changed-files < 80.0 }}
-#        uses: actions/github-script@v6
-#        with:
-#          script: |
-#            core.setFailed('Changed files coverage is less than ${{ matrix.changed }}%!')
+      - name: Build and run unit tests
+        run: sbt ++${{matrix.scala}} test
+      - name: Prepare testing database
+        run: sbt flywayMigrate
+      - name: Build and run integration tests
+        run: sbt ++${{matrix.scala}} testIT doc
