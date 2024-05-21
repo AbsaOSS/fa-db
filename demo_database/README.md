@@ -24,9 +24,11 @@ docker rm aul_db
 ```
 
 ### Using local postgres instance
+- create database `movies`
+- create required extension in file `V1.1.1__01_add_extensions.ddl`
 
+- migrate scripts
 ```zsh
-# migrate scripts
 sbt flywayMigrate
 ```
 
