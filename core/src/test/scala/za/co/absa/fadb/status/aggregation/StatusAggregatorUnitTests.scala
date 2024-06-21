@@ -18,13 +18,13 @@ package za.co.absa.fadb.status.aggregation
 
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.exceptions._
-import za.co.absa.fadb.status.{FailedOrRowSet, FailedOrRow, FunctionStatus, Row}
+import za.co.absa.fadb.status.{FailedOrRows, FailedOrRow, FunctionStatus, Row}
 
 class StatusAggregatorUnitTests extends AnyFunSuite {
 
   private val aggregateByFirstRowUnderTest: StatusAggregator = new StatusAggregator {
     override def aggregate[R](statusesWithData: Seq[FailedOrRow[R]]):
-    FailedOrRowSet[R] = Right(Seq.empty)
+    FailedOrRows[R] = Right(Seq.empty)
   }
 
   test("gatherExceptions should return empty Seq on empty input") {

@@ -46,5 +46,5 @@ package object status {
     *
     * Note: D here represents a single row reduced by status-related columns, i.e. a type of data.
     */
-  type FailedOrRowSet[D] = Either[StatusException, Seq[Row[D]]]
+  type FailedOrRows[D] = Either[StatusException, Seq[Row[D]]]
 }

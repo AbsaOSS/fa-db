@@ -20,7 +20,7 @@ import cats.MonadError
 import cats.implicits.toFlatMapOps
 import za.co.absa.fadb.status.aggregation.StatusAggregator
 import za.co.absa.fadb.status.handling.StatusHandling
-import za.co.absa.fadb.status.{FailedOrRowSet, FailedOrRow, Row}
+import za.co.absa.fadb.status.{FailedOrRows, FailedOrRow, Row}
 
 import scala.language.higherKinds
 
@@ -247,7 +247,7 @@ object DBFunction {
       *               type `R` wrapped around with Either, providing StatusException if raised
       */
     def apply(values: I)
-             (implicit me: MonadError[F, Throwable]): F[FailedOrRowSet[R]] =
+             (implicit me: MonadError[F, Throwable]): F[FailedOrRows[R]] =
       multipleResults(values).flatMap(data => me.pure(aggregate(data)))
   }
 

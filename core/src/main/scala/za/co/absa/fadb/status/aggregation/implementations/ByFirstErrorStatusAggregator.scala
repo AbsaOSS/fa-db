@@ -17,7 +17,7 @@
 package za.co.absa.fadb.status.aggregation.implementations
 
 import za.co.absa.fadb.status.aggregation.StatusAggregator
-import za.co.absa.fadb.status.{FailedOrRowSet, FailedOrRow}
+import za.co.absa.fadb.status.{FailedOrRows, FailedOrRow}
 
 /**
   *  `ByFirstErrorStatusAggregator` is a trait that extends the `StatusAggregator` interface.
@@ -27,12 +27,12 @@ import za.co.absa.fadb.status.{FailedOrRowSet, FailedOrRow}
   */
 trait ByFirstErrorStatusAggregator extends StatusAggregator {
 
-  override def aggregate[R](statusesWithData: Seq[FailedOrRow[R]]): FailedOrRowSet[R] = {
+  override def aggregate[R](statusesWithData: Seq[FailedOrRow[R]]): FailedOrRows[R] = {
     val firstError = statusesWithData.find(_.isLeft)
 
     firstError match {
         case Some(errRowFound)    => Left(errRowFound.left.toOption.get)
-        case None                 => Right(gatherDataWithStatuses(statusesWithData))
+        case None                 => Right(StatusAggregator.gatherDataWithStatuses(statusesWithData))
     }
   }
 

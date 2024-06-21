@@ -47,7 +47,7 @@ class DoobieQueryWithStatus[R](
   /*
    * Processes the status of the query and returns the status with data
    * @param initialResult - the initial result of the query
-   * @return the status with data
+   * @return data with status
    */
   override def processStatus(initialResult: StatusWithData[R]): Row[R] =
     Row(FunctionStatus(initialResult.status, initialResult.statusText), initialResult.data)
