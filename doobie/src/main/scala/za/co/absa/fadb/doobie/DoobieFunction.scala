@@ -261,17 +261,34 @@ object DoobieFunction {
       with DoobieFunction[I, R, F]
 
   /**
-    *  `DoobieMultipleResultFunctionWithStatus` represents a db function that returns multiple results with statuses.
-    */
+   *  `DoobieMultipleResultFunctionWithStatus` represents a db function that returns multiple results with statuses.
+   */
   abstract class DoobieMultipleResultFunctionWithStatus[I, R, F[_]](
-   override val toFragmentsSeq: I => Seq[Fragment],
-   functionNameOverride: Option[String] = None
+    override val toFragmentsSeq: I => Seq[Fragment],
+    functionNameOverride: Option[String] = None
   )(implicit
-   override val schema: DBSchema,
-   val dbEngine: DoobieEngine[F],
-   val readR: Read[R]
+    override val schema: DBSchema,
+    val dbEngine: DoobieEngine[F],
+    val readR: Read[R]
   ) extends DBMultipleResultFunctionWithStatus[I, R, DoobieEngine[F], F](functionNameOverride)
-      with DoobieFunctionWithStatus[I, R, F]
+    with DoobieFunctionWithStatus[I, R, F]
+
+  /**
+   * `DoobieMultipleResultFunctionWithAggStatus` represents a db function that returns multiple results with statuses.
+   *
+   * It's similar as `DoobieMultipleResultFunctionWithStatus` but the statuses are aggregated into a single value.
+   *
+   * The algorithm for performing the aggregation is based on provided implementation of `StatusAggregator.aggregate`.
+   */
+  abstract class DoobieMultipleResultFunctionWithAggStatus[I, R, F[_]](
+    override val toFragmentsSeq: I => Seq[Fragment],
+    functionNameOverride: Option[String] = None
+  )(implicit
+    override val schema: DBSchema,
+    val dbEngine: DoobieEngine[F],
+    val readR: Read[R]
+  ) extends DBMultipleResultFunctionWithAggStatus[I, R, DoobieEngine[F], F](functionNameOverride)
+    with DoobieFunctionWithStatus[I, R, F]
 
   /**
    *  `DoobieOptionalResultFunction` represents a db function that returns an optional result.

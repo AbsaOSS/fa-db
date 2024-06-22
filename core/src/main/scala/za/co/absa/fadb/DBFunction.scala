@@ -231,8 +231,7 @@ object DBFunction {
   abstract class DBMultipleResultFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](
     functionNameOverride: Option[String] = None
   )(implicit schema: DBSchema, dBEngine: E)
-    extends DBFunctionWithStatus[I, R, E, F](functionNameOverride)
-      with StatusAggregator {
+    extends DBFunctionWithStatus[I, R, E, F](functionNameOverride) {
 
     // A constructor that takes only the mandatory parameters and uses default values for the optional ones
     def this()(implicit schema: DBSchema, dBEngine: E) = this(None)
@@ -246,6 +245,35 @@ object DBFunction {
       *  @return       - a sequence of values, each coming from a row returned from the DB function transformed to scala
       *               type `R` wrapped around with Either, providing StatusException if raised
       */
+    def apply(values: I)(implicit me: MonadError[F, Throwable]): F[Seq[FailedOrRow[R]]] = multipleResults(values)
+  }
+
+  /**
+   *  `DBMultipleResultFunctionWithAggStatus` is an abstract class that represents a database function returning
+   *  multiple results with status information.
+   *  It extends the [[DBFunctionWithStatus]] class and overrides the apply method to return a sequence of results
+   *
+   *  It's similar to `DBMultipleResultFunctionWithStatus` but the statuses are aggregated into a single value.
+   *  The algorithm for performing the aggregation is based on provided implementation of `StatusAggregator.aggregate`.
+   */
+  abstract class DBMultipleResultFunctionWithAggStatus[I, R, E <: DBEngine[F], F[_]](
+   functionNameOverride: Option[String] = None
+  )(implicit schema: DBSchema, dBEngine: E)
+    extends DBFunctionWithStatus[I, R, E, F](functionNameOverride)
+      with StatusAggregator {
+
+    // A constructor that takes only the mandatory parameters and uses default values for the optional ones
+    def this()(implicit schema: DBSchema, dBEngine: E) = this(None)
+
+    // A constructor that allows specifying the function name as a string, but not as an option
+    def this(functionName: String)(implicit schema: DBSchema, dBEngine: E) = this(Some(functionName))
+
+    /**
+     *  For easy and convenient execution of the DB function call
+     *  @param values - the values to pass over to the database function
+     *  @return       - a sequence of values, each coming from a row returned from the DB function transformed to scala
+     *               type `R` wrapped around with Either, providing StatusException if raised
+     */
     def apply(values: I)
              (implicit me: MonadError[F, Throwable]): F[FailedOrRows[R]] =
       multipleResults(values).flatMap(data => me.pure(aggregate(data)))

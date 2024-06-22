@@ -18,20 +18,15 @@ package za.co.absa.fadb.status.aggregation
 
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.exceptions._
-import za.co.absa.fadb.status.{FailedOrRows, FailedOrRow, FunctionStatus, Row}
+import za.co.absa.fadb.status.{FunctionStatus, Row}
 
 class StatusAggregatorUnitTests extends AnyFunSuite {
-
-  private val aggregateByFirstRowUnderTest: StatusAggregator = new StatusAggregator {
-    override def aggregate[R](statusesWithData: Seq[FailedOrRow[R]]):
-    FailedOrRows[R] = Right(Seq.empty)
-  }
 
   test("gatherExceptions should return empty Seq on empty input") {
     val testData = Seq.empty
     val expectedGatheredExceptions = Seq.empty
 
-    val actualGatheredExceptions = aggregateByFirstRowUnderTest.gatherExceptions(testData)
+    val actualGatheredExceptions = StatusAggregator.gatherExceptions(testData)
     assert(actualGatheredExceptions == expectedGatheredExceptions)
   }
 
@@ -48,7 +43,7 @@ class StatusAggregatorUnitTests extends AnyFunSuite {
       ErrorInDataException(FunctionStatus(50, "Some data error"))
     )
 
-    val actualGatheredExceptions = aggregateByFirstRowUnderTest.gatherExceptions(testData)
+    val actualGatheredExceptions = StatusAggregator.gatherExceptions(testData)
     assert(actualGatheredExceptions == expectedGatheredExceptions)
   }
 
@@ -56,7 +51,7 @@ class StatusAggregatorUnitTests extends AnyFunSuite {
     val testData = Seq.empty
     val expectedGatheredExceptions = Seq.empty
 
-    val actualGatheredExceptions = aggregateByFirstRowUnderTest.gatherDataWithStatuses(testData)
+    val actualGatheredExceptions = StatusAggregator.gatherDataWithStatuses(testData)
     assert(actualGatheredExceptions == expectedGatheredExceptions)
   }
 
@@ -74,7 +69,7 @@ class StatusAggregatorUnitTests extends AnyFunSuite {
       Row(FunctionStatus(10, "Ok"), ("FirstName3", "SecondName3")),
     )
 
-    val actualGatheredData = aggregateByFirstRowUnderTest.gatherDataWithStatuses(testData)
+    val actualGatheredData = StatusAggregator.gatherDataWithStatuses(testData)
     assert(actualGatheredData == expectedGatheredData)
   }
 

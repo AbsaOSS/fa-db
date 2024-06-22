@@ -20,39 +20,33 @@ import za.co.absa.fadb.exceptions.StatusException
 import za.co.absa.fadb.status.{FailedOrRows, FailedOrRow, Row}
 
 /**
- * `StatusAggregator` is a base trait that defines the interface for aggregating the error statuses of a function
- * invocation. It provides methods to aggregate the error statuses into a single status information - this is
- * typically needed for database functions that retrieve multiple records.
+ *  `StatusAggregator` is a base trait that defines the interface for aggregating the error statuses of a function
+ *  invocation. It provides methods to aggregate the error statuses into a single status information - this is
+ *  typically needed for database functions that retrieve multiple records.
  */
 trait StatusAggregator {
 
-
   /**
-   * Aggregates the error status information into a single error.
+   *  Aggregates the error status information into a single error.
    *
-   * @param statusesWithData - The status of the function invocation with data.
-   * @return Either a `StatusException` if the status code indicates an error, or the data (along with the status
+   *  @param statusesWithData - The status of the function invocation with data.
+   *  @return Either a `StatusException` if the status code indicates an error, or the data (along with the status
    *         information so that it's retrievable) if the status being returned doesn't indicate an error.
    */
   def aggregate[R](statusesWithData: Seq[FailedOrRow[R]]): FailedOrRows[R]
 }
 
 object StatusAggregator {
-  private[aggregation] def gatherExceptions[R](
-                                                eithersWithException: Seq[FailedOrRow[R]]
-                                              ): Seq[StatusException] = {
-
+  private[aggregation] def gatherExceptions[R](eithersWithException: Seq[FailedOrRow[R]]): Seq[StatusException] = {
     eithersWithException.flatMap {
       case Left(exception) => Some(exception)
-      case _ => None
+      case _               => None
     }
   }
 
-  private[aggregation] def gatherDataWithStatuses[R](
-                                                      eithersWithData: Seq[FailedOrRow[R]]
-                                                    ): Seq[Row[R]] = {
+  private[aggregation] def gatherDataWithStatuses[R](eithersWithData: Seq[FailedOrRow[R]]): Seq[Row[R]] = {
     eithersWithData.flatMap {
-      case Left(_) => None
+      case Left(_)                 => None
       case Right(dataWithStatuses) => Some(dataWithStatuses)
     }
   }

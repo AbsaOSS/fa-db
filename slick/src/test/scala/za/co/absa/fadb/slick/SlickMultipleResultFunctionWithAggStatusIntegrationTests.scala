@@ -21,18 +21,20 @@ import org.scalatest.funsuite.AnyFunSuite
 import slick.jdbc.SQLActionBuilder
 import za.co.absa.fadb.DBSchema
 import za.co.absa.fadb.slick.FaDbPostgresProfile.api._
-import za.co.absa.fadb.slick.SlickFunction.SlickMultipleResultFunctionWithStatus
-import za.co.absa.fadb.status.{FunctionStatus, Row}
+import za.co.absa.fadb.slick.SlickFunction.SlickMultipleResultFunctionWithAggStatus
+import za.co.absa.fadb.status.aggregation.implementations.ByFirstErrorStatusAggregator
 import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
+import za.co.absa.fadb.status.{FunctionStatus, Row}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
-class SlickMultipleResultFunctionWithStatusIntegrationTests extends AnyFunSuite with SlickTest with ScalaFutures {
+class SlickMultipleResultFunctionWithAggStatusIntegrationTests extends AnyFunSuite with SlickTest with ScalaFutures {
 
   class GetActorsByLastname(implicit override val schema: DBSchema, val dbEngine: SlickPgEngine)
-    extends SlickMultipleResultFunctionWithStatus[GetActorsByLastnameQueryParameters, Option[Actor]]
+    extends SlickMultipleResultFunctionWithAggStatus[GetActorsByLastnameQueryParameters, Option[Actor]]
       with StandardStatusHandling
+      with ByFirstErrorStatusAggregator
       with OptionalActorSlickConverter {
 
     override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("actor_id", "first_name", "last_name")
@@ -51,6 +53,12 @@ class SlickMultipleResultFunctionWithStatusIntegrationTests extends AnyFunSuite 
     )
 
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("Weasley")).futureValue
-    assert(results.toSet == expectedResultElem)
+    val actualData = results match {
+      case Left(_) => fail("should not be left")
+      case Right(dataWithStatuses) => dataWithStatuses
+    }
+    assert(actualData.length == 2)
+    assert(actualData.toSet == expectedResultElem)
+
   }
 }

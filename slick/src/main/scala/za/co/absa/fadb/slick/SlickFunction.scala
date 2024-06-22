@@ -139,6 +139,18 @@ object SlickFunction {
       with SlickFunctionWithStatus[I, R]
 
   /**
+   * Similar as `SlickMultipleResultFunctionWithStatus` but the statuses are aggregated into a single value.
+   * The algorithm for performing the aggregation is based on provided implementation of `StatusAggregator.aggregate`.
+   */
+  abstract class SlickMultipleResultFunctionWithAggStatus[I, R](
+    functionNameOverride: Option[String] = None
+  )(implicit
+    override val schema: DBSchema,
+    dBEngine: SlickPgEngine
+  ) extends DBMultipleResultFunctionWithAggStatus[I, R, SlickPgEngine, Future](functionNameOverride)
+    with SlickFunctionWithStatus[I, R]
+
+  /**
    *  Class for Slick DB functions with optional result.
    */
   abstract class SlickOptionalResultFunction[I, R](

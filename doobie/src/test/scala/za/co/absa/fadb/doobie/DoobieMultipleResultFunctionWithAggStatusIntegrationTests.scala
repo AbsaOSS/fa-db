@@ -22,12 +22,12 @@ import doobie.Fragment
 import doobie.implicits.toSqlInterpolator
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.fadb.DBSchema
-import za.co.absa.fadb.doobie.DoobieFunction.DoobieMultipleResultFunctionWithStatus
-import za.co.absa.fadb.exceptions.{DataNotFoundException, StatusException}
+import za.co.absa.fadb.doobie.DoobieFunction.DoobieMultipleResultFunctionWithAggStatus
+import za.co.absa.fadb.status.aggregation.implementations.ByMajorityErrorsStatusAggregator
 import za.co.absa.fadb.status.handling.implementations.StandardStatusHandling
 import za.co.absa.fadb.status.{FunctionStatus, Row}
 
-class DoobieMultipleResultFunctionWithStatusIntegrationTests extends AnyFunSuite with DoobieTest {
+class DoobieMultipleResultFunctionWithAggStatusIntegrationTests extends AnyFunSuite with DoobieTest {
 
   private val getActorsByLastnameQueryFragments: GetActorsByLastnameQueryParameters => Seq[Fragment] = {
     values => Seq(fr"${values.lastName}", fr"${values.firstName}")
@@ -35,8 +35,9 @@ class DoobieMultipleResultFunctionWithStatusIntegrationTests extends AnyFunSuite
 
   class GetActorsByLastname(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
   // Option[Actor] because: Actor might not exist, and the function would return only status info without actor data
-    extends DoobieMultipleResultFunctionWithStatus[GetActorsByLastnameQueryParameters, Option[Actor], IO](getActorsByLastnameQueryFragments)
-      with StandardStatusHandling {
+    extends DoobieMultipleResultFunctionWithAggStatus[GetActorsByLastnameQueryParameters, Option[Actor], IO](getActorsByLastnameQueryFragments)
+      with StandardStatusHandling
+      with ByMajorityErrorsStatusAggregator {
     override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("actor_id", "first_name", "last_name")
   }
 
@@ -49,7 +50,12 @@ class DoobieMultipleResultFunctionWithStatusIntegrationTests extends AnyFunSuite
     )
 
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("Weasley")).unsafeRunSync()
-    assert(results.toSet == expectedResultElem)
+    val actualData = results match {
+      case Left(_) => fail("should not be left")
+      case Right(dataWithStatuses) => dataWithStatuses
+    }
+    assert(actualData.length == expectedResultElem.size)
+    assert(actualData.toSet == expectedResultElem)
   }
 
   test("Retrieving single actor from database, full match") {
@@ -58,7 +64,13 @@ class DoobieMultipleResultFunctionWithStatusIntegrationTests extends AnyFunSuite
     )
 
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("Simpson", Some("Liza"))).unsafeRunSync()
-    assert(results.toSet == expectedResultElem)
+    val actualData = results match {
+      case Left(_) => fail("should not be left")
+      case Right(dataWithStatuses) => dataWithStatuses
+    }
+
+    assert(actualData.length == 1)
+    assert(actualData.head == expectedResultElem)
   }
 
   test("Retrieving single actor from database, lastname match") {
@@ -67,15 +79,22 @@ class DoobieMultipleResultFunctionWithStatusIntegrationTests extends AnyFunSuite
     )
 
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("Simpson")).unsafeRunSync()
-    assert(results.toSet == expectedResultElem)
+    val actualData = results match {
+      case Left(_) => fail("should not be left")
+      case Right(dataWithStatuses) => dataWithStatuses
+    }
+
+    assert(actualData.length == 1)
+    assert(actualData.head == expectedResultElem)
   }
 
   test("Retrieving non-existing actor from database, no match") {
-    val expectedErr = Left(DataNotFoundException(FunctionStatus(41, "No actor found")))
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("TotallyNonExisting!")).unsafeRunSync()
-
-    assert(results.length == 1)
-    assert(results.head.isLeft)
-    assert(results.head == expectedErr)
+    results match {
+      case Left(err) =>
+        assert(err.status.statusText == "No actor found")
+        assert(err.status.statusCode == 41)
+      case Right(_) => fail("should not be right")
+    }
   }
 }
