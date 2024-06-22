@@ -29,13 +29,15 @@ import za.co.absa.fadb.status.{FunctionStatus, Row}
 
 class DoobieMultipleResultFunctionWithStatusIntegrationTests extends AnyFunSuite with DoobieTest {
 
-  private val getActorsByLastnameQueryFragments: GetActorsByLastnameQueryParameters => Seq[Fragment] = {
-    values => Seq(fr"${values.lastName}", fr"${values.firstName}")
+  private val getActorsByLastnameQueryFragments: GetActorsByLastnameQueryParameters => Seq[Fragment] = { values =>
+    Seq(fr"${values.lastName}", fr"${values.firstName}")
   }
 
   class GetActorsByLastname(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
   // Option[Actor] because: Actor might not exist, and the function would return only status info without actor data
-    extends DoobieMultipleResultFunctionWithStatus[GetActorsByLastnameQueryParameters, Option[Actor], IO](getActorsByLastnameQueryFragments)
+      extends DoobieMultipleResultFunctionWithStatus[GetActorsByLastnameQueryParameters, Option[Actor], IO](
+        getActorsByLastnameQueryFragments
+      )
       with StandardStatusHandling {
     override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("actor_id", "first_name", "last_name")
   }
@@ -44,8 +46,8 @@ class DoobieMultipleResultFunctionWithStatusIntegrationTests extends AnyFunSuite
 
   test("Retrieving multiple actors from database, lastName match") {
     val expectedResultElem = Set(
-      Row(FunctionStatus(11, "OK, match on last name only"), Some(Actor(51, "Fred", "Weasley"))),
-      Row(FunctionStatus(11, "OK, match on last name only"), Some(Actor(52, "George", "Weasley"))),
+      Right(Row(FunctionStatus(11, "OK, match on last name only"), Some(Actor(51, "Fred", "Weasley")))),
+      Right(Row(FunctionStatus(11, "OK, match on last name only"), Some(Actor(52, "George", "Weasley"))))
     )
 
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("Weasley")).unsafeRunSync()
@@ -53,8 +55,8 @@ class DoobieMultipleResultFunctionWithStatusIntegrationTests extends AnyFunSuite
   }
 
   test("Retrieving single actor from database, full match") {
-    val expectedResultElem = Row(
-      FunctionStatus(12, "OK, full match"), Some(Actor(50, "Liza", "Simpson"))
+    val expectedResultElem = Set(
+      Right(Row(FunctionStatus(12, "OK, full match"), Some(Actor(50, "Liza", "Simpson"))))
     )
 
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("Simpson", Some("Liza"))).unsafeRunSync()
@@ -62,8 +64,8 @@ class DoobieMultipleResultFunctionWithStatusIntegrationTests extends AnyFunSuite
   }
 
   test("Retrieving single actor from database, lastname match") {
-    val expectedResultElem = Row(
-      FunctionStatus(11, "OK, match on last name only"), Some(Actor(50, "Liza", "Simpson"))
+    val expectedResultElem = Set(
+      Right(Row(FunctionStatus(11, "OK, match on last name only"), Some(Actor(50, "Liza", "Simpson"))))
     )
 
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("Simpson")).unsafeRunSync()

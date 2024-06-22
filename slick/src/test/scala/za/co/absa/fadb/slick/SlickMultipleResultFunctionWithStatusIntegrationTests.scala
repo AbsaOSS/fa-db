@@ -46,8 +46,8 @@ class SlickMultipleResultFunctionWithStatusIntegrationTests extends AnyFunSuite 
 
   test("Retrieving actors from database") {
     val expectedResultElem = Set(
-      Row(FunctionStatus(11, "OK, match on last name only"), Some(Actor(51, "Fred", "Weasley"))),
-      Row(FunctionStatus(11, "OK, match on last name only"), Some(Actor(52, "George", "Weasley")))
+      Right(Row(FunctionStatus(11, "OK, match on last name only"), Some(Actor(51, "Fred", "Weasley")))),
+      Right(Row(FunctionStatus(11, "OK, match on last name only"), Some(Actor(52, "George", "Weasley"))))
     )
 
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("Weasley")).futureValue
