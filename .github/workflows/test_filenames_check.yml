@@ -14,24 +14,28 @@
 # limitations under the License.
 #
 
-name: License Check
+name: Test Filenames Check
 
 on:
-  push:
-    branches: [ main, develop, master ]
   pull_request:
     branches: [ master ]
-    types: [ assigned, opened, synchronize, reopened, labeled ]
+    types: [ opened, synchronize, reopened ]
 
 jobs:
-  license-check:
-    name: License Check
+  test_filenames_check:
+    name: Test Filenames Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Setup Scala
-        uses: olafurpg/setup-scala@v10
+
+      - name: Filename Inspector
+        id: scan-test-files
+        uses: AbsaOSS/filename-inspector@master
         with:
-          java-version: "adopt@1.8"
-      - run: sbt headerCheck
+          name-patterns: '*UnitTests.*,*IntegrationTests.*'
+          paths: '**/src/test/scala/**'
+          report-format: 'console'
+          excludes: ''
+          verbose-logging: 'false'
+          fail-on-violation: 'true'

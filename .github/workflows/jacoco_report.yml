@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-name: Build
+name: JaCoCo Report
 
 on:
   push:
@@ -23,7 +23,8 @@ on:
       types: [ assigned, opened, synchronize, reopened, labeled ]
 
 jobs:
-  jacoco:
+  build-test-and-measure:
+    name: Build, Test and Measure
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -43,7 +44,6 @@ jobs:
       SCALA_SHORT_VERSION: "2.13"
       COVERAGE_OVERALL_EXPECTATION: 75.0
       COVERAGE_CHANGED_EXPECTATION: 80.0
-    name: Build and run JaCoCo
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
