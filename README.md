@@ -124,9 +124,11 @@ It brings:
 * `class SlickOptionalResultFunction` - abstract class for DB functions returning optional result
 * `class SlickSingleResultFunctionWithStatus` - abstract class for DB functions with status handling; it requires an 
   implementation of `StatusHandling` to be mixed-in (`StandardStatusHandling` available out-of-the-box)
-* `class SlickMultipleResultFunctionWithStatus` - as `SlickSingleResultFunctionWithStatus` but for multiple record 
-  retrieval, it requires an implementation of `StatusAggregator` to be mixed-in 
-  (`ByFirstErrorStatusAggregator`, `ByFirstRowStatusAggregator`, and `ByMajorityErrorsStatusAggregator` available 
+* `class SlickMultipleResultFunctionWithStatus` - as `SlickSingleResultFunctionWithStatus` but for multiple record
+  retrieval
+* `class SlickMultipleResultFunctionWithAggStatus` - as `SlickMultipleResultFunctionWithStatus` but it aggregates
+  the statuses into a single record. It requires an implementation of `StatusAggregator` to be mixed-in
+  (`ByFirstErrorStatusAggregator`, `ByFirstRowStatusAggregator`, and `ByMajorityErrorsStatusAggregator` available
   out of the box)
 * `class SlickOptionalResultFunctionWithStatus` - as `SlickSingleResultFunctionWithStatus` but the returning record 
   is optional
@@ -166,8 +168,10 @@ It brings:
 * `class DoobieOptionalResultFunction` - abstract class for DB functions returning optional result
 * `class DoobieSingleResultFunctionWithStatus` - abstract class for DB functions with status handling; it requires 
   an implementation of `StatusHandling` to be mixed-in (`StandardStatusHandling` available out-of-the-box)
-* `class DoobieMultipleResultFunctionWithStatus` - as `DoobieSingleResultFunctionWithStatus` but for multiple record 
-  retrieval, it requires an implementation of `StatusAggregator` to be mixed-in
+* `class DoobieMultipleResultFunctionWithStatus` - as `DoobieSingleResultFunctionWithStatus` but for multiple record
+  retrieval
+* `class DoobieMultipleResultFunctionWithAggStatus` - as `DoobieMultipleResultFunctionWithStatus` but it aggregates 
+  the statuses into a single record. It requires an implementation of `StatusAggregator` to be mixed-in
   (`ByFirstErrorStatusAggregator`, `ByFirstRowStatusAggregator`, and `ByMajorityErrorsStatusAggregator` available
   out of the box)
 * `class DoobieOptionalResultFunctionWithStatus` - as `DoobieSingleResultFunctionWithStatus` but the returning record 
