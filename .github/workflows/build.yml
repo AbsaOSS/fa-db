@@ -24,7 +24,7 @@ on:
 
 jobs:
   build-test-and-doc:
-    name: Build, test and doc
+    name: Build, Test and Doc
     runs-on: ubuntu-latest
     services:
       postgres:
