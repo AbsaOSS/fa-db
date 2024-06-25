@@ -24,9 +24,8 @@ on:
     types: [ assigned, opened, synchronize, reopened, labeled ]
 
 jobs:
-  jacoco:
-  build-test-and-measure:
-    name: Build, Test and Measure
+  jacoco-build-test-and-measure:
+    name: "JaCoCo: Build, Test and Measure"
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -44,9 +43,6 @@ jobs:
     env:
       SCALA_VERSION: "2.13.12"
       SCALA_SHORT_VERSION: "2.13"
-      COVERAGE_OVERALL_EXPECTATION: 75.0
-      COVERAGE_CHANGED_EXPECTATION: 80.0
-    name: Build and run JaCoCo
     steps:
       - name: Checkout code
         uses: actions/checkout@v2

@@ -32,8 +32,33 @@ ThisBuild / developers := List(
     name  = "David Benedeki",
     email = "david.benedeki@absa.africa",
     url   = url("https://github.com/benedeki")
+  ),
+  Developer(
+    id = "lsulak",
+    name = "Ladislav Sulak",
+    email = "ladislav.sulak@absa.africa",
+    url = url("https://github.com/lsulak")
+  ),
+  Developer(
+    id = "salamonpavel",
+    name = "Pavel Salamon",
+    email = "pavel.salamon@absa.africa",
+    url = url("https://github.com/salamonpavel")
+  ),
+  Developer(
+    id = "miroslavpojer",
+    name = "Miroslav Pojer",
+    email = "miroslav.pojer@absa.africa",
+    url = url("https://github.com/miroslavpojer")
+  ),
+  Developer(
+    id = "Zejnilovic",
+    name = "Saša Zejnilović",
+    email = "sasa.zejnilovic@absa.africa",
+    url = url("https://github.com/Zejnilovic")
   )
 )
+
 
 ThisBuild / homepage := Some(url("https://github.com/AbsaOSS/fa-DB"))
 ThisBuild / description := "DB data access via DB functions"
