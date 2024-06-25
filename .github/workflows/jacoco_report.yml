@@ -23,8 +23,8 @@ on:
     types: [ assigned, opened, synchronize, reopened, labeled ]
 
 jobs:
-  jacoco-build-test-and-measure:
-    name: "JaCoCo: Build, Test and Measure"
+  build-test-and-measure:
+    name: "Build, Test and Measure"
     runs-on: ubuntu-latest
     services:
       postgres:
