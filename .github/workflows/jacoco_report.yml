@@ -14,15 +14,17 @@
 # limitations under the License.
 #
 
+name: Build
 name: JaCoCo Report
 
 on:
   push:
     branches: [master ]
   pull_request:
-      types: [ assigned, opened, synchronize, reopened, labeled ]
+    types: [ assigned, opened, synchronize, reopened, labeled ]
 
 jobs:
+  jacoco:
   build-test-and-measure:
     name: Build, Test and Measure
     runs-on: ubuntu-latest
@@ -42,8 +44,9 @@ jobs:
     env:
       SCALA_VERSION: "2.13.12"
       SCALA_SHORT_VERSION: "2.13"
-      COVERAGE_OVERALL_EXPECTATION: 61.0
+      COVERAGE_OVERALL_EXPECTATION: 75.0
       COVERAGE_CHANGED_EXPECTATION: 80.0
+    name: Build and run JaCoCo
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -62,8 +65,8 @@ jobs:
           paths: >
             ${{ github.workspace }}/core/target/scala-${{ env.SCALA_SHORT_VERSION }}/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: ${{ env.COVERAGE_OVERALL_EXPECTATION }}
-          min-coverage-changed-files: ${{ env.COVERAGE_CHANGED_EXPECTATION }}
+          min-coverage-overall: ${{ 61.0 }}
+          min-coverage-changed-files: ${{ 80.0 }}
           title: JaCoCo core code coverage report - scala ${{ env.SCALA_VERSION }}
           update-comment: true
       - name: Get the Coverage info
@@ -77,8 +80,8 @@ jobs:
           paths: >
             ${{ github.workspace }}/slick/target/scala-${{ env.SCALA_SHORT_VERSION }}/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: ${{ env.COVERAGE_OVERALL_EXPECTATION }}
-          min-coverage-changed-files: ${{ env.COVERAGE_CHANGED_EXPECTATION }}
+          min-coverage-overall: ${{ 61.0 }}
+          min-coverage-changed-files: ${{ 80.0 }}
           title: JaCoCo slick code coverage report - scala ${{ env.SCALA_VERSION }}
           update-comment: true
       - name: Get the Coverage info
@@ -92,50 +95,24 @@ jobs:
           paths: >
             ${{ github.workspace }}/doobie/target/scala-${{ env.SCALA_SHORT_VERSION }}/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: ${{ env.COVERAGE_OVERALL_EXPECTATION }}
-          min-coverage-changed-files: ${{ env.COVERAGE_CHANGED_EXPECTATION }}
+          min-coverage-overall: ${{ 61.0 }}
+          min-coverage-changed-files: ${{ 80.0 }}
           title: JaCoCo doobie code coverage report - scala ${{ env.SCALA_VERSION }}
           update-comment: true
       - name: Get the Coverage info
         run: |
           echo "Total doobie coverage ${{ steps.jacoco-doobie.outputs.coverage-overall }}"
           echo "Changed doobie Files coverage ${{ steps.jacoco-doobie.outputs.coverage-changed-files }}"
-      - name: Fail PR if Core changed files coverage is less than ${{ env.COVERAGE_CHANGED_EXPECTATION }}%
-        if: ${{ Number(steps.jacoco-core.outputs.coverage-changed-files) < Number(env.COVERAGE_CHANGED_EXPECTATION) }}
+      - name: Fail PR if changed files coverage is less than ${{ 80.0 }}%
+        if: ${{ steps.jacoco-core.outputs.coverage-changed-files < 80.0 || steps.jacoco-slick.outputs.coverage-changed-files < 80.0 || steps.jacoco-doobie.outputs.coverage-changed-files < 80.0 }}
         uses: actions/github-script@v6
         with:
           script: |
-            core.setFailed('Core changed files coverage are ${{ steps.jacoco-core.outputs.coverage-changed-files }}%, less than ${{ env.COVERAGE_CHANGED_EXPECTATION }}%!')
-      - name: Fail PR if Slick changed files coverage is less than ${{ env.COVERAGE_CHANGED_EXPECTATION }}%
-        if: ${{ steps.jacoco-slick.outputs.coverage-changed-files < env.COVERAGE_CHANGED_EXPECTATION }}
+            core.setFailed('Changed files coverage is less than ${{ 80.0 }}%!')
+      - name: Fail PR if total files coverage is less than ${{ 61.0 }}%
+        if: ${{ steps.jacoco-core.outputs.coverage-overall < 75.0 || steps.jacoco-slick.outputs.coverage-overall < 75.0 || steps.jacoco-doobie.outputs.coverage-overall < 75.0 }}
         uses: actions/github-script@v6
         with:
           script: |
-            core.setFailed('Slick changed files coverage are ${{ steps.jacoco-slick.outputs.coverage-changed-files }}%, less than ${{ env.COVERAGE_CHANGED_EXPECTATION }}%!')
-      - name: Fail PR if Doobie changed files coverage is less than ${{ env.COVERAGE_CHANGED_EXPECTATION }}%
-        if: ${{ steps.jacoco-doobie.outputs.coverage-changed-files < env.COVERAGE_CHANGED_EXPECTATION }}
-        uses: actions/github-script@v6
-        with:
-          script: |
-            core.setFailed('Doobie changed files coverage are ${{ steps.jacoco-core.outputs.coverage-changed-files }}%, less than ${{ env.COVERAGE_CHANGED_EXPECTATION }}%!')
+            core.setFailed('Total files coverage is less than ${{ 61.0 }}%!')
 
-      - name: Fail PR if total Core files coverage is less than ${{ env.COVERAGE_OVERALL_EXPECTATION }}%
-        if: ${{ steps.jacoco-core.outputs.coverage-overall < env.COVERAGE_OVERALL_EXPECTATION }}
-        uses: actions/github-script@v6
-        with:
-          script: |
-            core.setFailed('Total files coverage is ${{ steps.jacoco-core.outputs.coverage-overall }}%, less than ${{ env.COVERAGE_OVERALL_EXPECTATION }}%!')
-
-      - name: Fail PR if total Slick files coverage is less than ${{ env.COVERAGE_OVERALL_EXPECTATION }}%
-        if: ${{ steps.jacoco-slick.outputs.coverage-overall < env.COVERAGE_OVERALL_EXPECTATION }}
-        uses: actions/github-script@v6
-        with:
-          script: |
-            core.setFailed('Total files coverage is ${{ steps.jacoco-slick.outputs.coverage-overall }}%, less than ${{ env.COVERAGE_OVERALL_EXPECTATION }}%!')
-
-      - name: Fail PR if total Doobie files coverage is less than ${{ env.COVERAGE_OVERALL_EXPECTATION }}%
-        if: ${{ steps.jacoco-doobie.outputs.coverage-overall < env.COVERAGE_OVERALL_EXPECTATION }}
-        uses: actions/github-script@v6
-        with:
-          script: |
-            core.setFailed('Total files coverage is ${{ steps.jacoco-doobie.outputs.coverage-overall }}%, less than ${{ env.COVERAGE_OVERALL_EXPECTATION }}%!')
