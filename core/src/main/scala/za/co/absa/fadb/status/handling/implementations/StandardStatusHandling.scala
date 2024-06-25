@@ -16,8 +16,8 @@
 
 package za.co.absa.fadb.status.handling.implementations
 
-import za.co.absa.fadb.FunctionStatusWithData
 import za.co.absa.fadb.exceptions._
+import za.co.absa.fadb.status.{FailedOrRow, Row}
 import za.co.absa.fadb.status.handling.StatusHandling
 
 /**
@@ -29,10 +29,10 @@ trait StandardStatusHandling extends StatusHandling {
   /**
    *  Checks the status of a function invocation.
    */
-  override def checkStatus[A](statusWithData: FunctionStatusWithData[A]): Either[StatusException, A] = {
+  override def checkStatus[D](statusWithData: Row[D]): FailedOrRow[D] = {
     val functionStatus = statusWithData.functionStatus
     functionStatus.statusCode / 10 match {
-      case 1             => Right(statusWithData.data)
+      case 1             => Right(statusWithData)
       case 2             => Left(ServerMisconfigurationException(functionStatus))
       case 3             => Left(DataConflictException(functionStatus))
       case 4             => Left(DataNotFoundException(functionStatus))

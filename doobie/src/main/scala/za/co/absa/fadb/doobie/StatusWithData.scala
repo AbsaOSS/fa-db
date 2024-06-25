@@ -17,6 +17,11 @@
 package za.co.absa.fadb.doobie
 
 /**
- *  Represents a function status with data.
+ *  Represents a function status with data (basically a row returned from a DB).
+ *
+ *  Note: data here represent one row that has status-related fields omitted. In some scenarios, it actually might
+ *    be missing - i.e. query returns only status information with no data - pretty common scenario when a DB
+ *    function returns error, e.g.: (41, 'NoDataFound', NULL). In this case, R must be an Option - to be specified
+ *    by a user.
  */
 case class StatusWithData[R](status: Int, statusText: String, data: R)

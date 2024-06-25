@@ -18,9 +18,8 @@ package za.co.absa.fadb.doobie
 
 import doobie.util.Read
 import doobie.util.fragment.Fragment
-import za.co.absa.fadb.exceptions.StatusException
-import za.co.absa.fadb.status.FunctionStatus
-import za.co.absa.fadb.{FunctionStatusWithData, Query, QueryWithStatus}
+import za.co.absa.fadb.status.{FailedOrRow, FunctionStatus, Row}
+import za.co.absa.fadb.{Query, QueryWithStatus}
 
 /**
  *  `DoobieQuery` is a class that extends `Query` with `R` as the result type.
@@ -41,23 +40,23 @@ class DoobieQuery[R](val fragment: Fragment)(implicit val readR: Read[R]) extend
  */
 class DoobieQueryWithStatus[R](
   val fragment: Fragment,
-  checkStatus: FunctionStatusWithData[R] => Either[StatusException, R]
+  checkStatus: Row[R] => FailedOrRow[R]
 )(implicit val readStatusWithDataR: Read[StatusWithData[R]])
     extends QueryWithStatus[StatusWithData[R], R, R] {
 
   /*
    * Processes the status of the query and returns the status with data
    * @param initialResult - the initial result of the query
-   * @return the status with data
+   * @return data with status
    */
-  override def processStatus(initialResult: StatusWithData[R]): FunctionStatusWithData[R] =
-    FunctionStatusWithData(FunctionStatus(initialResult.status, initialResult.statusText), initialResult.data)
+  override def processStatus(initialResult: StatusWithData[R]): Row[R] =
+    Row(FunctionStatus(initialResult.status, initialResult.statusText), initialResult.data)
 
   /*
    * Converts the status with data to either a status exception or the data
    * @param statusWithData - the status with data
    * @return either a status exception or the data
    */
-  override def toStatusExceptionOrData(statusWithData: FunctionStatusWithData[R]): Either[StatusException, R] =
+  override def toStatusExceptionOrData(statusWithData: Row[R]): FailedOrRow[R] =
     checkStatus(statusWithData)
 }
