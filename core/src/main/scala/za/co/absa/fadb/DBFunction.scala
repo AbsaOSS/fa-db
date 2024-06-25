@@ -186,6 +186,7 @@ object DBFunction {
   )(implicit schema: DBSchema, dBEngine: E)
       extends DBFunction[I, R, E, F](functionNameOverride) {
 
+    
     // A constructor that takes only the mandatory parameters and uses default values for the optional ones
     def this()(implicit schema: DBSchema, dBEngine: E) = this(None)
 
