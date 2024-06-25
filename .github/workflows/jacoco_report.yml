@@ -100,15 +100,42 @@ jobs:
         run: |
           echo "Total doobie coverage ${{ steps.jacoco-doobie.outputs.coverage-overall }}"
           echo "Changed doobie Files coverage ${{ steps.jacoco-doobie.outputs.coverage-changed-files }}"
-      - name: Fail PR if changed files coverage is less than ${{ env.COVERAGE_CHANGED_EXPECTATION }}%
-        if: ${{ steps.jacoco-core.outputs.coverage-changed-files < env.COVERAGE_CHANGED_EXPECTATION || steps.jacoco-slick.outputs.coverage-changed-files < env.COVERAGE_CHANGED_EXPECTATION || steps.jacoco-doobie.outputs.coverage-changed-files < env.COVERAGE_CHANGED_EXPECTATION }}
+      - name: Fail PR if Core changed files coverage is less than ${{ env.COVERAGE_CHANGED_EXPECTATION }}%
+        if: ${{ steps.jacoco-core.outputs.coverage-changed-files < env.COVERAGE_CHANGED_EXPECTATION }}
         uses: actions/github-script@v6
         with:
           script: |
-            core.setFailed('Changed files coverage is ${{ steps.jacoco-core.outputs.coverage-changed-files }}, less than ${{ env.COVERAGE_CHANGED_EXPECTATION }}%!')
-      - name: Fail PR if total files coverage is less than ${{ env.COVERAGE_OVERALL_EXPECTATION }}%
-        if: ${{ steps.jacoco-core.outputs.coverage-overall < env.COVERAGE_OVERALL_EXPECTATION || steps.jacoco-slick.outputs.coverage-overall < env.COVERAGE_OVERALL_EXPECTATION || steps.jacoco-doobie.outputs.coverage-overall < env.COVERAGE_OVERALL_EXPECTATION }}
+            core.setFailed('Core changed files coverage are ${{ steps.jacoco-core.outputs.coverage-changed-files }}%, less than ${{ env.COVERAGE_CHANGED_EXPECTATION }}%!')
+      - name: Fail PR if Slick changed files coverage is less than ${{ env.COVERAGE_CHANGED_EXPECTATION }}%
+        if: ${{ steps.jacoco-slick.outputs.coverage-changed-files < env.COVERAGE_CHANGED_EXPECTATION }}
         uses: actions/github-script@v6
         with:
           script: |
-            core.setFailed('Total files coverage is ${{ steps.jacoco-core.outputs.coverage-overall }}, less than ${{ env.COVERAGE_OVERALL_EXPECTATION }}%!')
+            core.setFailed('Slick changed files coverage are ${{ steps.jacoco-slick.outputs.coverage-changed-files }}%, less than ${{ env.COVERAGE_CHANGED_EXPECTATION }}%!')
+      - name: Fail PR if Doobie changed files coverage is less than ${{ env.COVERAGE_CHANGED_EXPECTATION }}%
+        if: ${{ steps.jacoco-doobie.outputs.coverage-changed-files < env.COVERAGE_CHANGED_EXPECTATION }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.setFailed('Doobie changed files coverage are ${{ steps.jacoco-core.outputs.coverage-changed-files }}%, less than ${{ env.COVERAGE_CHANGED_EXPECTATION }}%!')
+
+      - name: Fail PR if total Core files coverage is less than ${{ env.COVERAGE_OVERALL_EXPECTATION }}%
+        if: ${{ steps.jacoco-core.outputs.coverage-overall < env.COVERAGE_OVERALL_EXPECTATION }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.setFailed('Total files coverage is ${{ steps.jacoco-core.outputs.coverage-overall }}%, less than ${{ env.COVERAGE_OVERALL_EXPECTATION }}%!')
+
+      - name: Fail PR if total Slick files coverage is less than ${{ env.COVERAGE_OVERALL_EXPECTATION }}%
+        if: ${{ steps.jacoco-slick.outputs.coverage-overall < env.COVERAGE_OVERALL_EXPECTATION }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.setFailed('Total files coverage is ${{ steps.jacoco-slick.outputs.coverage-overall }}%, less than ${{ env.COVERAGE_OVERALL_EXPECTATION }}%!')
+
+      - name: Fail PR if total Doobie files coverage is less than ${{ env.COVERAGE_OVERALL_EXPECTATION }}%
+        if: ${{ steps.jacoco-doobie.outputs.coverage-overall < env.COVERAGE_OVERALL_EXPECTATION }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.setFailed('Total files coverage is ${{ steps.jacoco-doobie.outputs.coverage-overall }}%, less than ${{ env.COVERAGE_OVERALL_EXPECTATION }}%!')
