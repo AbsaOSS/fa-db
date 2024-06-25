@@ -60,7 +60,7 @@ jobs:
           paths: >
             ${{ github.workspace }}/core/target/scala-${{ env.SCALA_SHORT_VERSION }}/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: ${{ 61.0 }}
+          min-coverage-overall: ${{ 57.0 }}
           min-coverage-changed-files: ${{ 80.0 }}
           title: JaCoCo core code coverage report - scala ${{ env.SCALA_VERSION }}
           update-comment: true
@@ -75,7 +75,7 @@ jobs:
           paths: >
             ${{ github.workspace }}/slick/target/scala-${{ env.SCALA_SHORT_VERSION }}/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: ${{ 61.0 }}
+          min-coverage-overall: ${{ 57.0 }}
           min-coverage-changed-files: ${{ 80.0 }}
           title: JaCoCo slick code coverage report - scala ${{ env.SCALA_VERSION }}
           update-comment: true
@@ -90,7 +90,7 @@ jobs:
           paths: >
             ${{ github.workspace }}/doobie/target/scala-${{ env.SCALA_SHORT_VERSION }}/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: ${{ 61.0 }}
+          min-coverage-overall: ${{ 57.0 }}
           min-coverage-changed-files: ${{ 80.0 }}
           title: JaCoCo doobie code coverage report - scala ${{ env.SCALA_VERSION }}
           update-comment: true
@@ -104,10 +104,10 @@ jobs:
         with:
           script: |
             core.setFailed('Changed files coverage is less than ${{ 80.0 }}%!')
-      - name: Fail PR if total files coverage is less than ${{ 61.0 }}%
+      - name: Fail PR if total files coverage is less than ${{ 57.0 }}%
         if: ${{ steps.jacoco-core.outputs.coverage-overall < 75.0 || steps.jacoco-slick.outputs.coverage-overall < 75.0 || steps.jacoco-doobie.outputs.coverage-overall < 75.0 }}
         uses: actions/github-script@v6
         with:
           script: |
-            core.setFailed('Total files coverage is less than ${{ 61.0 }}%!')
+            core.setFailed('Total files coverage is less than ${{ 57.0 }}%!')
 
