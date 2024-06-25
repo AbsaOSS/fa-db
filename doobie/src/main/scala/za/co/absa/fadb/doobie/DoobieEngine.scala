@@ -22,7 +22,7 @@ import doobie._
 import doobie.implicits._
 import doobie.util.Read
 import za.co.absa.fadb.DBEngine
-import za.co.absa.fadb.exceptions.StatusException
+import za.co.absa.fadb.status.FailedOrRow
 
 import scala.language.higherKinds
 
@@ -53,36 +53,37 @@ class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[
   }
 
   /**
-   *  Executes a Doobie query and returns the result as an `F[Either[StatusException, R]]`.
+   *  Executes a Doobie query and returns the result.
+   *
+   * Note: `StatusWithData` is needed here because it is more 'flat' in comparison to `FunctionStatusWithData`
+   *   and Doobie's `Read` wasn't able to work with it.
    *
    *  @param query the Doobie query to execute
    *  @param readStatusWithDataR the `Read[StatusWithData[R]]` instance used to read the query result into `StatusWithData[R]`
-   *  @return the query result as an `F[Either[StatusException, R]]`
+   *  @return the query result
    */
   private def executeQueryWithStatus[R](
     query: QueryWithStatusType[R]
-  )(implicit readStatusWithDataR: Read[StatusWithData[R]]): F[Either[StatusException, R]] = {
-    // .unique returns a single value, raising an exception if there is not exactly one row returned
-    // https://tpolecat.github.io/doobie/docs/04-Selecting.html
-    query.fragment.query[StatusWithData[R]].unique.transact(transactor).map(query.getResultOrException)
+  )(implicit readStatusWithDataR: Read[StatusWithData[R]]): F[Seq[FailedOrRow[R]]] = {
+      query.fragment.query[StatusWithData[R]].to[Seq].transact(transactor).map(_.map(query.getResultOrException))
   }
 
   /**
    *  Runs a Doobie query and returns the result as an `F[Seq[R]]`.
    *
    *  @param query the Doobie query to run
-   *  @return the query result as an `F[Seq[R]]`
+   *  @return the query result
    */
   override def run[R](query: QueryType[R]): F[Seq[R]] =
     executeQuery(query)(query.readR)
 
   /**
-   *  Runs a Doobie query and returns the result as an `F[Either[StatusException, R]]`.
+   *  Runs a Doobie query and returns the result.
    *
    *  @param query the Doobie query to run
-   *  @return the query result as an `F[Either[StatusException, R]]`
+   *  @return the query result
    */
-  override def runWithStatus[R](query: QueryWithStatusType[R]): F[Either[StatusException, R]] = {
+  override def runWithStatus[R](query: QueryWithStatusType[R]): F[Seq[FailedOrRow[R]]] = {
     executeQueryWithStatus(query)(query.readStatusWithDataR)
   }
 }

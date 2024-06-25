@@ -47,14 +47,16 @@ within the application.**
 
 ---
 
-Currently, the library is developed with Postgres as the target DB. But the approach is applicable to any DB supporting stored procedure/functions – Oracle, MS-SQL, ...
+Currently, the library is developed with Postgres as the target DB. But the approach is applicable to any DB 
+supporting stored procedure/functions – Oracle, MS-SQL, ...
 
 
 ## Usage
 
 #### Sbt
 
-Import one of the two available module at the moment. Slick module works with Scala Futures. Doobie module works with any effect type (typically IO or ZIO) provided cats effect's Async instance is available.
+Import one of the two available module at the moment. Slick module works with Scala Futures. Doobie module works with 
+any effect type (typically IO or ZIO) provided cats effect's Async instance is available.
 
 ```scala
 libraryDependencies *= "za.co.absa.fa-db" %% "slick"  % "X.Y.Z"
@@ -111,7 +113,8 @@ Text about status codes returned from the database function can be found [here](
 
 ## Slick module
 
-As the name suggests it runs on [Slick library](https://github.com/slick/slick) and also brings in the [Slickpg library](https://github.com/tminglei/slick-pg/) for extended Postgres type support.
+As the name suggests it runs on [Slick library](https://github.com/slick/slick) and also brings in the [Slickpg library](https://github.com/tminglei/slick-pg/) for extended 
+Postgres type support.
 
 It brings:
 
@@ -119,8 +122,18 @@ It brings:
 * `class SlickSingleResultFunction` - abstract class for DB functions returning single result
 * `class SlickMultipleResultFunction` - abstract class for DB functions returning sequence of results
 * `class SlickOptionalResultFunction` - abstract class for DB functions returning optional result
-* `class SlickSingleResultFunctionWithStatus` - abstract class for DB functions with status handling; it requires an implementation of `StatusHandling` to be mixed-in (`StandardStatusHandling` available out-of-the-box)
-* `trait FaDbPostgresProfile` - to bring support for Postgres and its extended data types in one class (except JSON, as there are multiple implementations for this data type in _Slick-Pg_)
+* `class SlickSingleResultFunctionWithStatus` - abstract class for DB functions with status handling; it requires an 
+  implementation of `StatusHandling` to be mixed-in (`StandardStatusHandling` available out-of-the-box)
+* `class SlickMultipleResultFunctionWithStatus` - as `SlickSingleResultFunctionWithStatus` but for multiple record
+  retrieval
+* `class SlickMultipleResultFunctionWithAggStatus` - as `SlickMultipleResultFunctionWithStatus` but it aggregates
+  the statuses into a single record. It requires an implementation of `StatusAggregator` to be mixed-in
+  (`ByFirstErrorStatusAggregator`, `ByFirstRowStatusAggregator`, and `ByMajorityErrorsStatusAggregator` available
+  out of the box)
+* `class SlickOptionalResultFunctionWithStatus` - as `SlickSingleResultFunctionWithStatus` but the returning record 
+  is optional
+* `trait FaDbPostgresProfile` - to bring support for Postgres and its extended data types in one class 
+  (except JSON, as there are multiple implementations for this data type in _Slick-Pg_)
 * `object FaDbPostgresProfile` - instance of the above trait for direct use
 
 #### Known issues
@@ -143,7 +156,9 @@ val macAddr: Option[MacAddrString] = pr.nextMacAddrOption
 
 ## Doobie module
 
-As the name suggests it runs on [Doobie library](https://tpolecat.github.io/doobie/). The main benefit of the module is that it allows to use any effect type (typically IO or ZIO) therefore is more suitable for functional programming. It also brings in the [Doobie-Postgres library](https://tpolecat.github.io/doobie/docs/14-PostgreSQL.html) for extended Postgres type support.
+As the name suggests it runs on [Doobie library](https://tpolecat.github.io/doobie/). The main benefit of the module is that it allows to use any 
+effect type (typically IO or ZIO) therefore is more suitable for functional programming. 
+It also brings in the [Doobie-Postgres library](https://tpolecat.github.io/doobie/docs/14-PostgreSQL.html) for extended Postgres type support.
 
 It brings:
 
@@ -151,9 +166,19 @@ It brings:
 * `class DoobieSingleResultFunction` - abstract class for DB functions returning single result
 * `class DoobieMultipleResultFunction` - abstract class for DB functions returning sequence of results
 * `class DoobieOptionalResultFunction` - abstract class for DB functions returning optional result
-* `class DoobieSingleResultFunctionWithStatus` - abstract class for DB functions with status handling; it requires an implementation of `StatusHandling` to be mixed-in (`StandardStatusHandling` available out-of-the-box)
+* `class DoobieSingleResultFunctionWithStatus` - abstract class for DB functions with status handling; it requires 
+  an implementation of `StatusHandling` to be mixed-in (`StandardStatusHandling` available out-of-the-box)
+* `class DoobieMultipleResultFunctionWithStatus` - as `DoobieSingleResultFunctionWithStatus` but for multiple record
+  retrieval
+* `class DoobieMultipleResultFunctionWithAggStatus` - as `DoobieMultipleResultFunctionWithStatus` but it aggregates 
+  the statuses into a single record. It requires an implementation of `StatusAggregator` to be mixed-in
+  (`ByFirstErrorStatusAggregator`, `ByFirstRowStatusAggregator`, and `ByMajorityErrorsStatusAggregator` available
+  out of the box)
+* `class DoobieOptionalResultFunctionWithStatus` - as `DoobieSingleResultFunctionWithStatus` but the returning record 
+  is optional
 
-Since Doobie also interoperates with ZIO, there is an example of how a database connection can be properly established within a ZIO application. Please see [this file](doobie/zio-setup.md) for more details.
+Since Doobie also interoperates with ZIO, there is an example of how a database connection can be properly established 
+within a ZIO application. Please see [this file](doobie/zio-setup.md) for more details.
 
 ## Testing
 

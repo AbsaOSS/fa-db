@@ -16,7 +16,9 @@
 
 INSERT INTO integration.actors VALUES
     (49, 'Pavel', 'Marek'),
-    (50, 'Liza', 'Simpson');
+    (50, 'Liza', 'Simpson'),
+    (51, 'Fred', 'Weasley'),
+    (52, 'George', 'Weasley');
 
 
 INSERT INTO integration.other_types VALUES (

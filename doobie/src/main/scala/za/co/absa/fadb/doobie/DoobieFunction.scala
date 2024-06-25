@@ -21,8 +21,8 @@ import doobie.implicits.toSqlInterpolator
 import doobie.util.Read
 import doobie.util.fragment.Fragment
 import za.co.absa.fadb.DBFunction._
-import za.co.absa.fadb.exceptions.StatusException
-import za.co.absa.fadb.{DBFunctionWithStatus, DBSchema, FunctionStatusWithData}
+import za.co.absa.fadb.DBSchema
+import za.co.absa.fadb.status.{FailedOrRow, Row}
 
 import scala.language.higherKinds
 
@@ -196,7 +196,7 @@ trait DoobieFunctionWithStatus[I, R, F[_]] extends DoobieFunctionBase[R] {
   }
 
   // This is to be mixed in by an implementation of StatusHandling
-  def checkStatus[A](statusWithData: FunctionStatusWithData[A]): Either[StatusException, A]
+  def checkStatus[D](statusWithData: Row[D]): FailedOrRow[D]
 }
 
 /**
@@ -204,28 +204,6 @@ trait DoobieFunctionWithStatus[I, R, F[_]] extends DoobieFunctionBase[R] {
  *  These classes use Doobie's `Fragment` to represent SQL queries and `DoobieEngine` to execute them.
  */
 object DoobieFunction {
-
-  /**
-   *  `DoobieSingleResultFunctionWithStatus` represents a db function that returns a single result with status.
-   *
-   *  @param toFragmentsSeq a function that generates a sequence of `Fragment`s
-   *  @param functionNameOverride the optional override for the function name
-   *  @param schema the database schema
-   *  @param dbEngine the `DoobieEngine` instance used to execute SQL queries
-   *  @param readR Read instance for `R`
-   *  @param readSelectWithStatus Read instance for `StatusWithData[R]`
-   *  @tparam F the effect type, which must have an `Async` and a `Monad` instance
-   */
-  abstract class DoobieSingleResultFunctionWithStatus[I, R, F[_]](
-    override val toFragmentsSeq: I => Seq[Fragment],
-    functionNameOverride: Option[String] = None
-  )(implicit
-    override val schema: DBSchema,
-    val dbEngine: DoobieEngine[F],
-    val readR: Read[R],
-    val readSelectWithStatus: Read[StatusWithData[R]]
-  ) extends DBFunctionWithStatus[I, R, DoobieEngine[F], F](functionNameOverride)
-      with DoobieFunctionWithStatus[I, R, F]
 
   /**
    *  `DoobieSingleResultFunction` represents a db function that returns a single result.
@@ -248,6 +226,28 @@ object DoobieFunction {
       with DoobieFunction[I, R, F]
 
   /**
+    *  `DoobieSingleResultFunctionWithStatus` represents a db function that returns a single result with status.
+    *
+    *  @param toFragmentsSeq a function that generates a sequence of `Fragment`s
+    *  @param functionNameOverride the optional override for the function name
+    *  @param schema the database schema
+    *  @param dbEngine the `DoobieEngine` instance used to execute SQL queries
+    *  @param readR Read instance for `R`
+    *  @param readSelectWithStatus Read instance for `StatusWithData[R]`
+    *  @tparam F the effect type, which must have an `Async` and a `Monad` instance
+    */
+  abstract class DoobieSingleResultFunctionWithStatus[I, R, F[_]](
+    override val toFragmentsSeq: I => Seq[Fragment],
+    functionNameOverride: Option[String] = None
+  )(implicit
+    override val schema: DBSchema,
+    val dbEngine: DoobieEngine[F],
+    val readR: Read[R],
+    val readSelectWithStatus: Read[StatusWithData[R]]
+  ) extends DBSingleResultFunctionWithStatus[I, R, DoobieEngine[F], F](functionNameOverride)
+      with DoobieFunctionWithStatus[I, R, F]
+
+  /**
    *  `DoobieMultipleResultFunction` represents a db function that returns multiple results.
    */
   abstract class DoobieMultipleResultFunction[I, R, F[_]](
@@ -261,6 +261,36 @@ object DoobieFunction {
       with DoobieFunction[I, R, F]
 
   /**
+   *  `DoobieMultipleResultFunctionWithStatus` represents a db function that returns multiple results with statuses.
+   */
+  abstract class DoobieMultipleResultFunctionWithStatus[I, R, F[_]](
+    override val toFragmentsSeq: I => Seq[Fragment],
+    functionNameOverride: Option[String] = None
+  )(implicit
+    override val schema: DBSchema,
+    val dbEngine: DoobieEngine[F],
+    val readR: Read[R]
+  ) extends DBMultipleResultFunctionWithStatus[I, R, DoobieEngine[F], F](functionNameOverride)
+    with DoobieFunctionWithStatus[I, R, F]
+
+  /**
+   * `DoobieMultipleResultFunctionWithAggStatus` represents a db function that returns multiple results with statuses.
+   *
+   * It's similar as `DoobieMultipleResultFunctionWithStatus` but the statuses are aggregated into a single value.
+   *
+   * The algorithm for performing the aggregation is based on provided implementation of `StatusAggregator.aggregate`.
+   */
+  abstract class DoobieMultipleResultFunctionWithAggStatus[I, R, F[_]](
+    override val toFragmentsSeq: I => Seq[Fragment],
+    functionNameOverride: Option[String] = None
+  )(implicit
+    override val schema: DBSchema,
+    val dbEngine: DoobieEngine[F],
+    val readR: Read[R]
+  ) extends DBMultipleResultFunctionWithAggStatus[I, R, DoobieEngine[F], F](functionNameOverride)
+    with DoobieFunctionWithStatus[I, R, F]
+
+  /**
    *  `DoobieOptionalResultFunction` represents a db function that returns an optional result.
    */
   abstract class DoobieOptionalResultFunction[I, R, F[_]](
@@ -272,4 +302,17 @@ object DoobieFunction {
     val readR: Read[R]
   ) extends DBOptionalResultFunction[I, R, DoobieEngine[F], F](functionNameOverride)
       with DoobieFunction[I, R, F]
+
+  /**
+    *  `DoobieOptionalResultFunctionWithStatus` represents a db function that returns an optional result.
+    */
+  abstract class DoobieOptionalResultFunctionWithStatus[I, R, F[_]](
+    override val toFragmentsSeq: I => Seq[Fragment],
+    functionNameOverride: Option[String] = None
+  )(implicit
+    override val schema: DBSchema,
+    val dbEngine: DoobieEngine[F],
+    val readR: Read[R]
+  ) extends DBOptionalResultFunctionWithStatus[I, R, DoobieEngine[F], F](functionNameOverride)
+      with DoobieFunctionWithStatus[I, R, F]
 }

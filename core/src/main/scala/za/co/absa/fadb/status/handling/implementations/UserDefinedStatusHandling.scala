@@ -16,9 +16,9 @@
 
 package za.co.absa.fadb.status.handling.implementations
 
-import za.co.absa.fadb.FunctionStatusWithData
-import za.co.absa.fadb.exceptions.{OtherStatusException, StatusException}
+import za.co.absa.fadb.exceptions.OtherStatusException
 import za.co.absa.fadb.status.handling.StatusHandling
+import za.co.absa.fadb.status.{FailedOrRow, Row}
 
 /**
  *  Trait represents user defined status handling
@@ -26,9 +26,9 @@ import za.co.absa.fadb.status.handling.StatusHandling
 trait UserDefinedStatusHandling extends StatusHandling {
   def OKStatuses: Set[Integer]
 
-  override def checkStatus[A](statusWithData: FunctionStatusWithData[A]): Either[StatusException, A] =
+  override def checkStatus[D](statusWithData: Row[D]): FailedOrRow[D] =
     if (OKStatuses.contains(statusWithData.functionStatus.statusCode)) {
-      Right(statusWithData.data)
+      Right(statusWithData)
     } else {
       Left(OtherStatusException(statusWithData.functionStatus))
     }
