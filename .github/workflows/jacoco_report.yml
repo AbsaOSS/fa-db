@@ -14,12 +14,11 @@
 # limitations under the License.
 #
 
-name: Build
 name: JaCoCo Report
 
 on:
   push:
-    branches: [master ]
+    branches: [master]
   pull_request:
     types: [ assigned, opened, synchronize, reopened, labeled ]
 
