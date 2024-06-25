@@ -101,7 +101,7 @@ jobs:
           echo "Total doobie coverage ${{ steps.jacoco-doobie.outputs.coverage-overall }}"
           echo "Changed doobie Files coverage ${{ steps.jacoco-doobie.outputs.coverage-changed-files }}"
       - name: Fail PR if Core changed files coverage is less than ${{ env.COVERAGE_CHANGED_EXPECTATION }}%
-        if: ${{ steps.jacoco-core.outputs.coverage-changed-files < env.COVERAGE_CHANGED_EXPECTATION }}
+        if: ${{ Number(steps.jacoco-core.outputs.coverage-changed-files) < Number(env.COVERAGE_CHANGED_EXPECTATION) }}
         uses: actions/github-script@v6
         with:
           script: |
