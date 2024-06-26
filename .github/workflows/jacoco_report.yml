@@ -24,9 +24,9 @@ on:
 env:
   scalaLong: 2.13.11
   scalaShort: 2.13
-  coverage-overall: 80.0
+  coverage-overall: 57.0
   coverage-changed-files: 80.0
-  check-overall-coverages: false
+  check-overall-coverages: true
 
 jobs:
   build-test-and-measure:
