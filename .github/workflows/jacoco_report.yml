@@ -17,21 +17,28 @@
 name: JaCoCo Report
 
 on:
-  push:
-    branches: [master]
   pull_request:
-    types: [ assigned, opened, synchronize, reopened, labeled ]
+    branches: [ master ]
+    types: [ opened, edited, synchronize, reopened ]
+
+env:
+  scalaLong: 2.13.11
+  scalaShort: 2.13
+  coverage-overall: 80.0
+  coverage-changed-files: 80.0
+  check-overall-coverages: true
 
 jobs:
   build-test-and-measure:
-    name: "Build, Test and Measure"
+    name: Build, Test and Measure
     runs-on: ubuntu-latest
+
     services:
       postgres:
         image: postgres:15
         env:
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: movies
+          POSTGRES_DB: atum_db
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -39,74 +46,112 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-    env:
-      SCALA_VERSION: "2.13.12"
-      SCALA_SHORT_VERSION: "2.13"
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Setup Scala
         uses: olafurpg/setup-scala@v14
         with:
           java-version: "adopt@1.8"
       - name: Prepare testing database
         run: sbt flywayMigrate
-      - name: Build and run all tests for code coverage
-        run: sbt ++${{env.SCALA_VERSION}} jacoco # We will need JaCoCo report in second job
-      - name: Add coverage to PR
+      - name: Build and run tests
+        continue-on-error: true
+        id: jacocorun
+        run: sbt ++${{env.scalaLong}} jacoco
+      - name: Add coverage to PR (core)
+        if: steps.jacocorun.outcome == 'success'
         id: jacoco-core
         uses: madrapps/jacoco-report@v1.6.1
         with:
-          paths: >
-            ${{ github.workspace }}/core/target/scala-${{ env.SCALA_SHORT_VERSION }}/jacoco/report/jacoco.xml
+          paths: ${{ github.workspace }}/core/target/scala-${{ env.scalaShort }}/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: 57.0
-          min-coverage-changed-files: 80.0
-          title: JaCoCo core code coverage report - scala ${{ env.SCALA_VERSION }}
+          min-coverage-overall: ${{ env.coverage-overall }}
+          min-coverage-changed-files: ${{ env.coverage-changed-files }}
+          title: JaCoCo `model` module code coverage report - scala ${{ env.scalaLong }}
           update-comment: true
-      - name: Get the Coverage info
-        run: |
-          echo "Total core core coverage ${{ steps.jacoco-core.outputs.coverage-overall }}"
-          echo "Changed core Files coverage ${{ steps.jacoco-core.outputs.coverage-changed-files }}"
-      - name: Add coverage to PR
-        id: jacoco-slick
-        uses: madrapps/jacoco-report@v1.6.1
-        with:
-          paths: >
-            ${{ github.workspace }}/slick/target/scala-${{ env.SCALA_SHORT_VERSION }}/jacoco/report/jacoco.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: ${{ 57.0 }}
-          min-coverage-changed-files: ${{ 80.0 }}
-          title: JaCoCo slick code coverage report - scala ${{ env.SCALA_VERSION }}
-          update-comment: true
-      - name: Get the Coverage info
-        run: |
-          echo "Total slick coverage ${{ steps.jacoco-slick.outputs.coverage-overall }}"
-          echo "Changed slick Files coverage ${{ steps.jacoco-slick.outputs.coverage-changed-files }}"
-      - name: Add coverage to PR
+      - name: Add coverage to PR (doobie)
+        if: steps.jacocorun.outcome == 'success'
         id: jacoco-doobie
         uses: madrapps/jacoco-report@v1.6.1
         with:
-          paths: >
-            ${{ github.workspace }}/doobie/target/scala-${{ env.SCALA_SHORT_VERSION }}/jacoco/report/jacoco.xml
+          paths: ${{ github.workspace }}/doobie/target/scala-${{ env.scalaShort }}/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: ${{ 57.0 }}
-          min-coverage-changed-files: ${{ 80.0 }}
-          title: JaCoCo doobie code coverage report - scala ${{ env.SCALA_VERSION }}
+          min-coverage-overall: ${{ env.coverage-overall }}
+          min-coverage-changed-files: ${{ env.coverage-changed-files }}
+          title: JaCoCo `agent` module code coverage report - scala ${{ env.scalaLong }}
+          update-comment: true
+      - name: Add coverage to PR (slick)
+        if: steps.jacocorun.outcome == 'success'
+        id: jacoco-slick
+        uses: madrapps/jacoco-report@v1.6.1
+        with:
+          paths: ${{ github.workspace }}/slick/target/scala-${{ env.scalaShort }}/jacoco/report/jacoco.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: ${{env.coverage-overall }}
+          min-coverage-changed-files: ${{ env.coverage-changed-files }}
+          title: JaCoCo `slick` module code coverage report - scala ${{ env.scalaLong }}
           update-comment: true
       - name: Get the Coverage info
+        if: steps.jacocorun.outcome == 'success'
         run: |
-          echo "Total doobie coverage ${{ steps.jacoco-doobie.outputs.coverage-overall }}"
-          echo "Changed doobie Files coverage ${{ steps.jacoco-doobie.outputs.coverage-changed-files }}"
-      - name: Fail PR if changed files coverage is less than ${{ 80.0 }}%
-        if: ${{ steps.jacoco-core.outputs.coverage-changed-files < 80.0 || steps.jacoco-slick.outputs.coverage-changed-files < 80.0 || steps.jacoco-doobie.outputs.coverage-changed-files < 80.0 }}
+          echo "Total `core` module coverage ${{ steps.jacoco-core.outputs.coverage-overall }}"
+          echo "Changed Files coverage ${{ steps.jacoco-core.outputs.coverage-changed-files }}"
+          echo "Total `doobie` module coverage ${{ steps.jacoco-doobie.outputs.coverage-overall }}"
+          echo "Changed Files coverage ${{ steps.jacoco-doobie.outputs.coverage-changed-files }}"
+          echo "Total `slick` module coverage ${{ steps.jacoco-slick.outputs.coverage-overall }}"
+          echo "Changed Files coverage ${{ steps.jacoco-slick.outputs.coverage-changed-files }}"
+      - name: Fail PR if changed files coverage is less than ${{ env.coverage-changed-files }}%
+        if: steps.jacocorun.outcome == 'success'
         uses: actions/github-script@v6
         with:
           script: |
-            core.setFailed('Changed files coverage is less than ${{ 80.0 }}%!')
-      - name: Fail PR if total files coverage is less than ${{ 57.0 }}%
-        if: ${{ steps.jacoco-core.outputs.coverage-overall < 57.0 || steps.jacoco-slick.outputs.coverage-overall < 57.0 || steps.jacoco-doobie.outputs.coverage-overall < 57.0 }}
+            const coverageCheckFailed =
+              Number('${{ steps.jacoco-core.outputs.coverage-changed-files }}') < Number('${{ env.coverage-changed-files }}') ||
+              Number('${{ steps.jacoco-doobie.outputs.coverage-changed-files }}') < Number('${{ env.coverage-changed-files }}') ||
+              Number('${{ steps.jacoco-slick.outputs.coverage-changed-files }}') < Number('${{ env.coverage-changed-files }}');
+            if (coverageCheckFailed) {
+              core.setFailed('Changed files coverage is less than ${{ env.coverage-changed-files }}%!');
+            }
+      - name: Fail PR if overall files coverage is less than ${{ env.coverage-overall }}%
+        if: ${{ (steps.jacocorun.outcome == 'success') && (env.check-overall-coverages == 'true') }}
         uses: actions/github-script@v6
         with:
           script: |
-            core.setFailed('Total files coverage is less than ${{ 57.0 }}%!')
+            const coverageCheckFailed =
+              Number('${{ steps.jacoco-core.outputs.coverage-overall }}') < Number('${{ env.coverage-overall }}') ||
+              Number('${{ steps.jacoco-doobie.outputs.coverage-overall }}') < Number('${{ env.coverage-overall }}') ||
+              Number('${{ steps.jacoco-slick.outputs.coverage-overall }}') < Number('${{ env.coverage-overall }}');
+            if (coverageCheckFailed) {
+              core.setFailed('Overall coverage is less than ${{ env.coverage-overall }}%!');
+            }
+      - name: Edit JaCoCo comments on build failure
+        if: steps.jacocorun.outcome != 'success'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const issue_number = context.issue.number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const jacocoReportRegExp = /^### JaCoCo .* code coverage report .*/;
+
+            const comments = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number,
+            });
+
+            for (const comment of comments.data) {
+              const lines = comment.body.split('\n');
+              if (lines.length > 0 && jacocoReportRegExp.test(lines[0])) {
+                await github.rest.issues.updateComment({
+                  owner,
+                  repo,
+                  comment_id: comment.id,
+                  body: lines[0] + "\n\n### Build Failed",
+                });
+              }
+            }
+
+            core.setFailed('JaCoCo test coverage report generation failed, and related PR comments were updated.');
