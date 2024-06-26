@@ -60,8 +60,8 @@ jobs:
           paths: >
             ${{ github.workspace }}/core/target/scala-${{ env.SCALA_SHORT_VERSION }}/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: ${{ 57.0 }}
-          min-coverage-changed-files: ${{ 80.0 }}
+          min-coverage-overall: 57.0
+          min-coverage-changed-files: 80.0
           title: JaCoCo core code coverage report - scala ${{ env.SCALA_VERSION }}
           update-comment: true
       - name: Get the Coverage info
@@ -110,4 +110,3 @@ jobs:
         with:
           script: |
             core.setFailed('Total files coverage is less than ${{ 57.0 }}%!')
-
