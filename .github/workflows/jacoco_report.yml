@@ -38,7 +38,7 @@ jobs:
         image: postgres:15
         env:
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: atum_db
+          POSTGRES_DB: movies
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
