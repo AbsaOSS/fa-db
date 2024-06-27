@@ -23,7 +23,8 @@ on:
       types: [ assigned, opened, synchronize, reopened, labeled ]
 
 jobs:
-  build:
+  build-test-and-doc:
+    name: Build, Test and Doc
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -42,7 +43,6 @@ jobs:
       fail-fast: false
       matrix:
         scala: [2.12.17, 2.13.12]
-    name: Build and test
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -52,7 +52,9 @@ jobs:
           java-version: "adopt@1.8"
       - name: Build and run unit tests
         run: sbt ++${{matrix.scala}} test
+      - name: Generate documentation
+        run: sbt ++${{matrix.scala}} doc
       - name: Prepare testing database
         run: sbt flywayMigrate
-      - name: Build and run integration tests
-        run: sbt ++${{matrix.scala}} testIT doc
+      - name: Run integration tests
+        run: sbt ++${{matrix.scala}} testIT
