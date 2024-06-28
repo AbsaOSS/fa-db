@@ -23,6 +23,7 @@ import za.co.absa.db.fadb.DBSchema
 import za.co.absa.db.fadb.slick.FaDbPostgresProfile.api._
 import za.co.absa.db.fadb.slick.SlickFunction.SlickSingleResultFunctionWithStatus
 import za.co.absa.db.fadb.status.handling.implementations.StandardStatusHandling
+import za.co.absa.db.fadb.testing.classes.SlickTest
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

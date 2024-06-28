@@ -22,6 +22,7 @@ import slick.jdbc.SQLActionBuilder
 import za.co.absa.db.fadb.DBSchema
 import za.co.absa.db.fadb.slick.FaDbPostgresProfile.api._
 import za.co.absa.db.fadb.slick.SlickFunction.SlickOptionalResultFunction
+import za.co.absa.db.fadb.testing.classes.{Actor, ActorSlickConverter, SlickTest}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

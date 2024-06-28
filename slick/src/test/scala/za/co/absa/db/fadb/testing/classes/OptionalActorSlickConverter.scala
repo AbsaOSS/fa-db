@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package za.co.absa.db.fadb.slick
+package za.co.absa.db.fadb.testing.classes
 
-import slick.jdbc.JdbcBackend.Database
-import za.co.absa.db.fadb.DBSchema
+import slick.jdbc.{GetResult, PositionedResult}
 
-trait SlickTest {
-  case class GetActorsQueryParameters(firstName: Option[String], lastName: Option[String])
-  case class GetActorsByLastnameQueryParameters(lastName: String, firstName: Option[String] = None)
+/**
+ *  A trait representing a converter from a Slick PositionedResult to an Actor.
+ *  The trait is to be mixed into a SlickFunction returning an Actor.
+ */
+trait OptionalActorSlickConverter {
 
-  case class CreateActorRequestBody(firstName: String, lastName: String)
-
-  import za.co.absa.db.fadb.naming.implementations.SnakeCaseNaming.Implicits._
-  object Integration extends DBSchema
-
-  val db = Database.forConfig("postgrestestdb")
+  protected def slickConverter: GetResult[Option[Actor]] = {
+    def converter(r: PositionedResult): Option[Actor] = {
+      Some(Actor(r.<<, r.<<, r.<<))
+    }
+    GetResult(converter)
+  }
 }

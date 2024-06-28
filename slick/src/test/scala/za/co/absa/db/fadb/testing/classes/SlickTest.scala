@@ -14,6 +14,19 @@
  * limitations under the License.
  */
 
-package za.co.absa.db.fadb.slick
+package za.co.absa.db.fadb.testing.classes
 
-case class Actor(actorId: Int, firstName: String, lastName: String)
+import slick.jdbc.JdbcBackend.Database
+import za.co.absa.db.fadb.DBSchema
+
+trait SlickTest {
+  case class GetActorsQueryParameters(firstName: Option[String], lastName: Option[String])
+  case class GetActorsByLastnameQueryParameters(lastName: String, firstName: Option[String] = None)
+
+  case class CreateActorRequestBody(firstName: String, lastName: String)
+
+  import za.co.absa.db.fadb.naming.implementations.SnakeCaseNaming.Implicits._
+  object Integration extends DBSchema
+
+  val db = Database.forConfig("postgrestestdb")
+}

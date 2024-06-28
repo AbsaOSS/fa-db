@@ -24,6 +24,7 @@ import za.co.absa.db.fadb.slick.FaDbPostgresProfile.api._
 import za.co.absa.db.fadb.slick.SlickFunction.SlickMultipleResultFunctionWithStatus
 import za.co.absa.db.fadb.status.{FunctionStatus, Row}
 import za.co.absa.db.fadb.status.handling.implementations.StandardStatusHandling
+import za.co.absa.db.fadb.testing.classes.{Actor, OptionalActorSlickConverter, SlickTest}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

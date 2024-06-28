@@ -25,6 +25,7 @@ import za.co.absa.db.fadb.slick.SlickFunction.SlickMultipleResultFunctionWithAgg
 import za.co.absa.db.fadb.status.aggregation.implementations.ByFirstErrorStatusAggregator
 import za.co.absa.db.fadb.status.handling.implementations.StandardStatusHandling
 import za.co.absa.db.fadb.status.{FunctionStatus, Row}
+import za.co.absa.db.fadb.testing.classes.{Actor, OptionalActorSlickConverter, SlickTest}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
