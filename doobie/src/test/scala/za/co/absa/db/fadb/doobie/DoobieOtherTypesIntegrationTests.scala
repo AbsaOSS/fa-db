@@ -25,6 +25,7 @@ import za.co.absa.db.fadb.doobie.DoobieFunction.{DoobieSingleResultFunction, Doo
 import za.co.absa.db.fadb.exceptions.DataConflictException
 import za.co.absa.db.fadb.status.FunctionStatus
 import za.co.absa.db.fadb.status.handling.implementations.StandardStatusHandling
+import za.co.absa.db.fadb.testing.classes.DoobieTest
 
 import java.net.InetAddress
 import java.util.UUID

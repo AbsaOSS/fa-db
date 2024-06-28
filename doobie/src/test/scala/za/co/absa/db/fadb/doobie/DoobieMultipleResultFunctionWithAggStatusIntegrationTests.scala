@@ -26,6 +26,7 @@ import za.co.absa.db.fadb.doobie.DoobieFunction.DoobieMultipleResultFunctionWith
 import za.co.absa.db.fadb.status.aggregation.implementations.ByMajorityErrorsStatusAggregator
 import za.co.absa.db.fadb.status.handling.implementations.StandardStatusHandling
 import za.co.absa.db.fadb.status.{FunctionStatus, Row}
+import za.co.absa.db.fadb.testing.classes.DoobieTest
 
 class DoobieMultipleResultFunctionWithAggStatusIntegrationTests extends AnyFunSuite with DoobieTest {
 

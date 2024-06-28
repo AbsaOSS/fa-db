@@ -25,6 +25,7 @@ import za.co.absa.db.fadb.DBSchema
 import za.co.absa.db.fadb.doobie.DoobieFunction.DoobieSingleResultFunctionWithStatus
 import za.co.absa.db.fadb.exceptions.StatusException
 import za.co.absa.db.fadb.status.handling.implementations.StandardStatusHandling
+import za.co.absa.db.fadb.testing.classes.DoobieTest
 
 class DoobieSingleResultFunctionWithStatusIntegrationTests extends AnyFunSuite with DoobieTest {
 

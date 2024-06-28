@@ -23,6 +23,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.db.fadb.DBSchema
 import za.co.absa.db.fadb.doobie.DoobieFunction.{DoobieSingleResultFunction, DoobieSingleResultFunctionWithStatus}
 import za.co.absa.db.fadb.status.handling.implementations.StandardStatusHandling
+import za.co.absa.db.fadb.testing.classes.DoobieTest
 
 class DatesTimesIntegrationTests extends AnyFunSuite with DoobieTest {
 

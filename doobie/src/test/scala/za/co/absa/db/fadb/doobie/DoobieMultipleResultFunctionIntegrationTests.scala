@@ -25,6 +25,7 @@ import doobie.implicits.toSqlInterpolator
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.db.fadb.DBSchema
 import za.co.absa.db.fadb.doobie.DoobieFunction.DoobieMultipleResultFunction
+import za.co.absa.db.fadb.testing.classes.DoobieTest
 
 class DoobieMultipleResultFunctionIntegrationTests extends AnyFunSuite with DoobieTest {
 

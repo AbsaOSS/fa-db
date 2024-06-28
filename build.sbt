@@ -42,8 +42,8 @@ lazy val commonJacocoReportSettings: JacocoReportSettings = JacocoReportSettings
 )
 
 /**
-  * add `za.co.absa.fadb.naming.NamingConvention`  to filter a class
-  * or  `za.co.absa.fadb.naming.NamingConvention*` to filter the class and all related objects
+  * add `za.co.absa.db.fadb.naming.NamingConvention`  to filter a class
+  * or  `za.co.absa.db.fadb.naming.NamingConvention*` to filter the class and all related objects
   */
 lazy val commonJacocoExcludes: Seq[String] = Seq(
 )

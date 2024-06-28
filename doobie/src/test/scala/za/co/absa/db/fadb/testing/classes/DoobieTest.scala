@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package za.co.absa.db.fadb.doobie
+package za.co.absa.db.fadb.testing.classes
 
 import cats.effect.IO
 import doobie.util.transactor.Transactor

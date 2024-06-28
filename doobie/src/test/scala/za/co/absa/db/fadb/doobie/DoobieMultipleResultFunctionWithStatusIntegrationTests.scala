@@ -26,6 +26,7 @@ import za.co.absa.db.fadb.doobie.DoobieFunction.DoobieMultipleResultFunctionWith
 import za.co.absa.db.fadb.exceptions.{DataNotFoundException, StatusException}
 import za.co.absa.db.fadb.status.handling.implementations.StandardStatusHandling
 import za.co.absa.db.fadb.status.{FunctionStatus, Row}
+import za.co.absa.db.fadb.testing.classes.DoobieTest
 
 class DoobieMultipleResultFunctionWithStatusIntegrationTests extends AnyFunSuite with DoobieTest {
 
