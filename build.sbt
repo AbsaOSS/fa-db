@@ -42,10 +42,18 @@ lazy val commonJacocoReportSettings: JacocoReportSettings = JacocoReportSettings
 )
 
 /**
-  * add `za.co.absa.fadb.naming.NamingConvention`  to filter a class
-  * or  `za.co.absa.fadb.naming.NamingConvention*` to filter the class and all related objects
+  * add `za.co.absa.db.fadb.naming.NamingConvention`  to filter a class
+  * or  `za.co.absa.db.fadb.naming.NamingConvention*` to filter the class and all related objects
   */
 lazy val commonJacocoExcludes: Seq[String] = Seq(
+)
+
+lazy val commonSettings = Seq(
+  javacOptions ++= commonJavacOptions,
+  scalacOptions ++= commonScalacOptions,
+  Test / parallelExecution := false,
+  (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value, // printScalaVersion is run with compile
+  jacocoExcludes := commonJacocoExcludes
 )
 
 lazy val parent = (project in file("."))
@@ -59,42 +67,30 @@ lazy val parent = (project in file("."))
   )
 
 lazy val faDbCore = (project in file("core"))
+  .settings(commonSettings: _*)
   .settings(
     name := "core",
     libraryDependencies ++= coreDependencies(scalaVersion.value),
-    javacOptions ++= commonJavacOptions,
-    scalacOptions ++= commonScalacOptions,
-    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value, // printScalaVersion is run with compile
-  )
-  .settings(
     jacocoReportSettings := commonJacocoReportSettings.withTitle(s"fa-db:core Jacoco Report - scala:${scalaVersion.value}"),
-    jacocoExcludes := commonJacocoExcludes
   )
 
 lazy val faDBSlick = (project in file("slick"))
+  .settings(commonSettings: _*)
   .settings(
     name := "slick",
     libraryDependencies ++= slickDependencies(scalaVersion.value),
-    javacOptions ++= commonJavacOptions,
-    scalacOptions ++= commonScalacOptions,
-    (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value, // printScalaVersion is run with compile
-  ).dependsOn(faDbCore)
-  .settings(
     jacocoReportSettings := commonJacocoReportSettings.withTitle(s"fa-db:slick Jacoco Report - scala:${scalaVersion.value}"),
-    jacocoExcludes := commonJacocoExcludes
   )
+  .dependsOn(faDbCore)
 
 lazy val faDBDoobie = (project in file("doobie"))
+  .settings(commonSettings: _*)
   .settings(
     name := "doobie",
     libraryDependencies ++= doobieDependencies(scalaVersion.value),
-    javacOptions ++= commonJavacOptions,
-    scalacOptions ++= commonScalacOptions,
-  ).dependsOn(faDbCore)
-  .settings(
     jacocoReportSettings := commonJacocoReportSettings.withTitle(s"fa-db:doobie Jacoco Report - scala:${scalaVersion.value}"),
-    jacocoExcludes := commonJacocoExcludes
   )
+  .dependsOn(faDbCore)
 
 lazy val flywaySettings = project
   .enablePlugins(FlywayPlugin)

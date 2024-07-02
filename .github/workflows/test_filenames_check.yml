@@ -36,6 +36,6 @@ jobs:
           name-patterns: '*UnitTests.*,*IntegrationTests.*'
           paths: '**/src/test/scala/**'
           report-format: 'console'
-          excludes: 'slick/src/test/scala/za/co/absa/fadb/slick/Actor.scala,slick/src/test/scala/za/co/absa/fadb/slick/ActorSlickConverter.scala,slick/src/test/scala/za/co/absa/fadb/slick/SlickTest.scala,doobie/src/test/scala/za/co/absa/fadb/doobie/DoobieTest.scala,slick/src/test/scala/za/co/absa/fadb/slick/OptionalActorSlickConverter.scala'
+          excludes: '**/src/test/scala/za/co/absa/db/fadb/testing/**'
           verbose-logging: 'false'
           fail-on-violation: 'true'
