@@ -16,7 +16,8 @@
 
 ThisBuild / organizationHomepage := Some(url("https://www.absa.africa"))
 
-sonatypeProfileName := "za.co.absa.db"
+ThisBuild / organization := "za.co.absa.db"
+sonatypeProfileName := "za.co.absa"
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
