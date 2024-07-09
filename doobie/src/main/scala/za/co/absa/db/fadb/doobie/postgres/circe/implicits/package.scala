@@ -38,7 +38,7 @@ package object implicits {
       .tcontramap { a =>
         val o = new PGobject
         o.setType("json[]")
-        o.setValue(circeJsonListToPGJsonArrayString(a))
+        o.setValue(jsonListToPGJsonArrayString(a))
         o
       }
   }
@@ -48,7 +48,7 @@ package object implicits {
       .other[PgArray](
         NonEmptyList.of("json[]")
       )
-      .temap(pgArray => pgArrayToListOfCirceJson(pgArray))
+      .temap(pgArray => pgArrayToListOfJson(pgArray))
   }
 
   implicit val jsonbArrayPut: Put[List[Json]] = {
@@ -59,12 +59,12 @@ package object implicits {
       .tcontramap { a =>
         val o = new PGobject
         o.setType("jsonb[]")
-        o.setValue(circeJsonListToPGJsonArrayString(a))
+        o.setValue(jsonListToPGJsonArrayString(a))
         o
       }
   }
 
-  private def circeJsonListToPGJsonArrayString(jsonList: List[Json]): String = {
+  private def jsonListToPGJsonArrayString(jsonList: List[Json]): String = {
     val arrayElements = jsonList.map { x =>
       // Convert to compact JSON string and escape inner quotes
       val escapedJsonString = x.noSpaces.replace("\"", "\\\"")
@@ -75,7 +75,7 @@ package object implicits {
     arrayElements.mkString("{", ",", "}")
   }
 
-  private def pgArrayToListOfCirceJson(pgArray: PgArray): Either[String, List[Json]] = {
+  private def pgArrayToListOfJson(pgArray: PgArray): Either[String, List[Json]] = {
     Try(Option(pgArray.getArray)) match {
       case Success(Some(array: Array[_])) =>
         val results = array.toList.map {
