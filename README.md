@@ -5,7 +5,7 @@
 
 [![Build](https://github.com/AbsaOSS/fa-db/workflows/Build/badge.svg)](https://github.com/AbsaOSS/fa-db/actions)
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa..db.fa-db/core_2.12/badge.svg)](https://search.maven.org/search?q=g:za.co.absa.db.fa-db)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.db.fa-db/core_2.12/badge.svg)](https://search.maven.org/search?q=g:za.co.absa.db.fa-db)
 
 ___
 
