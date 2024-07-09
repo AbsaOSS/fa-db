@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package za.co.absa.db.fadb.doobie.postgres
+package za.co.absa.db.fadb.doobie.postgres.circe
 
 import cats.Show
 import cats.data.NonEmptyList
@@ -25,7 +25,7 @@ import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGobject
 import io.circe.parser._
 
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 package object implicits {
 
@@ -33,6 +33,40 @@ package object implicits {
 
   implicit val getMapWithOptionStringValues: Get[Map[String, Option[String]]] = Get[Map[String, String]]
     .tmap(map => map.map { case (k, v) => k -> Option(v) })
+
+  implicit val jsonArrayPut: Put[List[CirceJson]] = {
+    Put.Advanced
+      .other[PGobject](
+        NonEmptyList.of("json[]")
+      )
+      .tcontramap { a =>
+        val o = new PGobject
+        o.setType("json[]")
+        o.setValue(circeJsonListToPGJsonArrayString(a))
+        o
+      }
+  }
+
+  implicit val jsonArrayGet: Get[List[CirceJson]] = {
+    Get.Advanced
+      .other[PgArray](
+        NonEmptyList.of("json[]")
+      )
+      .temap(pgArray => pgArrayToListOfCirceJson(pgArray))
+  }
+
+  implicit val jsonbArrayPut: Put[List[CirceJson]] = {
+    Put.Advanced
+      .other[PGobject](
+        NonEmptyList.of("jsonb[]")
+      )
+      .tcontramap { a =>
+        val o = new PGobject
+        o.setType("jsonb[]")
+        o.setValue(circeJsonListToPGJsonArrayString(a))
+        o
+      }
+  }
 
   private def circeJsonListToPGJsonArrayString(jsonList: List[CirceJson]): String = {
     val arrayElements = jsonList.map { x =>
@@ -46,67 +80,20 @@ package object implicits {
   }
 
   private def pgArrayToListOfCirceJson(pgArray: PgArray): Either[String, List[CirceJson]] = {
-    Try {
-      Option(pgArray.getArray) match {
-        case Some(array: Array[_]) => array.collect {
-          case str: String => parse(str).toTry.get
-          case other => parse(other.toString).toTry.get
-        }.toList
-        case None => List.empty[CirceJson]
-        case _ => throw new IllegalArgumentException("Unexpected type encountered.")
-      }
-    }
-      .toEither
-      .left.map(_.getMessage)
-  }
-
-  object Sequence {
-
-    implicit val get: Get[Seq[String]] = Get[List[String]].map(_.toSeq)
-    implicit val put: Put[Seq[String]] = Put[List[String]].contramap(_.toList)
-
-  }
-
-  object Json {
-
-    implicit val jsonArrayPut: Put[List[CirceJson]] = {
-      Put.Advanced
-        .other[PGobject](
-          NonEmptyList.of("json[]")
-        )
-        .tcontramap { a =>
-          val o = new PGobject
-          o.setType("json[]")
-          o.setValue(circeJsonListToPGJsonArrayString(a))
-          o
+    Try(Option(pgArray.getArray)) match {
+      case Success(Some(array: Array[_])) =>
+        val results = array.toList.map {
+          case str: String => parse(str).left.map(_.getMessage)
+          case other => parse(other.toString).left.map(_.getMessage)
         }
-    }
-
-    implicit val jsonArrayGet: Get[List[CirceJson]] = {
-      Get.Advanced
-        .other[PgArray](
-          NonEmptyList.of("json[]")
-        )
-        .temap(pgArray => pgArrayToListOfCirceJson(pgArray))
-    }
-
-  }
-
-  object Jsonb {
-
-    implicit val jsonbArrayPut: Put[List[CirceJson]] = {
-      Put.Advanced
-        .other[PGobject](
-          NonEmptyList.of("jsonb[]")
-        )
-        .tcontramap { a =>
-          val o = new PGobject
-          o.setType("jsonb[]")
-          o.setValue(circeJsonListToPGJsonArrayString(a))
-          o
+        results.partition(_.isLeft) match {
+          case (Nil, rights) => Right(rights.collect { case Right(json) => json })
+          case (lefts, _) => Left("Failed to parse JSON: " + lefts.collect { case Left(err) => err }.mkString(", "))
         }
+      case Success(Some(_)) => Left("Unexpected type encountered. Expected an Array.")
+      case Success(None) => Right(Nil)
+      case Failure(exception) => Left(exception.getMessage)
     }
-
   }
 
 }

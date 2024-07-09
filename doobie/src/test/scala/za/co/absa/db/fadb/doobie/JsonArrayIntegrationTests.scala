@@ -26,7 +26,7 @@ import za.co.absa.db.fadb.DBSchema
 import za.co.absa.db.fadb.doobie.DoobieFunction.{DoobieMultipleResultFunction, DoobieSingleResultFunction}
 import za.co.absa.db.fadb.testing.classes.DoobieTest
 
-import za.co.absa.db.fadb.doobie.postgres.implicits.Json.jsonArrayGet
+import za.co.absa.db.fadb.doobie.postgres.circe.implicits.jsonArrayGet
 
 class JsonArrayIntegrationTests extends AnyFunSuite with DoobieTest {
 
@@ -36,11 +36,11 @@ class JsonArrayIntegrationTests extends AnyFunSuite with DoobieTest {
         val actorsAsJsonList = values.map(_.asJson)
         Seq(
           {
-            import za.co.absa.db.fadb.doobie.postgres.implicits.Json.jsonArrayPut
+            import za.co.absa.db.fadb.doobie.postgres.circe.implicits.jsonArrayPut
             fr"$actorsAsJsonList"
           },
           {
-            import za.co.absa.db.fadb.doobie.postgres.implicits.Jsonb.jsonbArrayPut
+            import za.co.absa.db.fadb.doobie.postgres.circe.implicits.jsonbArrayPut
             fr"$actorsAsJsonList"
           }
         )
