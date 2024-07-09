@@ -5,7 +5,7 @@
 
 [![Build](https://github.com/AbsaOSS/fa-db/workflows/Build/badge.svg)](https://github.com/AbsaOSS/fa-db/actions)
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa..db.fa-db/core_2.12/badge.svg)](https://search.maven.org/search?q=g:za.co.absa.fa-db)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.db.fa-db/core_2.12/badge.svg)](https://search.maven.org/search?q=g:za.co.absa.db.fa-db)
 
 ___
 
@@ -68,9 +68,9 @@ libraryDependencies *= "za.co.absa.db.fa-db" %% "doobie"  % "X.Y.Z"
 ##### Scala 2.12
 
 Modules:
-* Core [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.db.fa-db/core_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/core_2.12)
-* Slick [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.db.fa-db/slick_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/slick_2.12)
-* Doobie [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.db.fa-db/doobie_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/doobie_2.12)
+* Core [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.db.fa-db/core_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.db.fa-db/core_2.12)
+* Slick [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.db.fa-db/slick_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.db.fa-db/slick_2.12)
+* Doobie [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.db.fa-db/doobie_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.db.fa-db/doobie_2.12)
 
 ```xml
 <dependencies>
@@ -89,9 +89,9 @@ Modules:
 
 ### Scala 2.13
 Modules:
-* Core [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/core_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/core_2.13)
-* Slick [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/slick_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/slick_2.13)
-* Doobie [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/doobie_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.fa-db/doobie_2.13)
+* Core [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.db.fa-db/core_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.db.fa-db/core_2.13)
+* Slick [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.db.fa-db/slick_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.db.fa-db/slick_2.13)
+* Doobie [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa.db.fa-db/doobie_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa.db.fa-db/doobie_2.13)
 
 ```xml
 <dependencies>

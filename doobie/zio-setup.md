@@ -3,7 +3,7 @@
 Add the following dependencies to your `build.sbt` file.
 
 ```scala
-"za.co.absa.fa-db" %% "doobie" % "<version>"
+"za.co.absa.db.fa-db" %% "doobie" % "<version>"
 // if not already included as transitive dependency
 "dev.zio" %% "zio-interop-cats" % "23.0.0.8"
 ```
