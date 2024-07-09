@@ -28,7 +28,7 @@ import za.co.absa.db.fadb.testing.classes.DoobieTest
 
 import za.co.absa.db.fadb.doobie.postgres.implicits.Json.jsonArrayGet
 
-class JsonArrayTests extends AnyFunSuite with DoobieTest {
+class JsonArrayIntegrationTests extends AnyFunSuite with DoobieTest {
 
   class InsertActorsJson(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
     extends DoobieSingleResultFunction[List[Actor], Unit, IO] (
