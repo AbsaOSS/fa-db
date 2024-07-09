@@ -20,9 +20,15 @@ import cats.effect.IO
 import doobie.util.transactor.Transactor
 import doobie.util.transactor.Transactor.Aux
 import za.co.absa.db.fadb.DBSchema
+import io.circe.{Decoder, Encoder}
+import io.circe.generic.semiauto._
 
 trait DoobieTest {
   case class Actor(actorId: Int, firstName: String, lastName: String)
+  object Actor {
+    implicit val actorEncoder: Encoder[Actor] = deriveEncoder
+    implicit val actorDecoder: Decoder[Actor] = deriveDecoder
+  }
   case class GetActorsQueryParameters(firstName: Option[String], lastName: Option[String])
   case class GetActorsByLastnameQueryParameters(lastName: String, firstName: Option[String] = None)
   case class CreateActorRequestBody(firstName: String, lastName: String)
