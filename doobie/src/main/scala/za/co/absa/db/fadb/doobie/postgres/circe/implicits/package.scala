@@ -18,7 +18,6 @@ package za.co.absa.db.fadb.doobie.postgres.circe
 
 import cats.Show
 import cats.data.NonEmptyList
-import doobie.postgres.implicits._
 import doobie.{Get, Put}
 import io.circe.Json
 import org.postgresql.jdbc.PgArray
@@ -30,9 +29,6 @@ import scala.util.{Failure, Success, Try}
 package object implicits {
 
   private implicit val showPgArray: Show[PgArray] = Show.fromToString
-
-  implicit val getMapWithOptionStringValues: Get[Map[String, Option[String]]] = Get[Map[String, String]]
-    .tmap(map => map.map { case (k, v) => k -> Option(v) })
 
   implicit val jsonArrayPut: Put[List[Json]] = {
     Put.Advanced
