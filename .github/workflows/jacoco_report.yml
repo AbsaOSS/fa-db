@@ -69,7 +69,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: ${{ env.coverage-overall }}
           min-coverage-changed-files: ${{ env.coverage-changed-files }}
-          title: JaCoCo `model` module code coverage report - scala ${{ env.scalaLong }}
+          title: JaCoCo `core` module code coverage report - scala ${{ env.scalaLong }}
           update-comment: true
       - name: Add coverage to PR (doobie)
         if: steps.jacocorun.outcome == 'success'
@@ -80,7 +80,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: ${{ env.coverage-overall }}
           min-coverage-changed-files: ${{ env.coverage-changed-files }}
-          title: JaCoCo `agent` module code coverage report - scala ${{ env.scalaLong }}
+          title: JaCoCo `doobie` module code coverage report - scala ${{ env.scalaLong }}
           update-comment: true
       - name: Add coverage to PR (slick)
         if: steps.jacocorun.outcome == 'success'
