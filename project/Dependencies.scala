@@ -48,7 +48,8 @@ object Dependencies {
       "org.tpolecat" %% "doobie-core" % "1.0.0-RC2",
       "org.tpolecat" %% "doobie-hikari" % "1.0.0-RC2",
       "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC2",
-      "org.tpolecat" %% "doobie-postgres-circe" % "1.0.0-RC2"
+      "org.tpolecat" %% "doobie-postgres-circe" % "1.0.0-RC2",
+      "io.circe" %% "circe-generic" % "0.14.9" % Test
     )
   }
 

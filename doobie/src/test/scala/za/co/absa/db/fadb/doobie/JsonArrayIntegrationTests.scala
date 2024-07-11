@@ -25,6 +25,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.db.fadb.DBSchema
 import za.co.absa.db.fadb.doobie.DoobieFunction.{DoobieMultipleResultFunction, DoobieSingleResultFunction}
 import za.co.absa.db.fadb.testing.classes.DoobieTest
+import io.circe.generic.auto._
 
 import za.co.absa.db.fadb.doobie.postgres.circe.implicits.jsonOrJsonbArrayGet
 
@@ -36,10 +37,14 @@ class JsonArrayIntegrationTests extends AnyFunSuite with DoobieTest {
         val actorsAsJsonList = values.map(_.asJson)
         Seq(
           {
+            // has to be imported inside separate scope to avoid conflicts with the import below
+            // as both implicits are of the same type and this would cause ambiguity
             import za.co.absa.db.fadb.doobie.postgres.circe.implicits.jsonArrayPut
             fr"$actorsAsJsonList"
           },
           {
+            // has to be imported inside separate scope to avoid conflicts with the import above
+            // as both implicits are of the same type and this would cause ambiguity
             import za.co.absa.db.fadb.doobie.postgres.circe.implicits.jsonbArrayPut
             fr"$actorsAsJsonList"
           }
