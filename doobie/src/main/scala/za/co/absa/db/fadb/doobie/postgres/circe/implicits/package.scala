@@ -30,6 +30,12 @@ package object implicits {
 
   private implicit val showPgArray: Show[PgArray] = Show.fromToString
 
+  implicit val jsonPut: Put[Json] = doobie.postgres.circe.json.implicits.jsonPut
+  implicit val jsonbPut: Put[Json] = doobie.postgres.circe.jsonb.implicits.jsonbPut
+
+  implicit val jsonGet: Get[Json] = doobie.postgres.circe.json.implicits.jsonGet
+  implicit val jsonbGet: Get[Json] = doobie.postgres.circe.jsonb.implicits.jsonbGet
+
   implicit val jsonArrayPut: Put[List[Json]] = {
     Put.Advanced
       .other[PGobject](

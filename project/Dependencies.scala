@@ -44,10 +44,11 @@ object Dependencies {
   }
 
   def doobieDependencies(scalaVersion: String): Seq[ModuleID] = {
-    commonDependencies(scalaVersion) ++ jsonSerdeDependencies ++ Seq(
+    commonDependencies(scalaVersion) ++ Seq(
       "org.tpolecat" %% "doobie-core" % "1.0.0-RC2",
       "org.tpolecat" %% "doobie-hikari" % "1.0.0-RC2",
-      "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC2"
+      "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC2",
+      "org.tpolecat" %% "doobie-postgres-circe" % "1.0.0-RC2"
     )
   }
 
@@ -57,15 +58,4 @@ object Dependencies {
     Seq(postgresql)
   }
 
-  private def jsonSerdeDependencies: Seq[ModuleID] = {
-    lazy val circeCore = "io.circe" %% "circe-core" % "0.14.7"
-    lazy val circeParser = "io.circe" %% "circe-parser" % "0.14.7"
-    lazy val circeGeneric = "io.circe" %% "circe-generic" % "0.14.7"
-
-    Seq(
-      circeCore,
-      circeParser,
-      circeGeneric,
-    )
-  }
 }
