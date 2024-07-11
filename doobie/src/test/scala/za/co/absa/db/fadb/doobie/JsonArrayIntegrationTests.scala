@@ -26,7 +26,7 @@ import za.co.absa.db.fadb.DBSchema
 import za.co.absa.db.fadb.doobie.DoobieFunction.{DoobieMultipleResultFunction, DoobieSingleResultFunction}
 import za.co.absa.db.fadb.testing.classes.DoobieTest
 
-import za.co.absa.db.fadb.doobie.postgres.circe.implicits.jsonArrayGet
+import za.co.absa.db.fadb.doobie.postgres.circe.implicits.jsonOrJsonbArrayGet
 
 class JsonArrayIntegrationTests extends AnyFunSuite with DoobieTest {
 

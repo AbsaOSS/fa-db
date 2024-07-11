@@ -43,14 +43,6 @@ package object implicits {
       }
   }
 
-  implicit val jsonArrayGet: Get[List[Json]] = {
-    Get.Advanced
-      .other[PgArray](
-        NonEmptyList.of("json[]")
-      )
-      .temap(pgArray => pgArrayToListOfJson(pgArray))
-  }
-
   implicit val jsonbArrayPut: Put[List[Json]] = {
     Put.Advanced
       .other[PGobject](
@@ -62,6 +54,14 @@ package object implicits {
         o.setValue(jsonListToPGJsonArrayString(a))
         o
       }
+  }
+
+  implicit val jsonOrJsonbArrayGet: Get[List[Json]] = {
+    Get.Advanced
+      .other[PgArray](
+        NonEmptyList.of("json[]")
+      )
+      .temap(pgArray => pgArrayToListOfJson(pgArray))
   }
 
   private def jsonListToPGJsonArrayString(jsonList: List[Json]): String = {
