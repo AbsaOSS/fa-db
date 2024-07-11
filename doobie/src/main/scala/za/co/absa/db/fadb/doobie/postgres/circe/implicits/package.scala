@@ -56,6 +56,8 @@ package object implicits {
       }
   }
 
+  // to be used for both json[] and jsonb[] as it handles well both and we want to avoid collision
+  // when resolving implicits
   implicit val jsonOrJsonbArrayGet: Get[List[Json]] = {
     Get.Advanced
       .other[PgArray](
