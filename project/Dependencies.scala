@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import sbt._
+import sbt.*
 
 object Dependencies {
 
@@ -47,7 +47,9 @@ object Dependencies {
     commonDependencies(scalaVersion) ++ Seq(
       "org.tpolecat" %% "doobie-core" % "1.0.0-RC2",
       "org.tpolecat" %% "doobie-hikari" % "1.0.0-RC2",
-      "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC2"
+      "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC2",
+      "org.tpolecat" %% "doobie-postgres-circe" % "1.0.0-RC2",
+      "io.circe" %% "circe-generic" % "0.14.9" % Test
     )
   }
 
@@ -56,4 +58,5 @@ object Dependencies {
 
     Seq(postgresql)
   }
+
 }
