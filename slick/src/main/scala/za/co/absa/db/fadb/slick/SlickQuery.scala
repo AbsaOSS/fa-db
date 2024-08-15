@@ -17,6 +17,7 @@
 package za.co.absa.db.fadb.slick
 
 import slick.jdbc.{GetResult, PositionedResult, SQLActionBuilder}
+import za.co.absa.db.fadb.exceptions.StatusException
 import za.co.absa.db.fadb.status.{FailedOrRow, FunctionStatus, Row}
 import za.co.absa.db.fadb.{Query, QueryWithStatus}
 
@@ -39,26 +40,30 @@ class SlickQuery[R](val sql: SQLActionBuilder, val getResult: GetResult[R]) exte
 class SlickQueryWithStatus[R](
   val sql: SQLActionBuilder,
   val getResult: GetResult[R],
-  checkStatus: Row[PositionedResult] => FailedOrRow[PositionedResult]
-) extends QueryWithStatus[PositionedResult, PositionedResult, R] {
+  checkStatus: FunctionStatus => Option[StatusException]
+) extends QueryWithStatus[PositionedResult, PositionedResult, R](checkStatus) {
 
   /**
    *  Processes the status of the query and returns the status with data
    *  @param initialResult - the initial result of the query
    *  @return data with status
    */
-  override def processStatus(initialResult: PositionedResult): Row[PositionedResult] = {
+  override def processStatus(initialResult: PositionedResult): Option[StatusException]= {
     val status: Int = initialResult.<<
     val statusText: String = initialResult.<<
     Row(FunctionStatus(status, statusText), initialResult)
   }
+
+//  override def processStatus(initialResult: FunctionStatus): Option[StatusException] =
+//    Row(FunctionStatus(initialResult.status, initialResult.statusText), initialResult.data)
+
 
   /**
    *  Converts the status with data to either a status exception or the data
    *  @param statusWithData - the status with data
    *  @return either a status exception or the data
    */
-  override def toStatusExceptionOrData(
+/*  override def toStatusExceptionOrData(
     statusWithData: Row[PositionedResult]
   ): FailedOrRow[R] = {
     checkStatus(statusWithData) match {
@@ -68,7 +73,7 @@ class SlickQueryWithStatus[R](
         val data = getResult(value.data)
         Right(Row(status, data))
     }
-  }
+  }*/
 
   /**
    *  Combines the processing of the status and the conversion of the status with data to either a status exception or the data

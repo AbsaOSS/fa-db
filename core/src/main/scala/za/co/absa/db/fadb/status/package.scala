@@ -17,6 +17,7 @@
 package za.co.absa.db.fadb
 
 import za.co.absa.db.fadb.exceptions.StatusException
+import za.co.absa.db.fadb.status.FailedOrRow
 
 package object status {
 
@@ -31,7 +32,25 @@ package object status {
     *  @param data the data of one row (barring the status fields)
     *  @tparam D the type of the data
     */
+
+  trait BlbyJmenoWithLayers[R] {
+    def toFailedOrRow(statusCheck: FunctionStatus => Option[StatusException]): FailedOrRow[R]
+  }
+
   case class Row[D](functionStatus: FunctionStatus, data: D)
+
+  case class StatusWithDataOptional[R](status: Int, statusText: String, data: Option[R])
+    extends BlbyJmenoWithLayers[R]{
+
+    def toFailedOrRow(statusCheck: FunctionStatus => Option[StatusException]): FailedOrRow[R] = {
+      val functionStatus = FunctionStatus(status, statusText)
+      val left = statusCheck(functionStatus)
+      left match {
+        case Some(e) => Left(e)
+        case None => Right(Row(functionStatus, data.get))
+      }
+    }
+  }
 
   /**
     *  This is a representation of a single row returned from a DB function with processed status information.

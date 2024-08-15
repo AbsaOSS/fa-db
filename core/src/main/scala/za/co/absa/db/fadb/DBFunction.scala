@@ -18,9 +18,10 @@ package za.co.absa.db.fadb
 
 import cats.MonadError
 import cats.implicits.toFlatMapOps
+import za.co.absa.db.fadb.exceptions.StatusException
 import za.co.absa.db.fadb.status.aggregation.StatusAggregator
 import za.co.absa.db.fadb.status.handling.StatusHandling
-import za.co.absa.db.fadb.status.{FailedOrRows, FailedOrRow, Row}
+import za.co.absa.db.fadb.status.{FailedOrRow, FailedOrRows, FunctionStatus, Row}
 
 import scala.language.higherKinds
 
@@ -111,7 +112,7 @@ abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOv
     *  @return - A sequence of results from the database function.
     */
   protected def multipleResults(values: I)(implicit me: MonadError[F, Throwable]): F[Seq[FailedOrRow[R]]] =
-    query(values).flatMap(q => dBEngine.fetchAllWithStatus(q))
+    query(values).flatMap((q: dBEngine.QueryWithStatusType[R]) => dBEngine.fetchAllWithStatus(q))
 
   /**
     *  Executes the database function and returns a single result.
@@ -148,7 +149,7 @@ abstract class DBFunctionWithStatus[I, R, E <: DBEngine[F], F[_]](functionNameOv
   protected def query(values: I)(implicit me: MonadError[F, Throwable]): F[dBEngine.QueryWithStatusType[R]]
 
   // To be provided by an implementation of QueryStatusHandling
-  override def checkStatus[D](statusWithData: Row[D]): FailedOrRow[D]
+  override def checkStatus(functionStatus: FunctionStatus): Option[StatusException]
 }
 
 object DBFunction {
