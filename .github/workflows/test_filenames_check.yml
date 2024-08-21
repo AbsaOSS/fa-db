@@ -31,11 +31,11 @@ jobs:
 
       - name: Filename Inspector
         id: scan-test-files
-        uses: AbsaOSS/filename-inspector@master
+        uses: AbsaOSS/filename-inspector@v0.1.0
         with:
           name-patterns: '*UnitTests.*,*IntegrationTests.*'
           paths: '**/src/test/scala/**'
           report-format: 'console'
-          excludes: '**/src/test/scala/za/co/absa/db/fadb/testing/**'
-          verbose-logging: 'false'
+#          excludes: '**/src/test/scala/za/co/absa/db/fadb/testing/**'
+          verbose-logging: 'true'
           fail-on-violation: 'true'
