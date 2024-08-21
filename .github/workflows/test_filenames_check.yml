@@ -42,5 +42,5 @@ jobs:
             slick/src/test/scala/za/co/absa/db/fadb/testing/classes/Actor.scala,
             slick/src/test/scala/za/co/absa/db/fadb/testing/classes/SlickTest.scala,
             doobie/src/test/scala/za/co/absa/db/fadb/testing/classes/DoobieTest.scala
-          verbose-logging: 'true'
+          verbose-logging: 'false'
           fail-on-violation: 'true'
