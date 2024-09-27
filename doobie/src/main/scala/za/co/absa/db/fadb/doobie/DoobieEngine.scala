@@ -49,13 +49,16 @@ class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[
    *  @return the query result as an `F[Seq[R]]`
    */
   private def executeQuery[R](query: QueryType[R])(implicit readR: Read[R]): F[Seq[R]] = {
-    query.fragment.query[R].to[Seq].transact(transactor)
+    val o: Query0[R] = query.fragment.query[R]
+    val o1: ConnectionIO[Seq[R]] = o.to[Seq]
+    val o2: F[Seq[R]] = o1.transact(transactor)
+    o2
   }
 
   /**
    *  Executes a Doobie query and returns the result.
    *
-   * Note: `StatusWithData` is needed here because it is more 'flat' in comparison to `FunctionStatusWithData`
+   *  Note: `StatusWithData` is needed here because it is more 'flat' in comparison to `FunctionStatusWithData`
    *   and Doobie's `Read` wasn't able to work with it.
    *
    *  @param query the Doobie query to execute
@@ -64,8 +67,8 @@ class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[
    */
   private def executeQueryWithStatus[R](
     query: QueryWithStatusType[R]
-  )(implicit readStatusWithDataR: Read[StatusWithData[R]]): F[Seq[FailedOrRow[R]]] = {
-      query.fragment.query[StatusWithData[R]].to[Seq].transact(transactor).map(_.map(query.getResultOrException))
+  )(implicit readStatusWithDataR: Read[StatusWithDataOptional[R]]): F[Seq[FailedOrRow[R]]] = {
+      query.fragment.query[StatusWithDataOptional[R]].to[Seq].transact(transactor).map(_.map(query.getResultOrException))
   }
 
   /**

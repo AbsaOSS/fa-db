@@ -25,3 +25,4 @@ package za.co.absa.db.fadb.doobie
  *    by a user.
  */
 case class StatusWithData[R](status: Int, statusText: String, data: R)
+case class StatusWithDataOptional[R](status: Int, statusText: String, data: Option[R])

@@ -22,6 +22,7 @@ import doobie.util.Read
 import doobie.util.fragment.Fragment
 import za.co.absa.db.fadb.DBFunction._
 import za.co.absa.db.fadb.DBSchema
+import za.co.absa.db.fadb.status.handling.StatusHandling
 import za.co.absa.db.fadb.status.{FailedOrRow, Row}
 
 import scala.language.higherKinds
@@ -120,16 +121,27 @@ trait DoobieFunction[I, R, F[_]] extends DoobieFunctionBase[R] {
 
 }
 
-trait DoobieFunctionWithStatus[I, R, F[_]] extends DoobieFunctionBase[R] {
+trait DoobieFunctionWithStatus[I, R, F[_]] extends DoobieFunctionBase[R] with StatusHandling {
 
   /**
    *  The `Read[StatusWithData[R]]` instance used to read the query result with status into `StatusWithData[R]`.
    */
-  implicit def readStatusWithDataR(implicit readR: Read[R]): Read[StatusWithData[R]] = Read[(Int, String, R)].map {
-    case (status, status_text, data) => StatusWithData(status, status_text, data)
-  }
+//  implicit def readStatusWithDataR(implicit readR: Read[R]): Read[StatusWithData[R]] = Read[(Int, String, R)].map {
+//    case (status, status_text, data) => StatusWithData(status, status_text, data)
+//  }
 
-  /**
+//  implicit def readStatusWithDataR(implicit readR: Read[R]): Read[StatusWithDataOptional[R]] = Read[(Int, String, Option[R])].map {
+//    case (status: Int, status_text: String, data: Option[R]) => StatusWithDataOptional(status, status_text, data)
+//  }
+
+//  def getOption[T](f: Fragment)(implicit read: Read[T]): Option[T] = {
+//    f.query[T]
+//      .option
+//      .transact(xa)
+//      .unsafeRunSync()
+
+
+    /**
    *  Function that generates a sequence of `Fragment`s representing the SQL query from input values for the function.
    *  @return the sequence of `Fragment`s representing the SQL query
    */
@@ -196,7 +208,8 @@ trait DoobieFunctionWithStatus[I, R, F[_]] extends DoobieFunctionBase[R] {
   }
 
   // This is to be mixed in by an implementation of StatusHandling
-  def checkStatus[D](statusWithData: Row[D]): FailedOrRow[D]
+//  def checkStatus[D](statusWithData: Row[D]): FailedOrRow[D]
+//  def checkStatus[D](statusWithData: Row[D]): FailedOrRow[D]
 }
 
 /**
