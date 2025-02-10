@@ -17,6 +17,7 @@
 package za.co.absa.db.fadb.slick
 
 import slick.jdbc.{GetResult, PositionedResult, SQLActionBuilder}
+import za.co.absa.db.fadb.exceptions.StatusException
 import za.co.absa.db.fadb.status.{FailedOrRow, FunctionStatus, Row}
 import za.co.absa.db.fadb.{Query, QueryWithStatus}
 
@@ -39,7 +40,7 @@ class SlickQuery[R](val sql: SQLActionBuilder, val getResult: GetResult[R]) exte
 class SlickQueryWithStatus[R](
   val sql: SQLActionBuilder,
   val getResult: GetResult[R],
-  checkStatus: Row[PositionedResult] => FailedOrRow[PositionedResult]
+  checkStatus: FunctionStatus => Option[StatusException]
 ) extends QueryWithStatus[PositionedResult, PositionedResult, R] {
 
   /**
@@ -61,13 +62,9 @@ class SlickQueryWithStatus[R](
   override def toStatusExceptionOrData(
     statusWithData: Row[PositionedResult]
   ): FailedOrRow[R] = {
-    checkStatus(statusWithData) match {
-      case Left(statusException)  => Left(statusException)
-      case Right(value) =>
-        val status = value.functionStatus
-        val data = getResult(value.data)
-        Right(Row(status, data))
-    }
+    checkStatus(statusWithData.functionStatus).toLeft(
+      Row(statusWithData.functionStatus, getResult(statusWithData.data))
+    )
   }
 
   /**
