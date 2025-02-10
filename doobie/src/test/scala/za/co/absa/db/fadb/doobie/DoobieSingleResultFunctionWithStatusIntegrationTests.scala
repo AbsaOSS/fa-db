@@ -46,15 +46,18 @@ class DoobieSingleResultFunctionWithStatusIntegrationTests extends AnyFunSuite w
     override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("input_value")
   }
 
-  class ErrorIfNotOneWithStatus(functionNameOverride: String)(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
-    extends DoobieSingleResultFunctionWithStatus[Int, Option[Int], IO](
-      params => Seq(fr"$params"), Some(functionNameOverride)
-    ) with StandardStatusHandling {
+  class ErrorIfNotOneOption(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
+    extends DoobieSingleResultFunctionWithStatus[Int, Option[Int], IO] (
+      params => Seq(fr"$params"),
+      Some("error_if_not_one")
+    )
+      with StandardStatusHandling {
     override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("input_value")
   }
 
   private val createActor = new CreateActor()(Integration, new DoobieEngine(transactor))
   private val errorIfNotOne = new ErrorIfNotOne()(Integration, new DoobieEngine(transactor))
+  private val errorIfNotOneOption = new ErrorIfNotOneOption()(Integration, new DoobieEngine(transactor))
 
   test("Creating actor within a function with status handling") {
     val requestBody = CreateActorRequestBody("Pavel", "Marek")
@@ -62,30 +65,25 @@ class DoobieSingleResultFunctionWithStatusIntegrationTests extends AnyFunSuite w
     assert(result == Right(125))
   }
 
-  test("Successful function call with status handling") {
-    val result = errorIfNotOne(1).unsafeRunSync()
-    assert(result.isRight)
-  }
-
-  test("Unsuccessful function call with status handling. Asserting on error when Int not wrapped in Option") {
-    // SQL `NULL` read at column 3 (JDBC type Integer) but mapping is to a non-Option type; use Option here. Note that JDBC column indexing is 1-based.
-    assertThrows[NonNullableColumnRead](errorIfNotOne(2).unsafeRunSync())
-  }
-
-  test("Unsuccessful function call with status handling. Asserting on error when Int wrapped in Option") {
-    val errorIfNotOne = new ErrorIfNotOneWithStatus("error_if_not_one")(Integration, new DoobieEngine(transactor))
-
+  test("Unsuccessful function call with status handling") {
     val result = errorIfNotOne(2).unsafeRunSync()
     assert(result.isLeft)
   }
 
-  test("Successful function call with status handling. Asserting on success when Int wrapped in Option") {
-    val errorIfNotOne = new ErrorIfNotOneWithStatus("error_if_not_one")(Integration, new DoobieEngine(transactor))
-
+  test("Successful function call with status handling") {
     val result = errorIfNotOne(1).unsafeRunSync()
     result match {
       case Left(_) => fail("should not be left")
-      case Right(value) => assert(value.data.contains(1))
+      case Right(value) => assert(value.data === 1)
     }
   }
+
+  test("backwards compatibility with already Optioned result #133)") {
+    assert(errorIfNotOneOption(2).unsafeRunSync().isLeft)
+    errorIfNotOneOption(1).unsafeRunSync() match {
+      case Left(_) => fail("should not be left")
+      case Right(value) => assert(value.data === Some(1))
+    }
+  }
+
 }

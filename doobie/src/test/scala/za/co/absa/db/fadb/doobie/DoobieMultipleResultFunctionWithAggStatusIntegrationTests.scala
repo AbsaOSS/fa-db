@@ -23,6 +23,7 @@ import doobie.implicits.toSqlInterpolator
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.db.fadb.DBSchema
 import za.co.absa.db.fadb.doobie.DoobieFunction.DoobieMultipleResultFunctionWithAggStatus
+import za.co.absa.db.fadb.exceptions.DataNotFoundException
 import za.co.absa.db.fadb.status.aggregation.implementations.ByMajorityErrorsStatusAggregator
 import za.co.absa.db.fadb.status.handling.implementations.StandardStatusHandling
 import za.co.absa.db.fadb.status.{FunctionStatus, Row}
@@ -35,19 +36,29 @@ class DoobieMultipleResultFunctionWithAggStatusIntegrationTests extends AnyFunSu
   }
 
   class GetActorsByLastname(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
-  // Option[Actor] because: Actor might not exist, and the function would return only status info without actor data
-    extends DoobieMultipleResultFunctionWithAggStatus[GetActorsByLastnameQueryParameters, Option[Actor], IO](getActorsByLastnameQueryFragments)
+    extends DoobieMultipleResultFunctionWithAggStatus[GetActorsByLastnameQueryParameters, Actor, IO](getActorsByLastnameQueryFragments)
+      with StandardStatusHandling
+      with ByMajorityErrorsStatusAggregator {
+    override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("actor_id", "first_name", "last_name")
+  }
+
+  class GetActorsByLastnameOption(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
+    extends DoobieMultipleResultFunctionWithAggStatus[GetActorsByLastnameQueryParameters, Option[Actor], IO](
+      getActorsByLastnameQueryFragments,
+      Some("get_actors_by_lastname")
+    )
       with StandardStatusHandling
       with ByMajorityErrorsStatusAggregator {
     override def fieldsToSelect: Seq[String] = super.fieldsToSelect ++ Seq("actor_id", "first_name", "last_name")
   }
 
   private val getActorsByLastname = new GetActorsByLastname()(Integration, new DoobieEngine(transactor))
+  private val getActorsByLastnameOption = new GetActorsByLastnameOption()(Integration, new DoobieEngine(transactor))
 
   test("Retrieving multiple actors from database, lastName match") {
     val expectedResultElem = Set(
-      Row(FunctionStatus(11, "OK, match on last name only"), Some(Actor(51, "Fred", "Weasley"))),
-      Row(FunctionStatus(11, "OK, match on last name only"), Some(Actor(52, "George", "Weasley"))),
+      Row(FunctionStatus(11, "OK, match on last name only"), Actor(51, "Fred", "Weasley")),
+      Row(FunctionStatus(11, "OK, match on last name only"), Actor(52, "George", "Weasley")),
     )
 
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("Weasley")).unsafeRunSync()
@@ -61,7 +72,7 @@ class DoobieMultipleResultFunctionWithAggStatusIntegrationTests extends AnyFunSu
 
   test("Retrieving single actor from database, full match") {
     val expectedResultElem = Row(
-      FunctionStatus(12, "OK, full match"), Some(Actor(50, "Liza", "Simpson"))
+      FunctionStatus(12, "OK, full match"), Actor(50, "Liza", "Simpson")
     )
 
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("Simpson", Some("Liza"))).unsafeRunSync()
@@ -76,7 +87,7 @@ class DoobieMultipleResultFunctionWithAggStatusIntegrationTests extends AnyFunSu
 
   test("Retrieving single actor from database, lastname match") {
     val expectedResultElem = Row(
-      FunctionStatus(11, "OK, match on last name only"), Some(Actor(50, "Liza", "Simpson"))
+      FunctionStatus(11, "OK, match on last name only"), Actor(50, "Liza", "Simpson")
     )
 
     val results = getActorsByLastname(GetActorsByLastnameQueryParameters("Simpson")).unsafeRunSync()
@@ -98,4 +109,20 @@ class DoobieMultipleResultFunctionWithAggStatusIntegrationTests extends AnyFunSu
       case Right(_) => fail("should not be right")
     }
   }
+
+  test("backwards compatibility with already Optioned result #133)") {
+    val foundExpectedResult = Set(
+      Row(FunctionStatus(11, "OK, match on last name only"), Some(Actor(51, "Fred", "Weasley"))),
+      Row(FunctionStatus(11, "OK, match on last name only"), Some(Actor(52, "George", "Weasley")))
+    )
+    val foundActualResult =
+      getActorsByLastnameOption(GetActorsByLastnameQueryParameters("Weasley")).unsafeRunSync().map(_.toSet)
+    assert(foundActualResult.contains(foundExpectedResult))
+
+    val notFoundExpectedResult = Left(DataNotFoundException(FunctionStatus(41, "No actor found")))
+    val notFoundActualResult =
+      getActorsByLastname(GetActorsByLastnameQueryParameters("TotallyNonExisting!")).unsafeRunSync()
+    assert(notFoundActualResult == notFoundExpectedResult)
+  }
+
 }

@@ -18,6 +18,7 @@ package za.co.absa.db.fadb.doobie
 
 import doobie.util.Read
 import doobie.util.fragment.Fragment
+import za.co.absa.db.fadb.exceptions.StatusException
 import za.co.absa.db.fadb.status.{FailedOrRow, FunctionStatus, Row}
 import za.co.absa.db.fadb.{Query, QueryWithStatus}
 
@@ -36,20 +37,20 @@ class DoobieQuery[R](val fragment: Fragment)(implicit val readR: Read[R]) extend
  *
  *  @param fragment the Doobie fragment representing the SQL query
  *  @param checkStatus the function to check the status of the query
- *  @param readStatusWithDataR the `Read[StatusWithData[R]]` instance used to read the query result into `StatusWithData[R]`
+ *  @param readStatusWithData the `Read[StatusWithData[R]]` instance used to read the query result into `StatusWithData[R]`
  */
 class DoobieQueryWithStatus[R](
   val fragment: Fragment,
-  checkStatus: Row[R] => FailedOrRow[R]
-)(implicit val readStatusWithDataR: Read[StatusWithData[R]])
-    extends QueryWithStatus[StatusWithData[R], R, R] {
+  checkStatus: FunctionStatus => Option[StatusException]
+)(implicit val readStatusWithData: Read[StatusWithData[R]])
+    extends QueryWithStatus[StatusWithData[R], Option[R], R] {
 
   /*
    * Processes the status of the query and returns the status with data
    * @param initialResult - the initial result of the query
    * @return data with status
    */
-  override def processStatus(initialResult: StatusWithData[R]): Row[R] =
+  override def processStatus(initialResult: StatusWithData[R]): Row[Option[R]] =
     Row(FunctionStatus(initialResult.status, initialResult.statusText), initialResult.data)
 
   /*
@@ -57,6 +58,9 @@ class DoobieQueryWithStatus[R](
    * @param statusWithData - the status with data
    * @return either a status exception or the data
    */
-  override def toStatusExceptionOrData(statusWithData: Row[R]): FailedOrRow[R] =
-    checkStatus(statusWithData)
+  override def toStatusExceptionOrData(statusWithData: Row[Option[R]]): FailedOrRow[R] =
+    checkStatus(statusWithData.functionStatus).toLeft(
+      statusWithData.data.getOrElse(throw new IllegalStateException("Status is OK but data is missing"))
+    ).map(r => Row(statusWithData.functionStatus, r))
+
 }
