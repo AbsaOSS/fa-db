@@ -21,15 +21,15 @@ import za.co.absa.db.fadb.status.FunctionStatus
 
 /**
  *  `StatusHandling` is a base trait that defines the interface for handling the status of a function invocation.
- *  It provides a method to check the status of a function invocation with data.
+ *  It provides a method to check the status of a function invocation.
  */
 trait StatusHandling {
 
   /**
    *  Checks the status of a function invocation.
-   *  @param statusWithData - The status of the function invocation with data.
-   *  @return Either a `StatusException` if the status code indicates an error, or the data (along with the status
-    *          information so that it's retrievable) if the status code is successful.
+   *  @param functionStatus - The status of the function invocation.
+   *  @return Some with a `StatusException` if the status code indicates an error,
+   *          or None if the status code is successful.
    */
   def checkStatus(functionStatus: FunctionStatus): Option[StatusException]
 }
