@@ -59,12 +59,12 @@ class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[
    *   and Doobie's `Read` wasn't able to work with it.
    *
    *  @param query the Doobie query to execute
-   *  @param readStatusWithDataR the `Read[StatusWithData[R]]` instance used to read the query result into `StatusWithData[R]`
+   *  @param readStatusWithData the `Read[StatusWithData[R]]` instance used to read the query result into `StatusWithData[R]`
    *  @return the query result
    */
   private def executeQueryWithStatus[R](
     query: QueryWithStatusType[R]
-  )(implicit readStatusWithDataR: Read[StatusWithData[R]]): F[Seq[FailedOrRow[R]]] = {
+  )(implicit readStatusWithData: Read[StatusWithData[R]]): F[Seq[FailedOrRow[R]]] = {
       query.fragment.query[StatusWithData[R]].to[Seq].transact(transactor).map(_.map(query.getResultOrException))
   }
 
@@ -84,6 +84,6 @@ class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[
    *  @return the query result
    */
   override def runWithStatus[R](query: QueryWithStatusType[R]): F[Seq[FailedOrRow[R]]] = {
-    executeQueryWithStatus(query)(query.readStatusWithDataR)
+    executeQueryWithStatus(query)(query.readStatusWithData)
   }
 }

@@ -52,7 +52,7 @@ class DoobieOtherTypesIntegrationTests extends AnyFunSuite with DoobieTest {
     extends DoobieSingleResultFunction[Int, OtherTypesData, IO] (values => Seq(fr"$values"))
 
   class InsertOtherTypes(implicit schema: DBSchema, dbEngine: DoobieEngine[IO])
-    extends DoobieSingleResultFunctionWithStatus[OtherTypesData, Option[Int], IO] (
+    extends DoobieSingleResultFunctionWithStatus[OtherTypesData, Int, IO] (
       values => Seq(
         fr"${values.id}",
         fr"${values.ltreeCol}::ltree",

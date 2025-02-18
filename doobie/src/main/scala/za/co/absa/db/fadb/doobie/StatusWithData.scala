@@ -16,12 +16,30 @@
 
 package za.co.absa.db.fadb.doobie
 
+import doobie.Read
+
 /**
- *  Represents a function status with data (basically a row returned from a DB).
- *
- *  Note: data here represent one row that has status-related fields omitted. In some scenarios, it actually might
- *    be missing - i.e. query returns only status information with no data - pretty common scenario when a DB
- *    function returns error, e.g.: (41, 'NoDataFound', NULL). In this case, R must be an Option - to be specified
- *    by a user.
+ * Represents a function status with data (basically a row returned from a DB).
  */
-case class StatusWithData[R](status: Int, statusText: String, data: R)
+case class StatusWithData[R](status: Int, statusText: String, data: Option[R])
+
+object StatusWithData {
+
+  implicit def read[T](implicit r: Read[Option[T]]): Read[StatusWithData[T]] =
+    Read[(Int, String, Option[T])].map {
+      case (status, statusText, data) => StatusWithData(status, statusText, data)
+    }
+
+  // This is for backward compatibility of #133 (which makes the data optional by default when reading from DB),
+  // as some users were overcoming the bug by wrapping the result type in Option themselves.
+  // Doobie provides Read for Option[T] for most of the types out of the box, except when T itself is an Option.
+  implicit def readOptionToReadDoubleOption[T](
+                                                implicit r: Read[StatusWithData[T]]
+                                              ): Read[StatusWithData[Option[T]]] = {
+    r.map {
+      case statusWithData @ StatusWithData(_, _, Some(data)) => statusWithData.copy(data = Some(Some(data)))
+      case statusWithData @ StatusWithData(_, _, None) => statusWithData.copy(data = None)
+    }
+  }
+
+}
