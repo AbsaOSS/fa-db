@@ -18,7 +18,7 @@ import Dependencies._
 import com.github.sbt.jacoco.report.JacocoReportSettings
 
 lazy val scala212 = "2.12.17"
-lazy val scala213 = "2.13.13"
+lazy val scala213 = "2.13.12"
 
 ThisBuild / scalaVersion := scala212
 ThisBuild / crossScalaVersions := Seq(scala212, scala213)
