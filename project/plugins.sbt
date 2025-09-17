@@ -15,7 +15,7 @@
  */
 
 
-addSbtPlugin("com.github.sbt"     % "sbt-ci-release"    % "1.5.12")
+addSbtPlugin("com.github.sbt"     % "sbt-ci-release"    % "1.11.2")
 
 addSbtPlugin("de.heikoseeberger"  % "sbt-header"        % "5.7.0")
 

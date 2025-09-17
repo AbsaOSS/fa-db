@@ -17,7 +17,6 @@
 ThisBuild / organizationHomepage := Some(url("https://www.absa.africa"))
 
 ThisBuild / organization := "za.co.absa.db.fa-db"
-sonatypeProfileName := "za.co.absa"
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
@@ -51,6 +50,18 @@ ThisBuild / developers := List(
     name = "Miroslav Pojer",
     email = "miroslav.pojer@absa.africa",
     url = url("https://github.com/miroslavpojer")
+  ),
+  Developer(
+    id    = "ABLL526",
+    name  = "Liam Leibrandt",
+    email = "liam.leibrandt@absa.africa",
+    url   = url("https://github.com/ABLL526")
+  ),
+  Developer(
+    id = "jakipatryk",
+    name = "Bartlomiej Baj",
+    email = "bartlomiej.baj@absa.africa",
+    url = url("https://github.com/jakipatryk")
   ),
   Developer(
     id = "Zejnilovic",
