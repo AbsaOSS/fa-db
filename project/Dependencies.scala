@@ -19,6 +19,7 @@ import sbt.*
 object Dependencies {
 
   private def commonDependencies(scalaVersion: String): Seq[ModuleID] = Seq(
+    "org.scala-lang"     % "scala-reflect" % scalaVersion,
     "org.typelevel"      %% "cats-core" % "2.9.0",
     "org.typelevel"      %% "cats-effect" % "3.5.0",
     "org.scalatest"      %% "scalatest" % "3.1.0"           % Test,
