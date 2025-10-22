@@ -19,7 +19,7 @@ package za.co.absa.db.fadb.slick
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.time.{Second, Span}
+import org.scalatest.time.{Seconds, Span}
 import slick.jdbc.{GetResult, SQLActionBuilder}
 import za.co.absa.db.fadb.DBSchema
 import za.co.absa.db.fadb.slick.FaDbPostgresProfile.api._
@@ -46,7 +46,7 @@ class SlickSingleResultFunctionWithStatusIntegrationTests extends AnyFunSuite wi
 
   test("Creating actor with status handling") {
     val requestBody = CreateActorRequestBody("Separated", "TestUser")
-    val timeout = Timeout(Span(3.0D, Second))
+    val timeout = Timeout(Span(3.0D, Seconds))
     val result = createActor(requestBody).futureValue(timeout)
     assert(result.isRight)
   }
