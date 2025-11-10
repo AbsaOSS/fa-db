@@ -53,9 +53,6 @@ object Dependencies {
     )
   }
 
-
-
-
   def flywayDependencies: Seq[ModuleID] = {
     val postgresql = "org.postgresql" % "postgresql" % "42.6.0"
 
