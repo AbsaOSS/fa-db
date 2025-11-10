@@ -14,9 +14,37 @@
 # limitations under the License.
 #
 # use glob syntax.
-/.idea
-target
-.bsp
+syntax: glob
+*.ser
+*.class
+*~
+*.bak
+#*.off
+*.old
+# eclipse conf file
+.settings
+.classpath
+.project
+.manager
+.scala_dependencies
+.scalastyle
+
+# idea
 .idea
 *.iml
+
+# vs code
 .vscode
+
+# building
+target
+build
+null
+tmp*
+temp*
+dist
+test-output
+build.log
+.bsp
+/.bloop/
+/.metals/
