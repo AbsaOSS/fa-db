@@ -45,10 +45,10 @@ object Dependencies {
 
   def doobieDependencies(scalaVersion: String): Seq[ModuleID] = {
     commonDependencies(scalaVersion) ++ Seq(
-      "org.tpolecat" %% "doobie-core" % "1.0.0-RC11",
-      "org.tpolecat" %% "doobie-hikari" % "1.0.0-RC11",
-      "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC11",
-      "org.tpolecat" %% "doobie-postgres-circe" % "1.0.0-RC11",
+      "org.tpolecat" %% "doobie-core" % "1.0.0-RC3",
+      "org.tpolecat" %% "doobie-hikari" % "1.0.0-RC3",
+      "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC3",
+      "org.tpolecat" %% "doobie-postgres-circe" % "1.0.0-RC3",
       "io.circe" %% "circe-generic" % "0.14.15" % Test
     )
   }
