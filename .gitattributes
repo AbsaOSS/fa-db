@@ -27,3 +27,10 @@
 # Also if a repo is accessed in Windows via a file share from Linux, the scripts will work too
 *.cmd text eol=crlf
 *.bat text eol=crlf
+
+# Treat certain files as binary
+*.png binary
+*.ttf binary
+*.jar binary
+*.pdf binary
+*.pptx binary

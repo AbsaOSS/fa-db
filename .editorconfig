@@ -26,11 +26,19 @@ indent_size = 4
 indent_style = space
 insert_final_newline = true
 
-[*.{java,scala,js,json,css}]
+[*.{java,scala,js,json,css,ts}]
 indent_size = 2
 indent_style = space
 insert_final_newline = true
 max_line_length = 120
 
 [*.md]
-trim_trailing_whitespace = false
+max_line_length = 120
+insert_final_newline = true
+
+[*.{sql,dd}]
+indent_size = 4
+indent_style = space
+end_of_line = crlf
+insert_final_newline = true
+max_line_length = 120
