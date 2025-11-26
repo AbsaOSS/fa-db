@@ -51,7 +51,7 @@ object ClassFieldNamesExtractor {
    * @tparam T               - type to investigate and extract field names from
    * @return                 - list of field names
    */
-  def extract[T: TypeTag]()(
+  def extract[T: TypeTag](
                            implicit namingConvention: NamingConvention = SnakeCaseNaming.Implicits.namingConvention
                          ): Seq[String] = {
     doExtract[T](namingConvention)

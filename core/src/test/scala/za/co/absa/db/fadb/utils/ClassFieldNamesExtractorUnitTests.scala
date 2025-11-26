@@ -27,7 +27,7 @@ class ClassFieldNamesExtractorUnitTests extends AnyFunSuiteLike {
       "int_field",
       "string_field"
     )
-    val fieldNames = ClassFieldNamesExtractor.extract[TestCaseClass]()
+    val fieldNames = ClassFieldNamesExtractor.extract[TestCaseClass]
     assert(fieldNames == expected)
   }
 
@@ -46,7 +46,7 @@ class ClassFieldNamesExtractorUnitTests extends AnyFunSuiteLike {
       "xfield",
       "yfield"
     )
-    val fieldNames = ClassFieldNamesExtractor.extract[TestClass]()
+    val fieldNames = ClassFieldNamesExtractor.extract[TestClass]
     assert(fieldNames == expected)
   }
 
