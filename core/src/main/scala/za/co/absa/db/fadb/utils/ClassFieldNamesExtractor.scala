@@ -26,28 +26,23 @@ object ClassFieldNamesExtractor {
 
   private def doExtract[T: TypeTag](namingConvention: NamingConvention): Seq[String] = {
     val tpe = typeOf[T]
-    if (tpe.typeSymbol.isClass) {
-      val cl = tpe.typeSymbol.asClass
-      if (cl.isPrimitive) {
-        throw new IllegalArgumentException(s"${tpe.typeSymbol} is a primitive type, extraction is not supported")
-      }
-      if (cl.isTrait) {
-        throw new IllegalArgumentException(s"${tpe.typeSymbol} is a trait, extraction is not supported")
-      }
-      if (cl.isCaseClass || cl.isClass) {
-        tpe
-          .decl(termNames.CONSTRUCTOR)
-          .asMethod
-          .paramLists
-          .flatten
-          .map(_.name.decodedName.toString)
-          .map(namingConvention.stringPerConvention)
-    } else {
-        throw new IllegalArgumentException(s"${tpe.typeSymbol} is not a case class nor a class")
-      }
-    } else {
+    if (!tpe.typeSymbol.isClass) {
       throw new IllegalArgumentException(s"${tpe.typeSymbol} is not a case class nor a class")
     }
+    val cl = tpe.typeSymbol.asClass
+    if (cl.isPrimitive) {
+      throw new IllegalArgumentException(s"${tpe.typeSymbol} is a primitive type, extraction is not supported")
+    }
+    if (cl.isTrait) {
+      throw new IllegalArgumentException(s"${tpe.typeSymbol} is a trait, extraction is not supported")
+    }
+    tpe
+      .decl(termNames.CONSTRUCTOR)
+      .asMethod
+      .paramLists
+      .flatten
+      .map(_.name.decodedName.toString)
+      .map(namingConvention.stringPerConvention)
   }
 
   /**
