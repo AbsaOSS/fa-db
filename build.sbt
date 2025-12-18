@@ -51,7 +51,10 @@ lazy val commonSettings = Seq(
   scalacOptions ++= commonScalacOptions,
   Test / parallelExecution := false,
   (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value, // printScalaVersion is run with compile
-  jacocoExcludes := commonJacocoExcludes
+  jacocoExcludes := commonJacocoExcludes,
+  // to mitigate CVE-2022-31183
+  dependencyOverrides += "co.fs2" %% "fs2-core" % "3.2.11",
+  dependencyOverrides += "co.fs2" %% "fs2-io"   % "3.2.11",
 )
 
 lazy val parent = (project in file("."))
