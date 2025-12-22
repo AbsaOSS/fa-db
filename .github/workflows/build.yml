@@ -45,9 +45,9 @@ jobs:
         scala: [2.12.17, 2.13.12]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
       - name: Setup Scala
-        uses: olafurpg/setup-scala@v14
+        uses: olafurpg/setup-scala@32ffa16635ff8f19cc21ea253a987f0fdf29844c
         with:
           java-version: "adopt@1.8"
       - name: Build and run unit tests

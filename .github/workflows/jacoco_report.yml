@@ -49,21 +49,25 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+
       - name: Setup Scala
-        uses: olafurpg/setup-scala@v14
+        uses: olafurpg/setup-scala@32ffa16635ff8f19cc21ea253a987f0fdf29844c
         with:
           java-version: "adopt@1.8"
+
       - name: Prepare testing database
         run: sbt flywayMigrate
+
       - name: Build and run tests
         continue-on-error: true
         id: jacocorun
         run: sbt ++${{env.scalaLong}} jacoco
+
       - name: Add coverage to PR (core)
         if: steps.jacocorun.outcome == 'success'
         id: jacoco-core
-        uses: madrapps/jacoco-report@v1.6.1
+        uses: madrapps/jacoco-report@50d3aff4548aa991e6753342d9ba291084e63848
         with:
           paths: ${{ github.workspace }}/core/target/scala-${{ env.scalaShort }}/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -71,10 +75,11 @@ jobs:
           min-coverage-changed-files: ${{ env.coverage-changed-files }}
           title: JaCoCo `core` module code coverage report - scala ${{ env.scalaLong }}
           update-comment: true
+
       - name: Add coverage to PR (doobie)
         if: steps.jacocorun.outcome == 'success'
         id: jacoco-doobie
-        uses: madrapps/jacoco-report@v1.6.1
+        uses: madrapps/jacoco-report@50d3aff4548aa991e6753342d9ba291084e63848
         with:
           paths: ${{ github.workspace }}/doobie/target/scala-${{ env.scalaShort }}/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -82,10 +87,11 @@ jobs:
           min-coverage-changed-files: ${{ env.coverage-changed-files }}
           title: JaCoCo `doobie` module code coverage report - scala ${{ env.scalaLong }}
           update-comment: true
+
       - name: Add coverage to PR (slick)
         if: steps.jacocorun.outcome == 'success'
         id: jacoco-slick
-        uses: madrapps/jacoco-report@v1.6.1
+        uses: madrapps/jacoco-report@50d3aff4548aa991e6753342d9ba291084e63848
         with:
           paths: ${{ github.workspace }}/slick/target/scala-${{ env.scalaShort }}/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -93,6 +99,7 @@ jobs:
           min-coverage-changed-files: ${{ env.coverage-changed-files }}
           title: JaCoCo `slick` module code coverage report - scala ${{ env.scalaLong }}
           update-comment: true
+
       - name: Get the Coverage info
         if: steps.jacocorun.outcome == 'success'
         run: |
@@ -102,9 +109,10 @@ jobs:
           echo "Changed Files coverage ${{ steps.jacoco-doobie.outputs.coverage-changed-files }}"
           echo "Total `slick` module coverage ${{ steps.jacoco-slick.outputs.coverage-overall }}"
           echo "Changed Files coverage ${{ steps.jacoco-slick.outputs.coverage-changed-files }}"
+
       - name: Fail PR if changed files coverage is less than ${{ env.coverage-changed-files }}%
         if: steps.jacocorun.outcome == 'success'
-        uses: actions/github-script@v6
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           script: |
             const coverageCheckFailed =
@@ -114,9 +122,10 @@ jobs:
             if (coverageCheckFailed) {
               core.setFailed('Changed files coverage is less than ${{ env.coverage-changed-files }}%!');
             }
+
       - name: Fail PR if overall files coverage is less than ${{ env.coverage-overall }}%
         if: ${{ (steps.jacocorun.outcome == 'success') && (env.check-overall-coverages == 'true') }}
-        uses: actions/github-script@v6
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           script: |
             const coverageCheckFailed =
@@ -126,9 +135,10 @@ jobs:
             if (coverageCheckFailed) {
               core.setFailed('Overall coverage is less than ${{ env.coverage-overall }}%!');
             }
+
       - name: Edit JaCoCo comments on build failure
         if: steps.jacocorun.outcome != 'success'
-        uses: actions/github-script@v6
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           script: |
             const issue_number = context.issue.number;
