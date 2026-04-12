@@ -114,7 +114,7 @@ jobs:
 
       - name: Fail PR if changed files coverage is less than ${{ env.coverage-changed-files }}%
         if: steps.jacocorun.outcome == 'success'
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
         with:
           script: |
             const coverageCheckFailed =
@@ -127,7 +127,7 @@ jobs:
 
       - name: Fail PR if overall files coverage is less than ${{ env.coverage-overall }}%
         if: ${{ (steps.jacocorun.outcome == 'success') && (env.check-overall-coverages == 'true') }}
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
         with:
           script: |
             const coverageCheckFailed =
@@ -140,7 +140,7 @@ jobs:
 
       - name: Edit JaCoCo comments on build failure
         if: steps.jacocorun.outcome != 'success'
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
         with:
           script: |
             const issue_number = context.issue.number;
