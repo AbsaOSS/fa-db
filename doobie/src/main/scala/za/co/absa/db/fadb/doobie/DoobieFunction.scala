@@ -17,13 +17,14 @@
 package za.co.absa.db.fadb.doobie
 
 import cats.MonadError
-import doobie.implicits.toSqlInterpolator
+import doobie.ConnectionIO
+import doobie.implicits._
 import doobie.util.Read
 import doobie.util.fragment.Fragment
 import za.co.absa.db.fadb.DBFunction._
 import za.co.absa.db.fadb.DBSchema
 import za.co.absa.db.fadb.exceptions.StatusException
-import za.co.absa.db.fadb.status.FunctionStatus
+import za.co.absa.db.fadb.status.{FailedOrRow, FunctionStatus}
 
 import scala.language.higherKinds
 
@@ -119,6 +120,19 @@ trait DoobieFunction[I, R, F[_]] extends DoobieFunctionBase[R] {
     meSql(values, selectEntry, functionName, alias)(read, me)
   }
 
+  /**
+   *  Returns the database function call as a `ConnectionIO[Seq[R]]` without executing a transaction.
+   *  This enables composing multiple function calls into a single transaction using for-comprehensions
+   *  over `ConnectionIO`, and then executing them atomically via `DoobieEngine.runConnectionIO`.
+   *
+   *  @param values the input values for the function
+   *  @return the `ConnectionIO[Seq[R]]` representing the database function call
+   */
+  def toConnectionIO(values: I): ConnectionIO[Seq[R]] = {
+    val fragments = toFragmentsSeq(values)
+    composeFragments(fragments).query[R].to[Seq]
+  }
+
 }
 
 trait DoobieFunctionWithStatus[I, R, F[_]] extends DoobieFunctionBase[R] {
@@ -190,6 +204,21 @@ trait DoobieFunctionWithStatus[I, R, F[_]] extends DoobieFunctionBase[R] {
 
   // This is to be mixed in by an implementation of StatusHandling
   def checkStatus(functionStatus: FunctionStatus): Option[StatusException]
+
+  /**
+   *  Returns the database function call as a `ConnectionIO[Seq[FailedOrRow[R]]]` without executing a transaction.
+   *  This enables composing multiple function calls into a single transaction using for-comprehensions
+   *  over `ConnectionIO`, and then executing them atomically via `DoobieEngine.runConnectionIO`.
+   *
+   *  @param values the input values for the function
+   *  @return the `ConnectionIO[Seq[FailedOrRow[R]]]` representing the database function call
+   */
+  def toConnectionIO(values: I): ConnectionIO[Seq[FailedOrRow[R]]] = {
+    val fragments = toFragmentsSeq(values)
+    val fragment = composeFragments(fragments)
+    val queryWithStatus = new DoobieQueryWithStatus[R](fragment, checkStatus)
+    fragment.query[StatusWithData[R]].to[Seq].map(_.map(queryWithStatus.getResultOrException))
+  }
 }
 
 /**
@@ -216,7 +245,18 @@ object DoobieFunction {
     val dbEngine: DoobieEngine[F],
     val readR: Read[R]
   ) extends DBSingleResultFunction[I, R, DoobieEngine[F], F](functionNameOverride)
-      with DoobieFunction[I, R, F]
+      with DoobieFunction[I, R, F] {
+
+    /**
+     *  Returns the database function call as a `ConnectionIO[R]` expecting exactly one result row.
+     *  @param values the input values for the function
+     *  @return the `ConnectionIO[R]` representing the database function call
+     */
+    def toConnectionIOSingle(values: I): ConnectionIO[R] = {
+      val fragments = toFragmentsSeq(values)
+      composeFragments(fragments).query[R].unique
+    }
+  }
 
   /**
     *  `DoobieSingleResultFunctionWithStatus` represents a db function that returns a single result with status.
@@ -238,7 +278,17 @@ object DoobieFunction {
     val readR: Read[R],
     val readStatusWithData: Read[StatusWithData[R]]
   ) extends DBSingleResultFunctionWithStatus[I, R, DoobieEngine[F], F](functionNameOverride)
-      with DoobieFunctionWithStatus[I, R, F]
+      with DoobieFunctionWithStatus[I, R, F] {
+
+    /**
+     *  Returns the database function call as a `ConnectionIO[FailedOrRow[R]]` expecting exactly one result row.
+     *  @param values the input values for the function
+     *  @return the `ConnectionIO[FailedOrRow[R]]` representing the database function call
+     */
+    def toConnectionIOSingle(values: I): ConnectionIO[FailedOrRow[R]] = {
+      toConnectionIO(values).map(_.head)
+    }
+  }
 
   /**
    *  `DoobieMultipleResultFunction` represents a db function that returns multiple results.
@@ -296,7 +346,18 @@ object DoobieFunction {
     val dbEngine: DoobieEngine[F],
     val readR: Read[R]
   ) extends DBOptionalResultFunction[I, R, DoobieEngine[F], F](functionNameOverride)
-      with DoobieFunction[I, R, F]
+      with DoobieFunction[I, R, F] {
+
+    /**
+     *  Returns the database function call as a `ConnectionIO[Option[R]]` expecting zero or one result rows.
+     *  @param values the input values for the function
+     *  @return the `ConnectionIO[Option[R]]` representing the database function call
+     */
+    def toConnectionIOOptional(values: I): ConnectionIO[Option[R]] = {
+      val fragments = toFragmentsSeq(values)
+      composeFragments(fragments).query[R].option
+    }
+  }
 
   /**
     *  `DoobieOptionalResultFunctionWithStatus` represents a db function that returns an optional result.
@@ -310,5 +371,15 @@ object DoobieFunction {
     val readR: Read[R],
     val readStatusWithData: Read[StatusWithData[R]]
   ) extends DBOptionalResultFunctionWithStatus[I, R, DoobieEngine[F], F](functionNameOverride)
-      with DoobieFunctionWithStatus[I, R, F]
+      with DoobieFunctionWithStatus[I, R, F] {
+
+    /**
+     *  Returns the database function call as a `ConnectionIO[Option[FailedOrRow[R]]]` expecting zero or one result rows.
+     *  @param values the input values for the function
+     *  @return the `ConnectionIO[Option[FailedOrRow[R]]]` representing the database function call
+     */
+    def toConnectionIOOptional(values: I): ConnectionIO[Option[FailedOrRow[R]]] = {
+      toConnectionIO(values).map(_.headOption)
+    }
+  }
 }
