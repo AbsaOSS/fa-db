@@ -295,7 +295,10 @@ object DoobieFunction {
      *  @return the `ConnectionIO[FailedOrRow[R]]` representing the database function call
      */
     def toConnectionIOSingle(values: I): ConnectionIO[FailedOrRow[R]] = {
-      toConnectionIO(values).map(_.head)
+      val fragments = toFragmentsSeq(values)
+      val fragment = composeFragments(fragments)
+      val queryWithStatus = new DoobieQueryWithStatus[R](fragment, checkStatus)
+      fragment.query[StatusWithData[R]].unique.map(queryWithStatus.getResultOrException)
     }
   }
 
@@ -390,7 +393,10 @@ object DoobieFunction {
      *  @return the `ConnectionIO[Option[FailedOrRow[R]]]` representing the database function call
      */
     def toConnectionIOOptional(values: I): ConnectionIO[Option[FailedOrRow[R]]] = {
-      toConnectionIO(values).map(_.headOption)
+      val fragments = toFragmentsSeq(values)
+      val fragment = composeFragments(fragments)
+      val queryWithStatus = new DoobieQueryWithStatus[R](fragment, checkStatus)
+      fragment.query[StatusWithData[R]].option.map(_.map(queryWithStatus.getResultOrException))
     }
   }
 }
