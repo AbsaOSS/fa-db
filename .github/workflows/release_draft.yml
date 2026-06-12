@@ -80,8 +80,8 @@ jobs:
             - { title: New Features 🎉, label: enhancement, order: 30 }
             - { title: Bugfixes 🛠, label: bug, order: 40 }
             - { title: Infrastructure ⚙️, label: infrastructure, order: 50 }
-            - { title: Refactoring, label: documentation, order: 60 }
-            - { title: Documentation️, label: documentation, order: 70 }
+            - { title: Refactoring 🔨, label: documentation, order: 60 }
+            - { title: Documentation️ 📖, label: documentation, order: 70 }
             - { title: Core, label: Core, order: 75 }
             - { title: Slick, label: Slick, order: 80 }
             - { title: Ultet, label: Ultet, order: 85 }
