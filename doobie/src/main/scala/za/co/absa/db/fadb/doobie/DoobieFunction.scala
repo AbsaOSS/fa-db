@@ -17,7 +17,7 @@
 package za.co.absa.db.fadb.doobie
 
 import cats.MonadError
-import doobie.ConnectionIO
+import doobie.{ConnectionIO, FC}
 import doobie.implicits._
 import doobie.util.Read
 import doobie.util.fragment.Fragment
@@ -129,8 +129,10 @@ trait DoobieFunction[I, R, F[_]] extends DoobieFunctionBase[R] {
    *  @return the `ConnectionIO[Seq[R]]` representing the database function call
    */
   def toConnectionIO(values: I): ConnectionIO[Seq[R]] = {
-    val fragments = toFragmentsSeq(values)
-    composeFragments(fragments).query[R].to[Seq]
+    val fragments = FC.delay(toFragmentsSeq(values))
+    fragments
+      .flatMap(frs => FC.delay(composeFragments(frs)))
+      .flatMap(fr => fr.query[R].to[Seq])
   }
 
 }
@@ -214,10 +216,15 @@ trait DoobieFunctionWithStatus[I, R, F[_]] extends DoobieFunctionBase[R] {
    *  @return the `ConnectionIO[Seq[FailedOrRow[R]]]` representing the database function call
    */
   def toConnectionIO(values: I): ConnectionIO[Seq[FailedOrRow[R]]] = {
-    val fragments = toFragmentsSeq(values)
-    val fragment = composeFragments(fragments)
-    val queryWithStatus = new DoobieQueryWithStatus[R](fragment, checkStatus)
-    fragment.query[StatusWithData[R]].to[Seq].map(_.map(queryWithStatus.getResultOrException))
+    val fragments = FC.delay(toFragmentsSeq(values))
+    fragments
+      .flatMap(frs => FC.delay(composeFragments(frs)))
+      .flatMap { fr =>
+        FC.delay(new DoobieQueryWithStatus[R](fr, checkStatus))
+      }
+      .flatMap { queryWithStatus =>
+        queryWithStatus.fragment.query[StatusWithData[R]].to[Seq].map(_.map(queryWithStatus.getResultOrException))
+      }
   }
 }
 
@@ -253,8 +260,10 @@ object DoobieFunction {
      *  @return the `ConnectionIO[R]` representing the database function call
      */
     def toConnectionIOSingle(values: I): ConnectionIO[R] = {
-      val fragments = toFragmentsSeq(values)
-      composeFragments(fragments).query[R].unique
+      val fragments = FC.delay(toFragmentsSeq(values))
+      fragments
+        .flatMap(frs => FC.delay(composeFragments(frs)))
+        .flatMap(fr => fr.query[R].unique)
     }
   }
 
@@ -354,8 +363,10 @@ object DoobieFunction {
      *  @return the `ConnectionIO[Option[R]]` representing the database function call
      */
     def toConnectionIOOptional(values: I): ConnectionIO[Option[R]] = {
-      val fragments = toFragmentsSeq(values)
-      composeFragments(fragments).query[R].option
+      val fragments = FC.delay(toFragmentsSeq(values))
+      fragments
+        .flatMap(frs => FC.delay(composeFragments(frs)))
+        .flatMap(fr => fr.query[R].option)
     }
   }
 

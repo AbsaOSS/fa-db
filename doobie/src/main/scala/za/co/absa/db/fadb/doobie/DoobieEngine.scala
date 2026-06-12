@@ -99,3 +99,21 @@ class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[
   def runConnectionIO[R](cio: ConnectionIO[R]): F[R] =
     cio.transact(transactor)
 }
+
+object DoobieEngine {
+
+  /**
+   *  Executes an arbitrary `ConnectionIO` program in a single transaction,
+   *  using an implicit `DoobieEngine` instance.
+   *  Useful in repository classes where the engine is not directly available
+   *  but is in implicit scope.
+   *
+   *  @param cio the `ConnectionIO` program to execute
+   *  @param engine the `DoobieEngine` instance (typically implicit)
+   *  @tparam R the result type of the program
+   *  @tparam F the effect type
+   *  @return the result wrapped in the effect type `F`
+   */
+  def runConnectionIO[R, F[_]: Async](cio: ConnectionIO[R])(implicit engine: DoobieEngine[F]): F[R] =
+    engine.runConnectionIO(cio)
+}
