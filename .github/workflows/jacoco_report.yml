@@ -37,11 +37,11 @@ env:
     - name: faDBDoobie
       paths:
         - '**/doobie/target/**/jacoco-report/jacoco.xml'
-      thresholds: '0*80*0'
+      thresholds: '67*80*0'
     - name: faDBSlick
       paths:
           - '**/slick/target/**/jacoco-report/jacoco.xml'
-      thresholds: '0*80*0'
+      thresholds: '39*80*0'
 
 jobs:
   detect:
