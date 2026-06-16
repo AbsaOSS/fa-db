@@ -26,10 +26,11 @@ alias test=; testOnly *UnitTests
 alias testIT=; testOnly *IntegrationTests
 
 # JaCoCo aliases
-alias jacoco=; jacocoOn; jacocoCore; jacocoDoobie; jacocoOff
+alias jacoco=; jacocoOn; jacocoCore; jacocoDoobie; jacocoSlick; jacocoOff
 
 alias jacocoOn=; set every jacocoPluginEnabled := true
 alias jacocoOff=; set every jacocoPluginEnabled := false
 
-alias jacocoCore=; project faDbCore; clean; testOnly *UnitTests; jacocoReportAll
-alias jacocoDoobie=; project faDBDoobie; clean; testOnly *UnitTests; jacocoReportAll
+alias jacocoCore=; project faDbCore; clean; testOnly *UnitTests *IntegrationTests; jacocoReportAll
+alias jacocoDoobie=; project faDBDoobie; clean; testOnly *UnitTests *IntegrationTests; jacocoReportAll
+alias jacocoSlick=; project faDBSlick; clean; testOnly *UnitTests *IntegrationTests; jacocoReportAll
