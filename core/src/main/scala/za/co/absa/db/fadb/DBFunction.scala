@@ -26,7 +26,7 @@ import za.co.absa.db.fadb.status.{FailedOrRow, FailedOrRows, FunctionStatus}
 import scala.language.higherKinds
 
 /**
- *  `DBFunction` is an abstract class that represents a database function
+ *  `DBFunction` is an abstract class that represents a database function.
  *  @param functionNameOverride - Optional parameter to override the class name if it does not match the database function name.
  *  @param schema - The schema the function belongs to.
  *  @param dBEngine - The database engine that is supposed to execute the function (contains connection to the database).
