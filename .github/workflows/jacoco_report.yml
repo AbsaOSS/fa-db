@@ -33,15 +33,15 @@ env:
     - name: faDbCore
       paths:
         - '**/core/target/**/jacoco-report/jacoco.xml'
-      thresholds: '61*80*0'
+      thresholds: '61*80*60'
     - name: faDBDoobie
       paths:
         - '**/doobie/target/**/jacoco-report/jacoco.xml'
-      thresholds: '67*80*0'
+      thresholds: '67*80*60'
     - name: faDBSlick
       paths:
           - '**/slick/target/**/jacoco-report/jacoco.xml'
-      thresholds: '39*80*0'
+      thresholds: '39*80*60'
 
 jobs:
   detect:
@@ -117,7 +117,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           global-thresholds: '0*80'
-          report-thresholds-default: '0*0*0'
+          report-thresholds-default: '39*80*60'
           skip-unchanged: 'true'
           evaluate-unchanged: 'false'
           report-groups: ${{ env.REPORT_GROUPS }}
