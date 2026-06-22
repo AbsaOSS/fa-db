@@ -19,8 +19,8 @@ docker run --name=movies -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=movies -p 
 sbt flywayMigrate
 
 # kill & remove docker container (optional; only if using dockerized postgres instance)
-docker kill aul_db
-docker rm aul_db
+docker kill movies
+docker rm movies
 ```
 
 ### Using local postgres instance
@@ -34,10 +34,10 @@ sbt flywayMigrate
 
 In case some structures are already present in the database, you can use
 ```zsh
-sbt flywayClean 
+sbt flywayClean
 ```
 to remove them or
 ```zsh
-sbt flywayBaseline 
+sbt flywayBaseline
 ```
 to set the current state as the baseline.

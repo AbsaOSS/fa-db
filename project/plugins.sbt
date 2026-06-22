@@ -19,6 +19,6 @@ addSbtPlugin("com.github.sbt"     % "sbt-ci-release"    % "1.11.2")
 addSbtPlugin("de.heikoseeberger"  % "sbt-header"        % "5.7.0")
 addSbtPlugin("com.thoughtworks.sbt-api-mappings" % "sbt-api-mappings" % "3.0.2")
 addSbtPlugin("io.github.davidmweber" % "flyway-sbt" % "7.4.0")
-addSbtPlugin("io.github.moranaapps" % "jacoco-method-filter-sbt" % "2.1.1")
+addSbtPlugin("io.github.moranaapps" % "jacoco-method-filter-sbt" % "2.2.0")
 
 addDependencyTreePlugin
