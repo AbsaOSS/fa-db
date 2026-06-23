@@ -15,7 +15,6 @@
  */
 
 import Dependencies._
-import com.github.sbt.jacoco.report.JacocoReportSettings
 
 lazy val scala212 = "2.12.17"
 lazy val scala213 = "2.13.12"
@@ -35,23 +34,12 @@ ThisBuild / printScalaVersion := {
   log.info(s"Local maven ${Resolver.mavenLocal}")
 }
 
-lazy val commonJacocoReportSettings: JacocoReportSettings = JacocoReportSettings(
-  formats = Seq(JacocoReportFormats.HTML, JacocoReportFormats.XML)
-)
-
-/**
-  * add `za.co.absa.db.fadb.naming.NamingConvention`  to filter a class
-  * or  `za.co.absa.db.fadb.naming.NamingConvention*` to filter the class and all related objects
-  */
-lazy val commonJacocoExcludes: Seq[String] = Seq(
-)
 
 lazy val commonSettings = Seq(
   javacOptions ++= commonJavacOptions,
   scalacOptions ++= commonScalacOptions,
   Test / parallelExecution := false,
   (Compile / compile) := ((Compile / compile) dependsOn printScalaVersion).value, // printScalaVersion is run with compile
-  jacocoExcludes := commonJacocoExcludes,
   // to mitigate CVE-2022-31183
   dependencyOverrides += "co.fs2" %% "fs2-core" % "3.2.11",
   dependencyOverrides += "co.fs2" %% "fs2-io"   % "3.2.11",
@@ -72,26 +60,26 @@ lazy val faDbCore = (project in file("core"))
   .settings(
     name := "core",
     libraryDependencies ++= coreDependencies(scalaVersion.value),
-    jacocoReportSettings := commonJacocoReportSettings.withTitle(s"fa-db:core Jacoco Report - scala:${scalaVersion.value}"),
   )
+  .enablePlugins(JacocoFilterPlugin)
 
 lazy val faDBSlick = (project in file("slick"))
   .settings(commonSettings: _*)
   .settings(
     name := "slick",
     libraryDependencies ++= slickDependencies(scalaVersion.value),
-    jacocoReportSettings := commonJacocoReportSettings.withTitle(s"fa-db:slick Jacoco Report - scala:${scalaVersion.value}"),
   )
   .dependsOn(faDbCore)
+  .enablePlugins(JacocoFilterPlugin)
 
 lazy val faDBDoobie = (project in file("doobie"))
   .settings(commonSettings: _*)
   .settings(
     name := "doobie",
     libraryDependencies ++= doobieDependencies(scalaVersion.value),
-    jacocoReportSettings := commonJacocoReportSettings.withTitle(s"fa-db:doobie Jacoco Report - scala:${scalaVersion.value}"),
   )
   .dependsOn(faDbCore)
+  .enablePlugins(JacocoFilterPlugin)
 
 lazy val flywaySettings = project
   .enablePlugins(FlywayPlugin)
