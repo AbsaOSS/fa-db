@@ -19,7 +19,7 @@ package za.co.absa.db.fadb.doobie
 import doobie.Read
 
 /**
- * Represents a function status with data (basically a row returned from a DB)
+ * Represents a function status with data (basically a row returned from a DB).
  */
 case class StatusWithData[R](status: Int, statusText: String, data: Option[R])
 
