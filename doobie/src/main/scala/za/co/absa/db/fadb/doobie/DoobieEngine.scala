@@ -86,4 +86,34 @@ class DoobieEngine[F[_]: Async](val transactor: Transactor[F]) extends DBEngine[
   override def runWithStatus[R](query: QueryWithStatusType[R]): F[Seq[FailedOrRow[R]]] = {
     executeQueryWithStatus(query)(query.readStatusWithData)
   }
+
+  /**
+   *  Executes an arbitrary `ConnectionIO` program in a single transaction.
+   *  This enables composing multiple database operations (including multiple fa-db function calls)
+   *  into a single atomic transaction.
+   *
+   *  @param cio the `ConnectionIO` program to execute
+   *  @tparam R the result type of the program
+   *  @return the result wrapped in the effect type `F`
+   */
+  def runConnectionIO[R](cio: ConnectionIO[R]): F[R] =
+    cio.transact(transactor)
+}
+
+object DoobieEngine {
+
+  /**
+   *  Executes an arbitrary `ConnectionIO` program in a single transaction,
+   *  using an implicit `DoobieEngine` instance.
+   *  Useful in repository classes where the engine is not directly available
+   *  but is in implicit scope.
+   *
+   *  @param cio the `ConnectionIO` program to execute
+   *  @param engine the `DoobieEngine` instance (typically implicit)
+   *  @tparam R the result type of the program
+   *  @tparam F the effect type
+   *  @return the result wrapped in the effect type `F`
+   */
+  def runConnectionIO[R, F[_]: Async](cio: ConnectionIO[R])(implicit engine: DoobieEngine[F]): F[R] =
+    engine.runConnectionIO(cio)
 }
